@@ -16,11 +16,19 @@
 scripts/link-in-progress.sh
 ```
 
-`skills/in-progress/`의 스킬마다 `~/.claude/skills/<스킬 이름>`에 심볼릭 링크를 건다. 저장소에서 고치면 다음 세션부터 바로 반영되고, 플러그인처럼 버전을 올릴 필요가 없다. 새 스킬을 추가했으면 다시 실행한다.
+`skills/in-progress/`의 스킬마다 `~/.claude/skills/<스킬 이름>`에 심볼릭 링크를 건다. 모든 프로젝트에서 쓸 수 있다. 저장소에서 고치면 다음 세션부터 바로 반영되고, 플러그인처럼 버전을 올릴 필요가 없다. 새 스킬을 추가했으면 다시 실행한다.
+
+특정 프로젝트에서만 쓰려면 그 프로젝트 폴더에서 `--project`로 실행한다.
+
+```bash
+cd <프로젝트>
+<dev-gongbang 경로>/scripts/link-in-progress.sh --project
+```
+
+현재 디렉터리의 `.claude/skills/`에 링크를 건다. 링크는 내 컴퓨터의 절대 경로를 가리키므로, 현재 디렉터리가 git 저장소 안이면 링크 경로를 그 저장소의 `.git/info/exclude`에 추가해 커밋되지 않게 한다. `.gitignore`는 건드리지 않는다.
 
 - 호출 이름에 `gongbang:` 접두사가 붙지 않는다. `/set-brief`처럼 부른다.
 - 같은 이름의 폴더가 이미 있고 링크가 아니면 덮어쓰지 않고 건너뛴다.
-- 다른 위치에 걸려면 `CLAUDE_SKILLS_DIR`를 지정한다. 예: 프로젝트 전용이면 `CLAUDE_SKILLS_DIR=<프로젝트>/.claude/skills scripts/link-in-progress.sh`
 
 ### 해제
 
@@ -28,4 +36,4 @@ scripts/link-in-progress.sh
 scripts/link-in-progress.sh --remove
 ```
 
-이 저장소를 가리키는 링크만 지운다. 스킬을 승격 버킷으로 옮기기 전에 실행한다. 옮긴 뒤에 실행하면 링크가 깨진 채 남으므로 `~/.claude/skills/`에서 직접 지운다.
+이 저장소를 가리키는 링크만 지운다. project 범위로 설치했으면 같은 폴더에서 `--project --remove`로 실행한다. `.git/info/exclude`에 넣은 줄은 남지만 영향은 없다. 스킬을 승격 버킷으로 옮기기 전에 실행한다. 옮긴 뒤에 실행하면 링크가 깨진 채 남으므로 `~/.claude/skills/`에서 직접 지운다.
