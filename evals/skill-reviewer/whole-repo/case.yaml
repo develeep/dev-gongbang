@@ -1,0 +1,31 @@
+schema_version: "1.1"
+name: whole-repo
+description: 인자 없이 실행하면 저장소의 모든 스킬을 검사하고 스킬별로 보고하는지
+tags: [repo]
+execution:
+  prompt: /skill-reviewer
+  max_turns: 20
+  allowed_tools: [Read, Glob, Grep, Bash, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  - name: runs-script
+    type: tool_used
+    tool: Bash
+    input_match: 'validate\.py'
+  - name: per-skill-report
+    type: llm
+    criteria: |
+      PASS: good와 typo 두 스킬을 각각 자기 절로 나눠 보고하고, typo는 실패로 표시한다.
+      FAIL: 한 스킬만 보고하거나 스킬별로 나누지 않는다.
+  - name: catches-typo-key
+    type: llm
+    criteria: |
+      PASS: typo의 `disable-model-invokation`을 알 수 없는 키(E6)로 지적하고, 이 때문에 사실상 Model-invoked인데 README의 User-invoked 절에 있다는 불일치(E12)와 없는 링크 rules.md(E8)도 보고한다.
+      FAIL: 셋 중 하나라도 빠진다.
+  - name: no-edit
+    type: tool_used
+    arm: both
+    tool: Edit
+    min: 0
+    max: 0

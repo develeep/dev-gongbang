@@ -1,0 +1,32 @@
+schema_version: "1.1"
+name: named-skill
+description: 스킬 이름을 주면 그 스킬만 검사하고 판단 항목에 원문 인용을 붙이는지
+tags: [named]
+execution:
+  prompt: /skill-reviewer typo
+  max_turns: 20
+  allowed_tools: [Read, Glob, Grep, Bash, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  - name: only-target
+    type: llm
+    criteria: |
+      PASS: typo 스킬만 보고하고 good 스킬의 결과 절은 없다.
+      FAIL: good 스킬도 검사 결과로 보고한다.
+  - name: judgement-with-quote
+    type: llm
+    criteria: |
+      PASS: 판단 미흡 항목마다 L 번호와 원문 인용(파일:줄 포함)이 붙어 있다. 판단 미흡이 없다면 그렇게 명시한다.
+      FAIL: 인용 없이 판단 미흡을 단정한다.
+  - name: plan-then-ask
+    type: llm
+    criteria: |
+      PASS: 오류부터 시작하는 번호 붙은 수정 계획이 있고, 항목마다 해결되는 규칙 ID를 적으며, 끝에 어느 항목부터 고칠지 묻는다.
+      FAIL: 수정 계획이 없거나, 묻지 않고 고치겠다고 하거나, 실제로 파일을 고친다.
+  - name: no-write
+    type: tool_used
+    arm: both
+    tool: Write
+    min: 0
+    max: 0
