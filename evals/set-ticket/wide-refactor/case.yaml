@@ -1,0 +1,27 @@
+schema_version: "1.1"
+name: wide-refactor
+description: 호출부가 넓게 퍼진 이름 변경을 expand-migrate-contract 순서와 막힘 관계로 나누는지
+tags: [breakdown, refactor]
+execution:
+  prompt: /set-ticket docs/context/2026-10-18-rename-user-id.md
+  max_turns: 20
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  - name: expand-migrate-contract
+    type: llm
+    criteria: |
+      PASS: 새 필드를 옛 필드 옆에 추가하는 티켓, 패키지 단위로 호출부를 옮기는 티켓 여러 개, 옛 필드를 지우는 티켓이 이 순서로 있다.
+      FAIL: 한 번에 이름을 바꾸는 티켓 하나로 두거나, 옛 필드를 먼저 지운다.
+  - name: blocking-edges
+    type: llm
+    criteria: |
+      PASS: 호출부 이전 티켓들이 모두 추가 티켓에 막히고, 삭제 티켓이 모든 이전 티켓에 막힌다.
+      FAIL: 막힘 관계가 빠지거나 이 구조와 다르다.
+  - name: no-write
+    type: tool_used
+    arm: both
+    tool: Write
+    min: 0
+    max: 0

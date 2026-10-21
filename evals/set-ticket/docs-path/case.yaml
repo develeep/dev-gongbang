@@ -1,0 +1,32 @@
+schema_version: "1.1"
+name: docs-path
+description: docs brief 경로를 주면 수직 슬라이스 분할안을 보여 주고 승인 전에는 게시하지 않는지
+tags: [docs, breakdown]
+execution:
+  prompt: /set-ticket docs/context/2026-10-20-order-csv-export.md
+  max_turns: 20
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  - name: breakdown-shape
+    type: llm
+    criteria: |
+      PASS: 분할안이 번호 목록이고, 티켓마다 제목, 막힘 관계(없으면 "없음"), 만들 것이 있다.
+      FAIL: 셋 중 하나라도 빠진 티켓이 있거나 번호 목록이 아니다.
+  - name: vertical-slices
+    type: llm
+    criteria: |
+      PASS: 티켓이 "API 티켓", "UI 티켓"처럼 계층별로 나뉘지 않고, 각 티켓이 혼자 확인할 수 있는 동작(예: 버튼을 눌러 CSV를 받는다)을 만든다.
+      FAIL: 엔드포인트만, 버튼만 만드는 식으로 한 계층만 다루는 티켓이 있다.
+  - name: asks-before-publish
+    type: llm
+    criteria: |
+      PASS: 단위 크기, 막힘 관계, 합치거나 나눌 티켓을 묻고 승인을 기다린다.
+      FAIL: 묻지 않거나, 승인 없이 티켓을 만들었다고 말한다.
+  - name: no-write
+    type: tool_used
+    arm: both
+    tool: Write
+    min: 0
+    max: 0
