@@ -18,6 +18,12 @@ scripts/link-in-progress.sh
 
 `skills/in-progress/`의 스킬마다 `~/.claude/skills/<스킬 이름>`에 심볼릭 링크를 건다. 모든 프로젝트에서 쓸 수 있다. 저장소에서 고치면 다음 세션부터 바로 반영되고, 플러그인처럼 버전을 올릴 필요가 없다. 새 스킬을 추가했으면 다시 실행한다.
 
+일부 스킬만 설치하려면 스킬 이름을 뒤에 적는다. 이름을 적지 않으면 전부 설치한다. `skills/in-progress/set-brief/`처럼 경로로 적어도 된다.
+
+```bash
+scripts/link-in-progress.sh set-brief set-ticket
+```
+
 특정 프로젝트에서만 쓰려면 그 프로젝트 폴더에서 `--project`로 실행한다.
 
 ```bash
@@ -36,4 +42,4 @@ cd <프로젝트>
 scripts/link-in-progress.sh --remove
 ```
 
-이 저장소를 가리키는 링크만 지운다. project 범위로 설치했으면 같은 폴더에서 `--project --remove`로 실행한다. `.git/info/exclude`에 넣은 줄은 남지만 영향은 없다. 스킬을 승격 버킷으로 옮기기 전에 실행한다. 옮긴 뒤에 실행하면 링크가 깨진 채 남으므로 `~/.claude/skills/`에서 직접 지운다.
+이 저장소를 가리키는 링크만 지운다. 스킬 이름을 적으면 그 스킬만 지운다. project 범위로 설치했으면 같은 폴더에서 `--project --remove`로 실행한다. `.git/info/exclude`에 넣은 줄은 남지만 영향은 없다. 스킬을 승격 버킷으로 옮기기 전에 실행한다. 옮긴 뒤에 실행하면 링크가 깨진 채 남으므로 `~/.claude/skills/`에서 직접 지운다.

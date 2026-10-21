@@ -17,7 +17,7 @@
 3. 승격 버킷이면 `.claude-plugin/plugin.json`의 `skills` 배열과 최상위 `README.md`에도 넣는다. `in-progress/`는 둘 다 넣지 않는다.
 4. 사용자에게 배포할 변경이면 `plugin.json`의 `version`을 올린다. 설치된 플러그인은 버전이 바뀔 때만 갱신된다. 버전은 `plugin.json`에만 둔다.
 5. `scripts/check.py`를 실행해 통과시킨다.
-6. `in-progress/`에서 승격할 때는 옮기기 전에 `scripts/link-in-progress.sh --remove`(project 범위면 `--project --remove`)로 로컬 링크를 지운다.
+6. `in-progress/`에서 승격할 때는 옮기기 전에 `scripts/link-in-progress.sh --remove <스킬 이름>`(project 범위면 `--project --remove <스킬 이름>`)으로 그 스킬의 로컬 링크를 지운다.
 
 ## 호출 방식
 
