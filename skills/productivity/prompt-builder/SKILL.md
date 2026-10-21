@@ -12,7 +12,7 @@ disable-model-invocation: true
 ## 핵심 규칙
 
 1. **내용은 사용자에게 받은 값으로만 채운다.** 역할, 목표, 도메인 지식, 규칙, 예시, 출력 형식, 톤을 추측하거나 지어내지 않는다. 답을 받지 못한 항목은 질문하고, 사용자가 "생략"을 고르면 뺀다.
-2. **모호하거나 결정이 필요한 것은 질문한다.** 해석에 따라 결과물이 달라지면 결정 사항이다. 답이 모호하면("간결하게", "알아서") 되묻는다. "알아서"라고 하면 구체적인 후보 2~3개를 보여 주고 고르게 한다. 빠른 모드의 기본값 표는 사용자가 보고 승인하는 절차이므로 조용히 고르는 것이 아니다. 기본값은 형식 항목에만 두고, 내용 항목(역할, 배경, 규칙, 예시)에는 두지 않는다.
+2. **모호하거나 결정이 필요한 것은 질문한다.** 해석에 따라 결과물이 달라지면 결정 사항이다. 답이 모호하면("간결하게", "알아서") 되묻는다. 빠른 모드의 기본값 표는 사용자가 보고 승인하는 절차이므로 조용히 고르는 것이 아니다. 기본값은 형식 항목에만 두고, 내용 항목(역할, 배경, 규칙, 예시)에는 두지 않는다.
 3. **스킬이 제공하는 것은 형식이다.** 형식이란 XML 태그 구조, 배치 순서, best practice 문구 패턴을 말한다. 모델 가이드의 스니펫과 공통 원칙 G·H 항목은 연결된 질문에 사용자가 해당된다고 답했을 때만 넣는다.
 4. **완성 프롬프트는 B2(프롬프트 언어) 답의 언어로 쓴다.** 태그 이름, 코드, API 식별자는 영문 그대로 둔다. 인터뷰와 설명은 사용자의 언어로 한다.
 5. **결과물은 기본적으로 채팅의 코드블록으로 전달한다.** SKILL.md에 번들 파일이 있거나 사용자가 저장을 요청하면, 경로를 확인받은 뒤에만 파일로 저장한다. 형식은 [reference/output-format.md](reference/output-format.md)를 따른다.
@@ -44,7 +44,7 @@ disable-model-invocation: true
 
 ### 2. 기본 설정
 
-[reference/interview.md](reference/interview.md)의 "0라운드"를 진행한다. 종류, B1 대상 모델, B2 프롬프트 언어, B3 진행 방식을 한 라운드에 묻는다. 요청이나 초안에서 이미 분명한 항목은 묻지 않고 "확인됨"으로 되짚는다. 예를 들어 "Haiku 4.5에서 돌릴"이라고 했으면 대상 모델은 묻지 않는다.
+[reference/interview.md](reference/interview.md)의 "0라운드"를 진행한다. 종류, B1 대상 모델, B2 프롬프트 언어, B3 진행 방식을 한 라운드에 묻는다.
 
 종류는 다음 넷이다.
 
@@ -114,4 +114,3 @@ B1(또는 K7)에서 고른 대상 모델로 아래 표를 위에서부터 맞춰
 - framing-problems 스킬: C16=예일 때 완성 프롬프트가 실행 시 호출하는 구체화 절차
 - [reference/output-format.md](reference/output-format.md): 최종 응답 구조와 파일 저장 조건
 - [reference/skill-authoring.md](reference/skill-authoring.md): CLAUDE.md와 SKILL.md 작성 규칙
-- 모델별 가이드: [opus-5-5](reference/models/opus-5-5.md), [opus-5](reference/models/opus-5.md), [sonnet-5-5](reference/models/sonnet-5-5.md), [sonnet-5](reference/models/sonnet-5.md), [fable-5-1](reference/models/fable-5-1.md), [haiku-4-5](reference/models/haiku-4-5.md)
