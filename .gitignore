@@ -1,0 +1,8 @@
+# claude plugin eval 실행 결과. 실행할 때마다 새로 생긴다
+evals/**/results/
+evals-trigger/**/results/
+
+# 개인 로컬 설정
+.claude/settings.local.json
+
+.DS_Store
