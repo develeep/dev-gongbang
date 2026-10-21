@@ -17,8 +17,8 @@ graders:
   - name: blocking-edges
     type: llm
     criteria: |
-      PASS: 호출부 이전 티켓들이 모두 추가 티켓에 막히고, 삭제 티켓이 모든 이전 티켓에 막힌다.
-      FAIL: 막힘 관계가 빠지거나 이 구조와 다르다.
+      PASS: 패키지별 호출부를 옮기는 티켓마다 "막힘 관계"에 account_id를 추가하는 티켓의 번호가 있고, user_id를 지우는 티켓의 "막힘 관계"에 호출부를 옮기는 티켓 번호가 모두 있다.
+      FAIL: 호출부를 옮기는 티켓 중 추가 티켓에 막히지 않는 것이 있거나, 지우는 티켓의 막힘 관계에 빠진 이전 티켓이 있다.
   - name: no-write
     type: tool_used
     arm: both
