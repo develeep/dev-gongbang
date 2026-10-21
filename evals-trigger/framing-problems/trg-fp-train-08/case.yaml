@@ -1,0 +1,15 @@
+schema_version: "1.1"
+name: trg-fp-train-08
+description: "트리거하면 안 됨 (near-miss) / train"
+tags: [trigger, train, negative]
+execution:
+  prompt: "docs/prd-checkout.md 읽고 빠진 요구사항 있는지 리뷰해줘"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?framing-problems"'
+    min: 0
+    max: 0

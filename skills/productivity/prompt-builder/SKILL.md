@@ -1,0 +1,117 @@
+---
+name: prompt-builder
+description: Claude 공식 best practice와 모델별 가이드에 맞춰 시스템·에이전트 프롬프트, CLAUDE.md, SKILL.md를 인터뷰로 설계하거나 기존 초안을 고치고 리뷰한다.
+argument-hint: "[초안 경로 또는 만들 프롬프트 설명]"
+disable-model-invocation: true
+---
+
+# Prompt Builder
+
+사용자와 인터뷰해 받은 값으로 프롬프트를 조립한다. 구조와 문구 패턴은 공식 best practice를 따르고, 대상 모델에 맞춘 조정을 더한다.
+
+## 핵심 규칙
+
+1. **내용은 사용자에게 받은 값으로만 채운다.** 역할, 목표, 도메인 지식, 규칙, 예시, 출력 형식, 톤을 추측하거나 지어내지 않는다. 답을 받지 못한 항목은 질문하고, 사용자가 "생략"을 고르면 뺀다.
+2. **모호하거나 결정이 필요한 것은 질문한다.** 해석에 따라 결과물이 달라지면 결정 사항이다. 답이 모호하면("간결하게", "알아서") 되묻는다. "알아서"라고 하면 구체적인 후보 2~3개를 보여 주고 고르게 한다. 빠른 모드의 기본값 표는 사용자가 보고 승인하는 절차이므로 조용히 고르는 것이 아니다. 기본값은 형식 항목에만 두고, 내용 항목(역할, 배경, 규칙, 예시)에는 두지 않는다.
+3. **스킬이 제공하는 것은 형식이다.** 형식이란 XML 태그 구조, 배치 순서, best practice 문구 패턴을 말한다. 모델 가이드의 스니펫과 공통 원칙 G·H 항목은 연결된 질문에 사용자가 해당된다고 답했을 때만 넣는다.
+4. **완성 프롬프트는 B2(프롬프트 언어) 답의 언어로 쓴다.** 태그 이름, 코드, API 식별자는 영문 그대로 둔다. 인터뷰와 설명은 사용자의 언어로 한다.
+5. **결과물은 기본적으로 채팅의 코드블록으로 전달한다.** SKILL.md에 번들 파일이 있거나 사용자가 저장을 요청하면, 경로를 확인받은 뒤에만 파일로 저장한다. 형식은 [reference/output-format.md](reference/output-format.md)를 따른다.
+
+## 주의할 점
+
+- **받은 값을 문장으로 풀 때 도메인 지식이 섞이기 쉽다.** 예: 계약서 비교 프롬프트에 "조항이 없는 것도 위험으로 본다" 같은 판단 기준이나 "지체상금, 손해배상액의 예정" 같은 조항 동의어 목록을 넣는 것. 사용자가 주지 않은 내용이므로 넣지 않는다. 필요해 보이면 질문하거나, 출력의 "다음 단계"에 넣을 만한 항목으로 제안한다.
+
+## 워크플로
+
+아래 체크리스트를 첫 응답에 한 번 보여 주고, 이후에는 단계가 바뀔 때만 갱신한다.
+
+```
+진행 상황:
+- [ ] 1. 세션 모델 감지
+- [ ] 2. 기본 설정 (종류, 대상 모델, 언어, 진행 방식)
+- [ ] 3. 모델 가이드 로드 및 확인일 점검
+- [ ] 4. 초안 분석 (있을 때)
+- [ ] 5. 구성 요소 인터뷰
+- [ ] 6. 모델 특화 결정 질문
+- [ ] 7. 조립
+- [ ] 8. 자체 검수
+- [ ] 9. 출력
+```
+
+### 1. 세션 모델 감지
+
+시스템 프롬프트나 환경 정보에 적힌 자신의 모델 ID(예: "The exact model ID is claude-opus-5-5")를 확인한다. 이 값은 2단계 대상 모델 질문의 첫 선택지가 된다. 첫 응답에 한 줄로 알린다. 예: `감지된 세션 모델: claude-opus-5-5`.
+
+### 2. 기본 설정
+
+[reference/interview.md](reference/interview.md)의 "0라운드"를 진행한다. 종류, B1 대상 모델, B2 프롬프트 언어, B3 진행 방식을 한 라운드에 묻는다. 요청이나 초안에서 이미 분명한 항목은 묻지 않고 "확인됨"으로 되짚는다. 예를 들어 "Haiku 4.5에서 돌릴"이라고 했으면 대상 모델은 묻지 않는다.
+
+종류는 다음 넷이다.
+
+- **API 시스템 프롬프트**: 챗봇이나 서비스에 들어가는 system 프롬프트
+- **에이전트/하네스 프롬프트**: 도구를 쓰는 에이전트나 장시간 자율 실행용 프롬프트
+- **단발 작업 프롬프트**: 분석, 문서 작성 같은 1회성 user 메시지
+- **CLAUDE.md / SKILL.md 본문**: 이 종류는 [reference/skill-authoring.md](reference/skill-authoring.md)도 함께 읽는다. B1 대신 K7(사용 모델, 다중 선택)을 묻는다.
+
+### 3. 모델 가이드 로드
+
+B1(또는 K7)에서 고른 대상 모델로 아래 표를 위에서부터 맞춰 보고, 처음 일치하는 줄을 쓴다. `[1m]`이나 날짜 같은 접미사는 무시한다.
+
+| 모델 ID 패턴 | 로드할 가이드 |
+|---|---|
+| `claude-opus-5-5*` | [reference/models/opus-5-5.md](reference/models/opus-5-5.md) |
+| `claude-opus-5*` | [reference/models/opus-5.md](reference/models/opus-5.md) |
+| `claude-sonnet-5-5*` | [reference/models/sonnet-5-5.md](reference/models/sonnet-5-5.md) |
+| `claude-sonnet-5*` | [reference/models/sonnet-5.md](reference/models/sonnet-5.md) |
+| `claude-fable-5-1*`, `claude-mythos-5-1*` | [reference/models/fable-5-1.md](reference/models/fable-5-1.md) |
+| `claude-haiku-4-5*` | [reference/models/haiku-4-5.md](reference/models/haiku-4-5.md) |
+| 그 외 또는 확인 불가 | 모델 가이드 없이 공통 원칙만 적용 |
+
+결과를 한 줄로 알린다. 예: `대상 모델: claude-sonnet-5-5 → Sonnet 5.5 가이드 적용`. 표에 없는 모델이면 "모델 특화 없이 공통 best practice만 적용합니다"라고 알린다. 공통 원칙 D·F의 prefill과 사고 설정 내용은 모델 세대에 따라 다르므로, 해당 모델에서 맞는지 확인할 수 없으면 실행 설정 권고에서 그 부분을 빼고 그렇다고 알린다.
+
+**확인일 점검**: 가이드 맨 위의 `확인일`이 오늘보다 90일 이상 이전이고 WebFetch를 쓸 수 있으면, 출처 문서와 가이드의 "특성 요약", "실행 설정 권고"를 대조한다. 대조할 항목은 기본 effort, 사고 설정, 베타 헤더, 400 오류 조건이다. 다르면 출처를 따르고 차이를 사용자에게 한 줄로 알린다. 대조하지 못했으면 설계 요약에 가이드 확인일을 적는다.
+
+### 4. 초안 분석
+
+요청에 프롬프트 초안(본문 붙여넣기, 파일 경로, 첨부)이 있으면:
+
+1. 초안을 끝까지 읽고 [reference/interview.md](reference/interview.md)의 구성 요소 카탈로그에 대응시킨다.
+2. `항목 | 초안에서 추출한 값 | 상태(확인됨/모호/없음)` 표를 보여 주고 추출 결과가 맞는지 확인받는다.
+3. 이후 인터뷰에서는 **모호**와 **없음** 항목만 질문한다.
+4. 모델 가이드의 "제거 검토" 목록에 해당하는 문구가 초안에 있으면 목록으로 보여 주고, 하나씩 제거할지 묻는다.
+
+초안이 없으면 5단계로 넘어간다.
+
+### 5. 구성 요소 인터뷰
+
+[reference/interview.md](reference/interview.md)에서 종류별 라운드 순서와 B3 진행 방식(빠른 모드 / 상세 인터뷰)에 맞는 절차를 확인하고 그대로 진행한다.
+
+- **선택형 항목**: AskUserQuestion으로 묻는다. 한 라운드에 최대 4문항, 문항마다 선택지 2~4개를 둔다. 선택지는 형식의 후보이지 내용을 지어낸 것이 아니어야 한다. best practice가 뒷받침하는 선택지만 맨 앞에 두고 "(권장)"을 붙인다.
+- **서술형 항목**(배경, 도메인 규칙, 예시, 역할 상세 등): 번호를 붙인 텍스트 질문으로 한 메시지에 모아서 묻고 답을 기다린다.
+- AskUserQuestion 도구가 없는 환경(claude.ai 등)에서는 모든 질문을 번호 목록 텍스트로 묻는다. 선택형 항목은 선택지를 (a)(b)(c)로 표기한다.
+- 라운드마다 받은 답을 짧게 되짚어 보고 다음 라운드로 넘어간다.
+
+### 6. 모델 특화 결정 질문
+
+로드한 모델 가이드의 "결정 질문" 중 조건이 현재 답에 맞는 것만 묻는다. 답에 따라 "프롬프트 반영" 스니펫과 "실행 설정 권고"를 고른다. 빠른 모드에서도 조건이 맞는 결정 질문은 묻는다. 5개 이상이면 스니펫을 넣을지 정하는 질문 4개를 먼저 묻고, 나머지는 기본값 표에 "미적용"으로 올려 승인받는다.
+
+### 7. 조립
+
+[reference/principles.md](reference/principles.md)의 조립 골격과 원칙에 따라 받은 값을 배치한다. 모델 가이드의 스니펫은 의미를 유지한 채 받은 값과 문맥에 맞게 B2 언어로 쓴다. 모델 가이드 스니펫과 공통 원칙 G 항목이 같은 행동을 다루면 모델 가이드 쪽만 넣는다. 조립 중에 빈 곳이 드러나면 채워 넣지 말고 5단계로 돌아가 질문한다.
+
+### 8. 자체 검수
+
+[reference/principles.md](reference/principles.md)의 공통 검수 목록과 모델 가이드의 검수 항목으로 점검한다. 필요한 정보가 없어서 통과하지 못한 항목은 질문으로 해결한다.
+
+### 9. 출력
+
+[reference/output-format.md](reference/output-format.md)의 응답 구조로 전달한다.
+
+## 참조 파일
+
+- [reference/principles.md](reference/principles.md): 모든 모델에 공통인 원칙, 조립 골격, 검수 목록
+- [reference/interview.md](reference/interview.md): 기본 설정, 구성 요소 카탈로그, 종류별 라운드, 빠른 모드
+- framing-problems 스킬: C16=예일 때 완성 프롬프트가 실행 시 호출하는 구체화 절차
+- [reference/output-format.md](reference/output-format.md): 최종 응답 구조와 파일 저장 조건
+- [reference/skill-authoring.md](reference/skill-authoring.md): CLAUDE.md와 SKILL.md 작성 규칙
+- 모델별 가이드: [opus-5-5](reference/models/opus-5-5.md), [opus-5](reference/models/opus-5.md), [sonnet-5-5](reference/models/sonnet-5-5.md), [sonnet-5](reference/models/sonnet-5.md), [fable-5-1](reference/models/fable-5-1.md), [haiku-4-5](reference/models/haiku-4-5.md)

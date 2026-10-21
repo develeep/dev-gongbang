@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: trg-fp-train-02
+description: "트리거해야 함 / train"
+tags: [trigger, train, positive]
+execution:
+  prompt: "원인부터 보자.. 빌드 시간이 지난주부터 갑자기 두배 됐어 ㅠ"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?framing-problems"'

@@ -1,0 +1,33 @@
+schema_version: "1.1"
+name: quick-contracts-final
+description: "단발 작업 최종 프롬프트에서 긴 자료를 위, 지시를 끝에 두는지"
+tags: [quick, oneshot, full]
+execution:
+  prompt: |
+    /prompt-builder 계약서 30개를 비교 분석하는 프롬프트 만들어줘. 답은 아래와 같아.
+    - 목적: 공급 계약서 30개의 위약금·해지 조항을 비교해 불리한 계약을 찾는다. 성공 = 계약별 위험도 표.
+    - 독자: 법무팀 변호사
+    - 배경: 우리 회사는 구매자 측이다
+    - 자료: 계약서 30개, 각 10~20쪽, {{CONTRACTS}} 변수로 넣는다
+    - 재사용: 한 번 쓰고 끝
+    - 산출물: 분석 문서, 출력 형식: 마크다운 표
+    - 실행 시 구체화(C16): 아니오
+    대상 모델은 세션 모델, 프롬프트 언어는 한국어, 빠른 모드로 하고, 기본값 표는 모두 승인한다. 모델 특화 결정 질문은 모두 '추가하지 않음 / 아니오'로 답한다. 더 묻지 말고 바로 최종 결과를 내줘.
+  max_turns: 20
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: docs-on-top
+    type: llm
+    criteria: |
+      PASS: 완성 프롬프트에서 계약서 자료(<documents> 또는 {{CONTRACTS}})가 위쪽에 있고 질문·최종 지시가 끝에 있다.
+      FAIL: 자료가 지시 뒤에 있거나 지시가 맨 끝에 없다.
+  - name: next-steps-defaults
+    type: llm
+    criteria: |
+      PASS: 다음 단계에서 기본값으로 처리한 항목 중 품질에 영향을 줄 수 있는 것을 한 줄씩 알린다.
+      FAIL: 기본값 처리 항목을 알리지 않는다.
+  - name: no-fabrication
+    type: llm
+    criteria: |
+      PASS: 사용자가 주지 않은 도메인 내용(위험 판단 기준, 법률 사실, 예시)을 프롬프트에 넣지 않는다. 표 칸, 위험도 척도, 정렬, 인용 단계 같은 형식 선택은 허용하되, 그 경우 다음 단계에서 기본값으로 정했다고 밝혀야 한다.
+      FAIL: 받지 않은 위험 판단 기준이나 도메인 사실을 넣거나, 스스로 정한 형식을 밝히지 않는다.

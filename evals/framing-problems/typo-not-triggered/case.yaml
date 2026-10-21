@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: typo-not-triggered
+description: 단순 수정 요청에서는 스킬을 실행하지 않고 바로 고치는지
+tags: [negative]
+execution:
+  prompt: README 4번째 줄 오타 고쳐줘
+  max_turns: 8
+  allowed_tools: [Read, Edit, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  - name: skill-not-fired
+    type: tool_used
+    arm: both
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?framing-problems"'
+    min: 0
+    max: 0
+  - name: typo-fixed
+    type: regex
+    arm: both
+    target: {source: file, path: README.md}
+    pattern: '상세 정보'
+    match: contains

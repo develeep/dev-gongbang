@@ -1,0 +1,36 @@
+schema_version: "1.1"
+name: unattended-agent
+description: "무인 마이그레이션 에이전트에서 확인 규칙·C16 생략·실행 설정 권고를 지키는지"
+tags: [agent, full]
+execution:
+  prompt: |
+    /prompt-builder 밤새 무인으로 레포 마이그레이션 돌릴 에이전트 프롬프트 만들어줘. 인터뷰 답은 아래와 같아.
+    - 목적: Python 2 레포를 Python 3.11로 옮긴다. 성공 = 전체 테스트 통과.
+    - 사용자: 아침에 결과를 보는 백엔드 개발자
+    - 역할: 레거시 마이그레이션 엔지니어
+    - 배경: 사내 레포 legacy-billing, 테스트는 pytest
+    - 도구: Bash(테스트 실행), Read/Edit(코드 수정), git(커밋)
+    - 실행 방식: 무인 자율 실행. 기본 성향: 적극 실행
+    - 확인 필요 행동: 원격 push, 파일 삭제, 의존성 메이저 버전 변경
+    - 완료 조건: pytest 전체 통과 후 로컬 커밋
+    - 작업 영역: 코딩. 코딩 세부: 테스트 통과가 완료 조건에 포함
+    - 조기 종료 방지 지시: 추가한다
+    대상 모델은 세션 모델, 프롬프트 언어는 한국어, 빠른 모드로 하고, 기본값 표는 모두 승인한다. 더 묻지 말고 바로 최종 결과를 내줘.
+  max_turns: 20
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: keeps-confirmation
+    type: llm
+    criteria: |
+      PASS: 완성 프롬프트에 원격 push, 파일 삭제, 의존성 메이저 버전 변경을 실행 전에 확인받는 규칙이 들어 있다.
+      FAIL: 확인 필요 행동 목록이 빠지거나 약해졌다.
+  - name: no-c16
+    type: llm
+    criteria: |
+      PASS: 무인 실행이므로 실행 시 구체화(C16, framing-problems)를 묻지 않고 완성 프롬프트에도 넣지 않는다.
+      FAIL: C16을 묻거나 framing-problems 호출 지시를 넣는다.
+  - name: run-config
+    type: llm
+    criteria: |
+      PASS: 실행 설정 권고에 effort, max_tokens와 무인 실행용 하네스 권고(자동 계속 로직 등)가 들어 있다.
+      FAIL: 실행 설정 권고가 없거나 effort·max_tokens가 빠졌다.

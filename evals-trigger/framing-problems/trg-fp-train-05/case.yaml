@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: trg-fp-train-05
+description: "트리거해야 함 / train"
+tags: [trigger, train, positive]
+execution:
+  prompt: "다음 분기 계획 세우는 중이야. 항목 중 하나가 '로그 비용 줄이기'인데, 이건 뭘 할지 정하기 전에 뭐가 진짜 문제고 우리가 못 바꾸는 조건이 뭔지부터 정리하고 싶어"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?framing-problems"'

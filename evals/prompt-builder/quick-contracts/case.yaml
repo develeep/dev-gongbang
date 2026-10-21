@@ -1,0 +1,15 @@
+schema_version: "1.1"
+name: quick-contracts
+description: "빠른 모드 단발 작업에서 기본값 표 승인과 긴 자료 배치를 지키는지"
+tags: [quick, oneshot]
+execution:
+  prompt: |
+    /prompt-builder 계약서 30개를 비교 분석하는 프롬프트 빨리 만들어줘. 질문은 최소로 해줘
+  max_turns: 20
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: defaults-table
+    type: llm
+    criteria: |
+      PASS: 선택 항목을 '항목 | 기본값 | 근거' 표 하나로 보여 주고 한 번에 승인을 요청한다(이번 응답에 없더라도 다음에 그렇게 하겠다고 밝히면 PASS). 서술형 선택 항목의 기본값은 '생략'이며 규칙·범위 같은 내용을 지어내지 않는다.
+      FAIL: 기본값으로 규칙이나 도메인 내용을 지어내거나, 선택 항목을 하나씩 묻는다.

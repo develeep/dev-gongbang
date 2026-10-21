@@ -1,0 +1,43 @@
+schema_version: "1.1"
+name: skill-with-bundle
+description: "번들 파일이 있는 SKILL.md에서 K 항목과 저장 승인 규칙을 지키는지"
+tags: [skill-md, full]
+execution:
+  prompt: |
+    /prompt-builder 회의록 요약 스킬 만들어줘. SKILL.md랑 요약 템플릿 참조 파일도 같이 필요해. 답은 아래와 같아.
+    - 사용 모델: Sonnet 5.5, Opus 5.5
+    - 이름: summarizing-meetings
+    - 하는 일과 트리거: 회의록 텍스트를 결정 사항·액션 아이템·논의 요약으로 정리. "회의록 요약해줘", "회의 정리해줘"에 실행
+    - 자유도: 중간. 절차: 없음
+    - 번들 파일: reference/template.md (요약 템플릿)
+    - 평가 시나리오: 1) 30분 주간 회의록 요약 2) 액션 아이템 없는 회의 3) 영어 회의록
+    - 프롬프트 언어 한국어, 빠른 모드, 기본값 모두 승인. 더 묻지 말고 결과를 보여 줘. 저장 위치는 아직 정하지 않았어.
+  max_turns: 20
+  allowed_tools: [Read, Glob, Grep, Skill, Write]
+graders:
+  - name: frontmatter
+    type: llm
+    criteria: |
+      PASS: SKILL.md frontmatter의 name이 summarizing-meetings이고, description이 3인칭으로 무엇을 하는지와 언제 쓰는지를 모두 담는다.
+      FAIL: name 규칙을 어기거나 description에 '무엇'이나 '언제'가 빠졌거나 1·2인칭이다.
+  - name: separate-blocks
+    type: llm
+    criteria: |
+      PASS: '### SKILL.md' 제목 아래 코드블록 하나, '### reference/template.md' 제목 아래 또 다른 코드블록 하나로 두 파일을 나눠 보여 준다.
+      FAIL: 두 파일을 한 블록에 넣거나 경로 제목이 없다.
+  - name: asks-save-location
+    type: llm
+    criteria: |
+      PASS: 저장할지와 위치(사용자 스킬 / 프로젝트 스킬 / 저장 안 함)를 묻는다.
+      FAIL: 저장 위치를 묻지 않는다.
+  - name: load-condition
+    type: llm
+    criteria: |
+      PASS: SKILL.md가 reference/template.md를 어떤 상황에서 읽는지(예: 요약을 작성할 때) 조건과 함께 가리킨다.
+      FAIL: 조건 없이 "참고"로만 언급하거나 template.md를 참조하지 않는다.
+  - name: no-write-before-approval
+    type: tool_used
+    arm: both
+    tool: Write
+    min: 0
+    max: 0

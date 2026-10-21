@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: haiku-classifier
+description: "대상 모델이 요청에 있으면 B1을 묻지 않고 Haiku 가이드를 쓰는지"
+tags: [model, round0]
+execution:
+  prompt: |
+    /prompt-builder Haiku 4.5에서 돌릴 문의 분류용 API 시스템 프롬프트 만들어줘. 결과는 JSON으로 받아야 해
+  max_turns: 20
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: loads-haiku-guide
+    type: tool_used
+    arm: both
+    tool: Read
+    input_match: 'haiku-4-5\.md'
+  - name: b1-not-asked
+    type: llm
+    criteria: |
+      PASS: 대상 모델을 다시 묻지 않고 Haiku 4.5로 되짚으며, 세션 모델과 다르다는 점과 테스트는 Haiku 4.5로 해야 한다는 점을 알린다.
+      FAIL: 대상 모델을 다시 묻거나, 세션 모델과 다르다는 안내가 없다.
+  - name: no-adaptive
+    type: llm
+    criteria: |
+      PASS: effort나 adaptive 사고를 권하지 않는다(언급한다면 Haiku 4.5에서는 budget_tokens 확장 사고를 쓴다고 맞게 말한다).
+      FAIL: Haiku 4.5에 effort나 adaptive 사고를 권한다.

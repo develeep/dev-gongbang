@@ -1,0 +1,40 @@
+schema_version: "1.1"
+name: correction-backtrack
+description: 확정된 기록에 전제 정정이 오면 해당 단계로 돌아가 이후 단계를 다시 판단하는지
+tags: [backtrack]
+execution:
+  prompt: |
+    framing-problems로 구체화하던 중이야. 지금까지 확정한 기록은 이거야.
+
+    | 항목 | 내용 | 출처 | 근거 |
+    |---|---|---|---|
+    | R1 의도 | 주문 조회 화면 이탈을 줄이고 싶다 | 사용자 | - |
+    | R2 이상 | 주문 조회 p95 300ms 이하 | 사용자 | R1 의도 |
+    | R2 현재 | 주문 조회 p95 1.8s | 사용자 | - |
+    | R2 문제 | 이상은 p95 300ms인데 현재는 1.8s다 | - | R2 이상, R2 현재 |
+    | R2 원인 | 같은 데이터를 반복 조회한다 (가설) | - | R2 현재 |
+    | R3 제약 | DB 스키마 변경은 이번 분기 불가 | 사용자 | - |
+    | R3 자원 | 사내 Redis 클러스터 | 사용자 | - |
+    | R4 근거 | 읽기 캐시: 맞음 | 모델 지식, 미검증 | R2 원인 |
+    | R5 목표 | 반복 조회 제거 | 사용자 | R2 원인 |
+    | R5 해법 | Redis 캐시 추가 | 사용자 승인 | R5 목표, R3, R4 |
+    | R6 부작용 | 캐시 불일치: 완화책(TTL 60s) | - | R5 해법 |
+
+    그게 아니고, 느린 게 문제가 아니라 피크 시간에 타임아웃이 나는 게 문제야.
+  max_turns: 10
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?framing-problems"'
+  - name: line-by-line-review
+    type: llm
+    criteria: |
+      PASS: R3~R6을 다시 보며 "R3 유지: 이유", "R5 변경: 이전 → 새 결정"(또는 "R5 재검토 필요: 이유")처럼 단계별로 한 줄씩 결과를 보여 준다.
+      FAIL: 이후 단계를 다시 보지 않거나, 결과를 단계별로 나눠 보여 주지 않는다.
+  - name: no-patching
+    type: llm
+    criteria: |
+      PASS: Redis 캐시 해법의 채택을 풀어(제안 해법으로 되돌리거나 보류하거나) 바뀐 원인에 맞춰 R5를 다시 판단하겠다고 밝힌다.
+      FAIL: Redis 캐시를 확정된 해법으로 둔 채 "타임아웃도 고려" 같은 조건이나 예외만 덧붙인다.

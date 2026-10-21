@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: trg-fp-val-03
+description: "트리거해야 함 / val"
+tags: [trigger, val, positive]
+execution:
+  prompt: "고객 문의 응답 시간이 길다는 지표가 나왔는데 다들 챗봇부터 붙이자고 해. 진짜 문제가 뭔지부터 짚고 싶은데 도와줄래?"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?framing-problems"'

@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: round0-chatbot
+description: "요청만 있는 API 프롬프트 요청에서 0라운드를 규칙대로 여는지"
+tags: [round0]
+execution:
+  prompt: |
+    /prompt-builder 고객센터 챗봇용 시스템 프롬프트 만들어줘
+  max_turns: 20
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: session-model-line
+    type: llm
+    criteria: |
+      PASS: 첫 응답에 감지한 세션 모델 ID를 한 줄로 알린다.
+      FAIL: 세션 모델 ID를 알리지 않는다.
+  - name: round0-questions
+    type: llm
+    criteria: |
+      PASS: 대상 모델(세션 모델이 첫 선택지), 프롬프트 언어, 진행 방식(빠른 모드/상세 인터뷰)을 묻고, 종류는 API 시스템 프롬프트로 되짚기만 하고 묻지 않는다.
+      FAIL: 종류를 다시 묻거나, 대상 모델·언어·진행 방식 중 하나를 묻지 않는다.
+  - name: no-fabrication
+    type: llm
+    criteria: |
+      PASS: 역할, 도메인, 규칙을 임의로 채운 프롬프트를 내놓지 않고 질문으로 멈춘다.
+      FAIL: 사용자 답 없이 완성 프롬프트나 역할·규칙 내용을 만들어 낸다.

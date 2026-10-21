@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: trg-fp-train-04
+description: "트리거해야 함 / train"
+tags: [trigger, train, positive]
+execution:
+  prompt: "팀장님이 레포를 모노레포로 합치자고 하는데 솔직히 왜 해야 하는지 모르겠어. 하자 말자 정하기 전에 판단 근거를 같이 세워보고 싶어"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?framing-problems"'

@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "claudeVersion": "2.1.300",
+  "startedAt": "2026-10-20T06:06:05.297Z",
+  "durationSeconds": 55,
+  "costUsd": 0.3258431,
+  "partial": false,
+  "suite": {
+    "root": "/root/ClaudeMe",
+    "ablation": "none",
+    "caseFilter": "draft-fix",
+    "threshold": 0,
+    "concurrency": 1,
+    "plugins": [
+      {
+        "name": "prompt-framing",
+        "version": "1.0.0",
+        "path": "/root/ClaudeMe"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "name": "draft-fix",
+      "dir": "evals/prompt-builder/draft-fix",
+      "source": "case_yaml",
+      "promptMarkdown": "이 프롬프트 best practice로 고쳐줘:\n\nYou are a code reviewer. CRITICAL: Only report high-severity issues. Think step by step and write your reasoning before the answer. Double-check your answer before responding.\n\n대상 모델은 세션 모델, 프롬프트 언어는 영어, 빠른 모드로 하고, 기본값 표는 모두 승인한다. 모델 특화 결정 질문은 모두 '추가하지 않음 / 아니오'로 답한다.\n",
+      "runsPerCase": 3,
+      "timeoutSeconds": 300,
+      "maxTurns": 20,
+      "graders": [
+        {
+          "name": "skill-fired",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?prompt-builder\""
+          }
+        },
+        {
+          "name": "extracted-table",
+          "type": "llm",
+          "weight": 1,
+          "graderMarkdown": "PASS: 초안에서 추출한 값(역할: 코드 리뷰어, 규칙 등)을 '항목 | 추출한 값 | 상태' 형태의 표로 보여 주고 확인을 요청한다.\nFAIL: 추출 표 없이 바로 다시 쓴다.\n",
+          "config": {
+            "criteria": "PASS: 초안에서 추출한 값(역할: 코드 리뷰어, 규칙 등)을 '항목 | 추출한 값 | 상태' 형태의 표로 보여 주고 확인을 요청한다.\nFAIL: 추출 표 없이 바로 다시 쓴다.\n",
+            "focus": "last_message"
+          }
+        },
+        {
+          "name": "removal-review",
+          "type": "llm",
+          "weight": 1,
+          "graderMarkdown": "PASS: 모델 가이드의 제거 검토 대상인 '답 앞에 추론을 쓰라는 지시'를 짚고, 재확인 지시나 CRITICAL 강조도 짚으며, 제거할지 하나씩 묻는다.\nFAIL: 제거 대상을 짚지 않거나, 묻지 않고 일괄 삭제한다.\n",
+          "config": {
+            "criteria": "PASS: 모델 가이드의 제거 검토 대상인 '답 앞에 추론을 쓰라는 지시'를 짚고, 재확인 지시나 CRITICAL 강조도 짚으며, 제거할지 하나씩 묻는다.\nFAIL: 제거 대상을 짚지 않거나, 묻지 않고 일괄 삭제한다.\n",
+            "focus": "last_message"
+          }
+        },
+        {
+          "name": "asks-gaps-only",
+          "type": "llm",
+          "weight": 1,
+          "graderMarkdown": "PASS: 초안에 없는 항목(종류, 목적·성공 기준, 입력 등)과 모호한 항목(심각도 기준 등)만 묻고, 초안에 이미 있는 역할(code reviewer)은 다시 묻지 않는다. 승인된 기본값으로 처리한 형식 항목은 묻지 않아도 된다.\nFAIL: 역할을 다시 묻거나, 빈 내용 항목(목적, 입력, 심각도 기준)을 묻지 않고 지어내 채운다.\n",
+          "config": {
+            "criteria": "PASS: 초안에 없는 항목(종류, 목적·성공 기준, 입력 등)과 모호한 항목(심각도 기준 등)만 묻고, 초안에 이미 있는 역할(code reviewer)은 다시 묻지 않는다. 승인된 기본값으로 처리한 형식 항목은 묻지 않아도 된다.\nFAIL: 역할을 다시 묻거나, 빈 내용 항목(목적, 입력, 심각도 기준)을 묻지 않고 지어내 채운다.\n",
+            "focus": "last_message"
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 7,
+            "costUsd": 0.3258431,
+            "judgeCostUsd": 0.0030243,
+            "durationSeconds": 55,
+            "startedAt": "2026-10-20T06:06:05.351Z",
+            "error": null,
+            "tracePath": "/tmp/claude-eval-BKQutv/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "extracted-table",
+                "passed": true,
+                "weight": 1,
+                "explanation": "judge votes: PASS PASS PASS",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  true,
+                  true,
+                  true
+                ],
+                "evidence": "진행 상황:\n- [x] 1. 세션 모델 감지\n- [x] 2. 기본 설정 (종류만 남음)\n- [x] 3. 모델 가이드 로드 및 확인일 점검\n- [ ] 4. 초안 분석 ← 지금 단계\n- [ ] 5. 구성 요소 인터뷰\n- [ ] 6. 모델 특화 결정 질문\n- [ ] 7. 조립\n- [ ] 8. 자체 검수\n- [ ] 9. 출력\n\n감지된 세션 모델: `claude-opus-5-5`\n대상 모델: `claude-opus-5-5` → Opus 5.5 가이드 적용 (가이드 확인일 2026-10-01이라 90일이 안 지나서 출처와 다시 대조하지 않았습니다)\n\n**확인된 설정:** 대상 모델 = 세션 모델, 프롬프트 언어 = 영어, 빠른 모드, 기본값 표 전부 승인, 모델 특화 결정 질문은 전부 \"추가하지 않음 / 아니오\".\n\n## 초안 분석\n\n| 항목 | 초안에서 뽑은 값 | 상태 |\n|---|---|---|\n| C3 역할 | \"a code reviewer\" | 확인됨 |\n| C7 규칙 | 심각도 높은 이슈만 보고 | 모호 (판단 기준과 이유가 없음) |\n| C1 목적과 성공 기준 | - | 없음 |\n| C4 배경 맥락 | - | 없음 |\n| C5 입력 | - | 없음 |\n| C10/C11 출력 형식·길이 | - | 없음 (빠른 모드 기본값으로 처리) |\n\n**형식은 제가 바로 고치겠습니다:** `CRITICAL:` 같은 강한 표현은 지시가 과하게 적용되게 만듭니다. 그래서 평이한 문장으로 바꾸고 이유를 붙이겠습니다.\n\n## 제거 검토 (Opus 5.5 가이드 기준)\n\n결정 질문과는 별개라서, 하나씩 확인받아야 합니다.\n\n- **R1. \"Think step by step\"**: Opus 5.5는 사고가 늘 켜져 있습니다. 이 지시를 빼도 품질은 그대로이고 응답이 더 빨리 시작됩니다. → (a) 제거 (권장) / (b) 유지\n- **R2. \"write your reasoning before the answer\"**: 응답 본문에 추론 과정을 쓰라는 지시는 `reasoning_extraction` 안전 분류기에 걸려 거부될 수 있습니다. 추론을 보고 싶다면 API의 `thinking.display: \"summarized\"`로 사고 요약을 받으면 됩니다. → (a) 제거하고 실행 설정에 summarized 권고 (권장) / (b) 제거만\n- **R3. \"Double-check your answer before responding\"**: 가이드의 제거 목록에 있는 문구는 아닙니다. 다만 Opus 5 계열은 스스로 검증하는 편이라, 지금처럼 막연한 지시는 효과가 적습니다. → (a) 제거 / (b) 구체적인 검증 기준으로 바꾸기 (기준은 질문 6에 답해 주세요) / (c) 그대로 유지\n\n## 필수 항목 질문\n\n프롬프트 내용은 제가 지어낼 수 없어서 아래 질문에 답이 필요합니다.\n\n1. **(B0) 종류**: (a) API 시스템 프롬프트: 서비스나 봇이 diff를 받아 리뷰 / (b) 에이전트: 도구로 저장소를 읽으며 리뷰 / (c) 단발 작업: 한 번 붙여넣고 리뷰\n2. **(C1) 목적과 성공 기준**: 이 리뷰로 무엇을 막고 싶으신가요? 좋은 리뷰 결과는 어떤 모습인가요?\n3. **(C7) \"high-severity\"의 기준과 이유**: 어떤 이슈가 여기에 들어가나요? (예: 정확성 버그, 보안 취약점, 데이터 손실 등. 직접 정해 주세요.) 낮은 심각도를 빼는 이유는 무엇인가요? (예: 노이즈를 줄이려고, 리뷰어 시간이 부족해서)\n4. **(C4) 배경 맥락**: 언어, 프레임워크, 팀 규범처럼 리뷰어가 알아야 할 정보가 있나요? 없으면 \"없음\"이라고 답해 주세요.\n5. **(C5) 입력**: 실행할 때 무엇이 들어오나요? (diff, 파일 전체, PR 설명 등) 대략적인 분량은요?\n6. **R1–R3 선택**, 그리고 R3에서 (b)를 고르셨다면 검증 기준을 알려 주세요.\n\n1번 답에 따라 필수 항목이 2~4개 더 생길 수 있습니다. API라면 배포 채널, 대화 형태, 외부 텍스트 여부를 묻고, 에이전트라면 도구 목록, 확인이 필요한 행동, 완료 조건 등을 묻게 됩니다. 그런 항목은 다음 라운드에 한 번에 묻겠습니다."
+              },
+              {
+                "name": "removal-review",
+                "passed": true,
+                "weight": 1,
+                "explanation": "judge votes: PASS PASS FAIL",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  true,
+                  true,
+                  false
+                ],
+                "evidence": "진행 상황:\n- [x] 1. 세션 모델 감지\n- [x] 2. 기본 설정 (종류만 남음)\n- [x] 3. 모델 가이드 로드 및 확인일 점검\n- [ ] 4. 초안 분석 ← 지금 단계\n- [ ] 5. 구성 요소 인터뷰\n- [ ] 6. 모델 특화 결정 질문\n- [ ] 7. 조립\n- [ ] 8. 자체 검수\n- [ ] 9. 출력\n\n감지된 세션 모델: `claude-opus-5-5`\n대상 모델: `claude-opus-5-5` → Opus 5.5 가이드 적용 (가이드 확인일 2026-10-01이라 90일이 안 지나서 출처와 다시 대조하지 않았습니다)\n\n**확인된 설정:** 대상 모델 = 세션 모델, 프롬프트 언어 = 영어, 빠른 모드, 기본값 표 전부 승인, 모델 특화 결정 질문은 전부 \"추가하지 않음 / 아니오\".\n\n## 초안 분석\n\n| 항목 | 초안에서 뽑은 값 | 상태 |\n|---|---|---|\n| C3 역할 | \"a code reviewer\" | 확인됨 |\n| C7 규칙 | 심각도 높은 이슈만 보고 | 모호 (판단 기준과 이유가 없음) |\n| C1 목적과 성공 기준 | - | 없음 |\n| C4 배경 맥락 | - | 없음 |\n| C5 입력 | - | 없음 |\n| C10/C11 출력 형식·길이 | - | 없음 (빠른 모드 기본값으로 처리) |\n\n**형식은 제가 바로 고치겠습니다:** `CRITICAL:` 같은 강한 표현은 지시가 과하게 적용되게 만듭니다. 그래서 평이한 문장으로 바꾸고 이유를 붙이겠습니다.\n\n## 제거 검토 (Opus 5.5 가이드 기준)\n\n결정 질문과는 별개라서, 하나씩 확인받아야 합니다.\n\n- **R1. \"Think step by step\"**: Opus 5.5는 사고가 늘 켜져 있습니다. 이 지시를 빼도 품질은 그대로이고 응답이 더 빨리 시작됩니다. → (a) 제거 (권장) / (b) 유지\n- **R2. \"write your reasoning before the answer\"**: 응답 본문에 추론 과정을 쓰라는 지시는 `reasoning_extraction` 안전 분류기에 걸려 거부될 수 있습니다. 추론을 보고 싶다면 API의 `thinking.display: \"summarized\"`로 사고 요약을 받으면 됩니다. → (a) 제거하고 실행 설정에 summarized 권고 (권장) / (b) 제거만\n- **R3. \"Double-check your answer before responding\"**: 가이드의 제거 목록에 있는 문구는 아닙니다. 다만 Opus 5 계열은 스스로 검증하는 편이라, 지금처럼 막연한 지시는 효과가 적습니다. → (a) 제거 / (b) 구체적인 검증 기준으로 바꾸기 (기준은 질문 6에 답해 주세요) / (c) 그대로 유지\n\n## 필수 항목 질문\n\n프롬프트 내용은 제가 지어낼 수 없어서 아래 질문에 답이 필요합니다.\n\n1. **(B0) 종류**: (a) API 시스템 프롬프트: 서비스나 봇이 diff를 받아 리뷰 / (b) 에이전트: 도구로 저장소를 읽으며 리뷰 / (c) 단발 작업: 한 번 붙여넣고 리뷰\n2. **(C1) 목적과 성공 기준**: 이 리뷰로 무엇을 막고 싶으신가요? 좋은 리뷰 결과는 어떤 모습인가요?\n3. **(C7) \"high-severity\"의 기준과 이유**: 어떤 이슈가 여기에 들어가나요? (예: 정확성 버그, 보안 취약점, 데이터 손실 등. 직접 정해 주세요.) 낮은 심각도를 빼는 이유는 무엇인가요? (예: 노이즈를 줄이려고, 리뷰어 시간이 부족해서)\n4. **(C4) 배경 맥락**: 언어, 프레임워크, 팀 규범처럼 리뷰어가 알아야 할 정보가 있나요? 없으면 \"없음\"이라고 답해 주세요.\n5. **(C5) 입력**: 실행할 때 무엇이 들어오나요? (diff, 파일 전체, PR 설명 등) 대략적인 분량은요?\n6. **R1–R3 선택**, 그리고 R3에서 (b)를 고르셨다면 검증 기준을 알려 주세요.\n\n1번 답에 따라 필수 항목이 2~4개 더 생길 수 있습니다. API라면 배포 채널, 대화 형태, 외부 텍스트 여부를 묻고, 에이전트라면 도구 목록, 확인이 필요한 행동, 완료 조건 등을 묻게 됩니다. 그런 항목은 다음 라운드에 한 번에 묻겠습니다."
+              },
+              {
+                "name": "asks-gaps-only",
+                "passed": true,
+                "weight": 1,
+                "explanation": "judge votes: PASS PASS PASS",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  true,
+                  true,
+                  true
+                ],
+                "evidence": "진행 상황:\n- [x] 1. 세션 모델 감지\n- [x] 2. 기본 설정 (종류만 남음)\n- [x] 3. 모델 가이드 로드 및 확인일 점검\n- [ ] 4. 초안 분석 ← 지금 단계\n- [ ] 5. 구성 요소 인터뷰\n- [ ] 6. 모델 특화 결정 질문\n- [ ] 7. 조립\n- [ ] 8. 자체 검수\n- [ ] 9. 출력\n\n감지된 세션 모델: `claude-opus-5-5`\n대상 모델: `claude-opus-5-5` → Opus 5.5 가이드 적용 (가이드 확인일 2026-10-01이라 90일이 안 지나서 출처와 다시 대조하지 않았습니다)\n\n**확인된 설정:** 대상 모델 = 세션 모델, 프롬프트 언어 = 영어, 빠른 모드, 기본값 표 전부 승인, 모델 특화 결정 질문은 전부 \"추가하지 않음 / 아니오\".\n\n## 초안 분석\n\n| 항목 | 초안에서 뽑은 값 | 상태 |\n|---|---|---|\n| C3 역할 | \"a code reviewer\" | 확인됨 |\n| C7 규칙 | 심각도 높은 이슈만 보고 | 모호 (판단 기준과 이유가 없음) |\n| C1 목적과 성공 기준 | - | 없음 |\n| C4 배경 맥락 | - | 없음 |\n| C5 입력 | - | 없음 |\n| C10/C11 출력 형식·길이 | - | 없음 (빠른 모드 기본값으로 처리) |\n\n**형식은 제가 바로 고치겠습니다:** `CRITICAL:` 같은 강한 표현은 지시가 과하게 적용되게 만듭니다. 그래서 평이한 문장으로 바꾸고 이유를 붙이겠습니다.\n\n## 제거 검토 (Opus 5.5 가이드 기준)\n\n결정 질문과는 별개라서, 하나씩 확인받아야 합니다.\n\n- **R1. \"Think step by step\"**: Opus 5.5는 사고가 늘 켜져 있습니다. 이 지시를 빼도 품질은 그대로이고 응답이 더 빨리 시작됩니다. → (a) 제거 (권장) / (b) 유지\n- **R2. \"write your reasoning before the answer\"**: 응답 본문에 추론 과정을 쓰라는 지시는 `reasoning_extraction` 안전 분류기에 걸려 거부될 수 있습니다. 추론을 보고 싶다면 API의 `thinking.display: \"summarized\"`로 사고 요약을 받으면 됩니다. → (a) 제거하고 실행 설정에 summarized 권고 (권장) / (b) 제거만\n- **R3. \"Double-check your answer before responding\"**: 가이드의 제거 목록에 있는 문구는 아닙니다. 다만 Opus 5 계열은 스스로 검증하는 편이라, 지금처럼 막연한 지시는 효과가 적습니다. → (a) 제거 / (b) 구체적인 검증 기준으로 바꾸기 (기준은 질문 6에 답해 주세요) / (c) 그대로 유지\n\n## 필수 항목 질문\n\n프롬프트 내용은 제가 지어낼 수 없어서 아래 질문에 답이 필요합니다.\n\n1. **(B0) 종류**: (a) API 시스템 프롬프트: 서비스나 봇이 diff를 받아 리뷰 / (b) 에이전트: 도구로 저장소를 읽으며 리뷰 / (c) 단발 작업: 한 번 붙여넣고 리뷰\n2. **(C1) 목적과 성공 기준**: 이 리뷰로 무엇을 막고 싶으신가요? 좋은 리뷰 결과는 어떤 모습인가요?\n3. **(C7) \"high-severity\"의 기준과 이유**: 어떤 이슈가 여기에 들어가나요? (예: 정확성 버그, 보안 취약점, 데이터 손실 등. 직접 정해 주세요.) 낮은 심각도를 빼는 이유는 무엇인가요? (예: 노이즈를 줄이려고, 리뷰어 시간이 부족해서)\n4. **(C4) 배경 맥락**: 언어, 프레임워크, 팀 규범처럼 리뷰어가 알아야 할 정보가 있나요? 없으면 \"없음\"이라고 답해 주세요.\n5. **(C5) 입력**: 실행할 때 무엇이 들어오나요? (diff, 파일 전체, PR 설명 등) 대략적인 분량은요?\n6. **R1–R3 선택**, 그리고 R3에서 (b)를 고르셨다면 검증 기준을 알려 주세요.\n\n1번 답에 따라 필수 항목이 2~4개 더 생길 수 있습니다. API라면 배포 채널, 대화 형태, 외부 텍스트 여부를 묻고, 에이전트라면 도구 목록, 확인이 필요한 행동, 완료 조건 등을 묻게 됩니다. 그런 항목은 다음 라운드에 한 번에 묻겠습니다."
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 1,
+        "passRate": 1
+      }
+    }
+  ],
+  "aggregates": {
+    "casesTotal": 1,
+    "casesPassed": 1,
+    "overallScore": 1,
+    "overallPassRate": 1
+  }
+}

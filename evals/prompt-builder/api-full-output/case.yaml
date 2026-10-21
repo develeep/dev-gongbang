@@ -1,0 +1,33 @@
+schema_version: "1.1"
+name: api-full-output
+description: "API 프롬프트 최종 출력 구조, 파일 미저장, framing 미포함을 지키는지"
+tags: [api, full, framing]
+execution:
+  prompt: |
+    /prompt-builder 고객 문의에 답하는 API 시스템 프롬프트 만들어줘. 답은 아래와 같아.
+    - 목적: 쇼핑몰 고객의 주문·배송·반품 문의에 답한다. 성공 = 상담원 연결 없이 해결
+    - 사용자: 일반 소비자. 역할: 쇼핑몰 고객지원 상담원
+    - 배경: 반품은 수령 후 7일 이내, 단순 변심 반품비 3,000원은 고객 부담
+    - 입력: 고객 메시지와 {{ORDER_INFO}}(주문 정보 JSON)
+    - 규칙: 환불 금액을 약속하지 않는다. 이유: 최종 금액은 검수 후 확정된다
+    - 범위 밖: 주문과 무관한 질문은 정중히 거절한다
+    - 배포 채널: 마크다운 채팅 UI. 대화: 멀티턴. 외부 텍스트 붙여넣기: 없음
+    대상 모델은 세션 모델, 프롬프트 언어는 한국어, 빠른 모드로 하고, 기본값 표는 모두 승인한다. 모델 특화 결정 질문은 모두 '추가하지 않음 / 아니오'로 답한다. 더 묻지 말고 바로 최종 결과를 내줘.
+  max_turns: 20
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: output-structure
+    type: llm
+    criteria: |
+      PASS: 설계 요약 → 완성 프롬프트(markdown 코드블록) → 실행 설정 권고 → 다음 단계 순서로 출력한다.
+      FAIL: 네 부분 중 하나가 빠졌거나 순서가 다르다.
+  - name: no-framing
+    type: regex
+    arm: both
+    pattern: 'framing-problems'
+    match: not_contains
+  - name: no-fabrication
+    type: llm
+    criteria: |
+      PASS: 받은 값(반품 7일, 반품비 3,000원, 환불 금액 약속 금지 등) 외의 정책이나 수치를 지어내지 않는다.
+      FAIL: 받지 않은 정책·수치·연락처 등을 지어 넣는다.

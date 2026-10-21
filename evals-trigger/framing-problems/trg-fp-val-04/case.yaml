@@ -1,0 +1,15 @@
+schema_version: "1.1"
+name: trg-fp-val-04
+description: "트리거하면 안 됨 (구체화 요청 없는 조언형) / val"
+tags: [trigger, val, negative]
+execution:
+  prompt: "신입 들어올 때마다 개발환경 세팅에 이틀씩 걸린대. 도커로 다 감싸자는 사람이 있는데 그게 답인지 확신이 안 서"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?framing-problems"'
+    min: 0
+    max: 0

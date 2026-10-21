@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "claudeVersion": "2.1.300",
+  "startedAt": "2026-10-20T05:48:26.547Z",
+  "durationSeconds": 8,
+  "costUsd": 0.1128294,
+  "partial": false,
+  "suite": {
+    "root": "/root/ClaudeMe",
+    "ablation": "none",
+    "caseFilter": "typo-not-triggered",
+    "threshold": 0,
+    "concurrency": 1,
+    "plugins": [
+      {
+        "name": "prompt-framing",
+        "version": "1.0.0",
+        "path": "/root/ClaudeMe"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "name": "typo-not-triggered",
+      "dir": "evals/framing-problems/typo-not-triggered",
+      "source": "case_yaml",
+      "promptMarkdown": "README 4번째 줄 오타 고쳐줘",
+      "runsPerCase": 3,
+      "timeoutSeconds": 300,
+      "maxTurns": 8,
+      "graders": [
+        {
+          "name": "skill-not-fired",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?framing-problems\"",
+            "min": 0,
+            "max": 0,
+            "arm": "both"
+          }
+        },
+        {
+          "name": "typo-fixed",
+          "type": "regex",
+          "weight": 1,
+          "config": {
+            "target": {
+              "source": "file",
+              "path": "README.md"
+            },
+            "pattern": "상세 정보",
+            "flags": "",
+            "match": "contains",
+            "arm": "both"
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 4,
+            "costUsd": 0.1128294,
+            "judgeCostUsd": 0,
+            "durationSeconds": 8,
+            "startedAt": "2026-10-20T05:48:26.573Z",
+            "error": null,
+            "tracePath": "/tmp/claude-eval-nzzRUH/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "skill-not-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "typo-fixed",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 상세 정보",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 1,
+        "passRate": 1
+      }
+    }
+  ],
+  "aggregates": {
+    "casesTotal": 1,
+    "casesPassed": 1,
+    "overallScore": 1,
+    "overallPassRate": 1
+  }
+}

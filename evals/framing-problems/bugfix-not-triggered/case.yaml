@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: bugfix-not-triggered
+description: 구체화를 요청하지 않은 버그 수정 요청에서는 스킬을 실행하지 않는지 (경계 사례)
+tags: [negative]
+execution:
+  prompt: 로그인이 항상 실패해. src/auth.py 고쳐줘
+  max_turns: 10
+  allowed_tools: [Read, Edit, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  - name: skill-not-fired
+    type: tool_used
+    arm: both
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?framing-problems"'
+    min: 0
+    max: 0
+  - name: hashes-input
+    type: regex
+    arm: both
+    target: {source: file, path: src/auth.py}
+    pattern: 'sha256\(\s*password'
+    match: contains

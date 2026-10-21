@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: trg-fp-train-06
+description: "트리거해야 함 / train"
+tags: [trigger, train, positive]
+execution:
+  prompt: "flaky 테스트 땜에 CI가 맨날 빨간데 재시도 옵션 붙이기 전에 제대로 생각 좀 해보자"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?framing-problems"'

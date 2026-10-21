@@ -1,0 +1,32 @@
+{
+  "name": "claudeMe",
+  "owner": {
+    "name": "shlee"
+  },
+  "metadata": {
+    "description": "개발 과정에서 쓰는 Claude Code 스킬 모음. 작업 전 요청 구체화, 모델별 프롬프트·CLAUDE.md·SKILL.md 설계 등 일상 개발 흐름을 돕는다.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "claudeme-skills",
+      "source": "./",
+      "description": "개발 과정에서 쓰는 Claude Code 스킬 모음. 작업 전 요청 구체화, 모델별 프롬프트·CLAUDE.md·SKILL.md 설계 등 일상 개발 흐름을 돕는다.",
+      "author": {
+        "name": "shlee"
+      },
+      "keywords": [
+        "skills",
+        "development",
+        "workflow",
+        "productivity",
+        "prompt-engineering",
+        "requirements",
+        "claude-md",
+        "korean"
+      ],
+      "category": "development",
+      "license": "MIT"
+    }
+  ]
+}

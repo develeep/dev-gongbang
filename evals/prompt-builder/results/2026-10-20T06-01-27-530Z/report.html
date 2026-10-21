@@ -1,0 +1,3304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Eval report — prompt-framing v1.0.0</title>
+</head>
+<body>
+<style>
+:root{--plane:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink-2:#52514e;--ink-3:#6b6a64;--hairline:rgba(11,11,11,.10);--grid:#e1e0d9;--inset:rgba(11,11,11,.04);--accent:#2a78d6;--base-fill:#6b6a64;--delta-good:#006300;--good:#067d06;--warning:#8a6100;--critical:#d03b3b;
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme:dark){:root{--plane:#0d0d0d;--surface:#1a1a19;--ink:#ffffff;--ink-2:#c3c2b7;--ink-3:#898781;--hairline:rgba(255,255,255,.10);--grid:#2c2c2a;--inset:rgba(255,255,255,.05);--accent:#3987e5;--base-fill:#898781;--delta-good:#0ca30c;--good:#0ca30c;--warning:#fab219;--critical:#e06c6c;color-scheme:dark}}
+:root[data-theme="dark"]{--plane:#0d0d0d;--surface:#1a1a19;--ink:#ffffff;--ink-2:#c3c2b7;--ink-3:#898781;--hairline:rgba(255,255,255,.10);--grid:#2c2c2a;--inset:rgba(255,255,255,.05);--accent:#3987e5;--base-fill:#898781;--delta-good:#0ca30c;--good:#0ca30c;--warning:#fab219;--critical:#e06c6c;color-scheme:dark}
+:root[data-theme="light"]{--plane:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink-2:#52514e;--ink-3:#6b6a64;--hairline:rgba(11,11,11,.10);--grid:#e1e0d9;--inset:rgba(11,11,11,.04);--accent:#2a78d6;--base-fill:#6b6a64;--delta-good:#006300;--good:#067d06;--warning:#8a6100;--critical:#d03b3b;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--plane);color:var(--ink);
+  font:14px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:880px;margin:0 auto;padding:40px 24px 64px;display:flex;flex-direction:column;gap:20px}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+header h1{margin:2px 0 0;font-size:24px;font-weight:600;line-height:1.25;text-wrap:balance}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;color:var(--ink-2);font-size:13px}
+.meta .num{font-variant-numeric:tabular-nums lining-nums}
+.banner{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:8px;
+  border:1px solid var(--hairline);background:var(--surface);font-size:13px}
+.banner .chip-warn{color:var(--warning);font-weight:600}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--hairline);border-radius:10px;padding:14px 16px;
+  display:flex;flex-direction:column;gap:4px}
+.tile .label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.tile .value{font-size:26px;font-weight:600;font-variant-numeric:tabular-nums lining-nums;line-height:1.1}
+.tile.hero .value{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:48px}
+.tile .sub{font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.tile .value.delta-pos{color:var(--delta-good)}
+.tile .value.delta-neg{color:var(--critical)}
+.toolbar{display:flex;gap:8px;justify-content:flex-end}
+.toolbar button{font:12px system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink-2);
+  background:var(--surface);border:1px solid var(--hairline);border-radius:6px;padding:4px 10px;cursor:pointer}
+.toolbar button:hover{color:var(--ink)}
+.toolbar button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.case{background:var(--surface);border:1px solid var(--hairline);border-radius:10px;padding:18px 20px;
+  display:flex;flex-direction:column;gap:10px}
+.case-regressed{border-left:3px solid var(--critical)}
+.verdict{margin:6px 0 0;font-size:15px}
+.verdict .delta{font-size:15px}
+.flag{font-size:11px;font-weight:600;color:var(--warning);white-space:nowrap}
+.star{color:var(--warning);font-size:.45em;vertical-align:super;line-height:0;cursor:help}
+.legend summary{cursor:pointer;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2)}
+.legend-list{margin:8px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--ink-2)}
+.case-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.case-head h2{margin:0;font-size:16px;font-weight:600}
+.case-head .spacer{flex:1}
+.case-score{font-size:15px;font-weight:600}
+.mono{font:12px "SF Mono",ui-monospace,Menlo,Consolas,monospace}
+.num{font-variant-numeric:tabular-nums lining-nums}
+.muted{color:var(--ink-3);font-size:12px}
+.meter{display:inline-block;position:relative;width:120px;height:6px;border-radius:4px;background:var(--grid);
+  vertical-align:middle}
+.meter>span{display:block;height:100%;border-radius:4px;max-width:100%}
+.meter .tick{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink-3);border-radius:1px}
+.m-accent>span{background:var(--accent)}
+.m-base>span{background:var(--base-fill)}
+.delta{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.delta-pos{color:var(--delta-good)}
+.delta-neg{color:var(--critical)}
+.delta-zero{color:var(--ink-3)}
+details.section{border-top:1px solid var(--grid);padding-top:10px}
+details.section>summary{cursor:pointer;font-size:12px;font-weight:600;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--ink-2);list-style-position:outside;margin-left:2px}
+details.section>summary:hover{color:var(--ink)}
+details.section[open]>summary{margin-bottom:8px}
+.md{display:flex;flex-direction:column;gap:8px;background:var(--inset);border-radius:8px;
+  padding:12px 14px;overflow-wrap:break-word}
+.md>:first-child{margin-top:0}
+.md h1,.md h2,.md h3,.md h4,.md h5,.md h6{margin:4px 0 0;font-size:1em;font-weight:600;line-height:1.3}
+.md p,.md ul,.md ol,.md blockquote,.md table,.md pre,.md hr{margin:0}
+.md ul,.md ol{display:flex;flex-direction:column;gap:4px;padding-left:20px}
+.md blockquote{border-left:2px solid var(--hairline);padding-left:10px;color:var(--ink-2)}
+.md :not(pre)>code{background:var(--inset);padding:1px 4px;border-radius:4px;
+  font:.92em "SF Mono",ui-monospace,Menlo,Consolas,monospace}
+.md pre{background:var(--inset);border:1px solid var(--hairline);padding:10px 12px;border-radius:6px;
+  overflow-x:auto;font:12px/1.5 "SF Mono",ui-monospace,Menlo,Consolas,monospace}
+.md pre code{background:none;padding:0;font:inherit}
+.md table{width:100%;border-collapse:collapse}
+.md th,.md td{padding:5px 8px;text-align:left;vertical-align:top;border-bottom:1px solid var(--grid)}
+.md th{font-weight:600;color:var(--ink-2)}
+.md a{color:var(--accent);text-decoration:none}
+.md a:hover{text-decoration:underline}
+.grader-def{display:flex;flex-direction:column;gap:6px;padding:8px 0}
+.grader-def+.grader-def{border-top:1px solid var(--grid)}
+.grader-def-head{display:flex;align-items:baseline;gap:8px}
+.grader-name{font:13px "SF Mono",ui-monospace,Menlo,Consolas,monospace;font-weight:600}
+.badge{font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2);
+  border:1px solid var(--hairline);border-radius:999px;padding:1px 8px}
+.config{display:flex;flex-direction:column;gap:2px;background:var(--inset);border-radius:8px;padding:10px 14px}
+.config code{font:12px "SF Mono",ui-monospace,Menlo,Consolas,monospace;overflow-wrap:anywhere}
+.arm{display:flex;flex-direction:column;gap:8px;padding:6px 0}
+.arm+.arm{border-top:1px dashed var(--grid);margin-top:4px;padding-top:12px}
+.arm-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.arm-label{font-size:13px;font-weight:600}
+.run{border:1px solid var(--grid);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.run-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.run-title{font-size:12px;font-weight:600;color:var(--ink-2)}
+.run-error .explanation{color:var(--ink-2)}
+.note{font-size:12px;color:var(--ink-2)}
+.graders{display:flex;flex-direction:column;gap:4px}
+details.grader{border-radius:6px}
+details.grader>summary{cursor:pointer;display:flex;align-items:baseline;gap:8px;padding:3px 4px;
+  border-radius:6px;list-style:none}
+details.grader>summary::-webkit-details-marker{display:none}
+details.grader>summary::before{content:'▸';font-size:10px;color:var(--ink-3);flex:none;
+  transition:transform .12s ease}
+details.grader[open]>summary::before{transform:rotate(90deg)}
+details.grader>summary:hover{background:var(--inset)}
+details.grader>summary:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.grader-body{padding:6px 8px 8px 24px;display:flex;flex-direction:column;gap:6px}
+.chip{font-size:11px;font-weight:600;border-radius:999px;padding:1px 8px;white-space:nowrap}
+.chip-pass{color:var(--good);border:1px solid currentColor}
+.chip-fail{color:var(--critical);border:1px solid currentColor}
+.chip.chip-warn{color:var(--warning);border:1px solid currentColor}
+.explanation{margin:0;font-size:13px;color:var(--ink-2);white-space:pre-wrap;overflow-wrap:break-word}
+.kv{display:flex;gap:8px;font-size:12px;color:var(--ink-3)}
+.votes{font-variant-numeric:tabular-nums;letter-spacing:.1em}
+pre.evidence{margin:0;background:var(--inset);border:1px solid var(--hairline);border-radius:6px;
+  padding:8px 10px;overflow-x:auto;max-height:320px;
+  font:12px/1.5 "SF Mono",ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;overflow-wrap:break-word}
+footer{color:var(--ink-3);font-size:12px;text-align:center;padding-top:8px}
+@media (prefers-reduced-motion:no-preference){
+  details.grader>summary,.toolbar button{transition:background .12s ease,color .12s ease}
+}
+@media (prefers-reduced-motion:reduce){
+  details.grader>summary::before{transition:none}
+}
+@media print{
+  :root,:root[data-theme="dark"],:root[data-theme="light"]{--plane:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink-2:#52514e;--ink-3:#6b6a64;--hairline:rgba(11,11,11,.10);--grid:#e1e0d9;--inset:rgba(11,11,11,.04);--accent:#2a78d6;--base-fill:#6b6a64;--delta-good:#006300;--good:#067d06;--warning:#8a6100;--critical:#d03b3b;color-scheme:light}
+  body{background:#fff}
+  .toolbar{display:none}
+  .case,.run,.grader-def{break-inside:avoid}
+  pre.evidence{max-height:none}
+}
+</style>
+<div class="wrap">
+<header>
+<div class="eyebrow">Plugin eval report</div>
+<h1>prompt-framing v1.0.0</h1>
+
+<div class="meta">
+<span class="mono">.</span>
+<span>Claude Code v2.1.300</span>
+<span class="num">2026-10-20 06:01 UTC</span>
+<span class="num">2m 16s</span>
+<span class="num">$3.48</span>
+<span class="num">12 runs</span>
+<span class="num">6 in flight</span>
+
+
+<span>judge default</span>
+<span class="num">threshold 0%</span>
+
+</div>
+</header>
+
+<section class="tiles">
+<div class="tile hero"><span class="label">Suite score</span><span class="value">90.3%</span><span class="sub">mean of per-case scores</span></div>
+
+<div class="tile"><span class="label">Cases</span><span class="value num">12</span><span class="sub">12 of 12 ≥ 0% threshold</span></div>
+<div class="tile"><span class="label">Perfect runs</span><span class="value num">58.3%</span><span class="sub">runs where every grader passed</span></div>
+</section>
+<details class="section legend">
+<summary>How to read this report</summary>
+<ul class="legend-list">
+<li>A run's score is the weighted fraction of its graders that passed; a "perfect" run passed every grader.</li>
+<li>A case's score is the mean of its runs; a case passes when its score is at or above the 0% threshold (the tick on each case bar).</li>
+<li>The suite score is the mean of the per-case scores.</li>
+<li>Judge votes are independent samples of the LLM judge; the majority decides pass or fail.</li>
+<li><strong>No baseline arm was run</strong> (ablation off) — this report shows absolute scores only and cannot say whether the plugin caused them. Re-run with <code>--ablation with-without</code> to measure the plugin’s effect.</li>
+
+</ul>
+</details>
+<div class="toolbar"><button type="button" data-act="expand">Expand all</button><button type="button" data-act="collapse">Collapse all</button></div>
+<article class="case" id="case-1">
+<div class="case-head">
+<h2>api-full-output</h2>
+<span class="muted mono">evals/prompt-builder/api-full-output</span>
+<span class="spacer"></span>
+
+
+
+<span class="meter m-accent" aria-hidden="true"><span style="width:75.0%"></span><i class="tick" style="left:0.0%"></i></span>
+<span class="num case-score">75%</span>
+</div>
+
+<details class="section" open>
+<summary>Results</summary>
+<section class="arm">
+<div class="arm-head">
+<span class="arm-label">Runs</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:75.0%"></span></span>
+<span class="num">75%</span>
+<span class="muted num">0% of runs perfect</span>
+</div>
+<div class="run">
+<div class="run-head">
+<span class="run-title">Run 1</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:75.0%"></span></span>
+<span class="num">75%</span>
+<span class="muted num">7 turns · $0.37 · 06:01:27 UTC</span>
+</div>
+
+<div class="graders"><details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">skill-fired</span>  </summary>
+<div class="grader-body">
+<p class="explanation">Skill called 1x (expected 1..∞)</p>
+
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">output-structure</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">감지된 세션 모델: claude-opus-5-5
+대상 모델: claude-opus-5-5 → Opus 5.5 가이드 적용 (확인일 2026-10-01이라 90일이 지나지 않아 다시 대조하지 않았습니다)
+
+```
+진행 상황:
+- [x] 1. 세션 모델 감지
+- [x] 2. 기본 설정 (API 시스템 / claude-opus-5-5 / 한국어 / 빠른 모드)
+- [x] 3. 모델 가이드 로드 및 확인일 점검
+- [x] 4. 초안 분석 (초안 없음)
+- [x] 5. 구성 요소 인터뷰 (요청에서 모두 확인, 기본값 표 승인)
+- [x] 6. 모델 특화 결정 질문 (M5: 추가하지 않음)
+- [x] 7. 조립
+- [x] 8. 자체 검수
+- [x] 9. 출력
+```
+
+**승인된 기본값**
+
+| 항목 | 기본값 | 근거 |
+|---|---|---|
+| A3 우선순위 | 품질 | - |
+| A4 구조화 출력 | 아니오 | 채팅 UI라서 코드가 파싱하지 않음 |
+| A5 모델 자기 인식 | 아니오 | - |
+| A7 민감 도메인 | 아니오 | - |
+| C6 작업 단계 | 생략 | - |
+| C9 불확실할 때 | 가정을 밝히고 진행 | 해석에 따라 결과가 달라질 때만 확인 |
+| C10 출력 형식 | 마크다운 | 마크다운을 렌더링하는 채팅 UI |
+| C11 출력 길이 | 내용에 맞게 | 최신 모델은 길이를 작업에 맞춰 조절함 |
+| C12 톤 | 생략 (모델 기본) | - |
+| C13 예시 / C14 성공 검증 | 생략 | - |
+| C15 특수 입출력 | 해당 없음 | - |
+
+## 프롬프트 설계 요약
+- 대상 모델: claude-opus-5-5 (세션 모델) · 적용 가이드: 공통 원칙 + Opus 5.5 가이드 (확인일 2026-10-01, 이번 세션에서는 대조하지 않음)
+- 종류: API 시스템 프롬프트 · 언어: 한국어 · 진행 방식: 빠른 모드
+- 반영한 결정:
+  - 범위를 주문·배송·반품 문의로 정하고, 주문과 무관한 질문은 정중히 거절합니다
+  - 환불 금액은 약속하지 않습니다. 최종 금액이 검수 후 확정되기 때문이라는 이유를 함께 넣었습니다
+  - 반품 기한(수령 후 7일)과 단순 변심 반품비(3,000원, 고객 부담)를 배경 사실로 넣었습니다
+  - `{{ORDER_INFO}}`를 런타임 변수로 두었습니다
+  - 멀티턴이지만 이전 답변 재검토를 막는 지시(P6)와 붙여넣은 텍스트 표시(P7)는 넣지 않았습니다
+- 적용한 best practice:
+  - 역할을 첫머리에 한두 문장으로 두었습니다
+  - 배경, 지시, 제약, 입력, 형식을 XML 태그로 나눴습니다
+  - 규칙마다 이유를 붙였습니다
+  - 금지형 문장을 해야 할 행동 중심으로 바꿨습니다
+  - `CRITICAL`이나 `MUST` 같은 과한 강조는 쓰지 않았습니다
+  - 프롬프트에 사고를 지시하는 문구를 넣지 않았습니다. Opus 5.5는 사고가 항상 켜져 있습니다
+
+### system
+
+```markdown
+당신은 온라인 쇼핑몰의 고객지원 상담원입니다. 일반 소비자 고객이 보내는 주문·배송·반품 문의에 답합니다.
+
+&lt;context&gt;
+- 목적: 고객의 주문·배송·반품 문의를 상담원 연결 없이 이 대화 안에서 해결하는 것입니다. 고객이 추가 문의 없이 다음 행동을 알 수 있으면 성공입니다.
+- 사용자: 쇼핑몰을 이용하는 일반 소비자입니다.
+- 반품 정책:
+  - 반품은 상품 수령 후 7일 이내에 신청할 수 있습니다.
+  - 단순 변심으로 반품하면 반품비 3,000원은 고객이 부담합니다.
+&lt;/context&gt;
+
+&lt;order_info&gt;
+{{ORDER_INFO}}
+&lt;/order_info&gt;
+
+&lt;instructions&gt;
+- 고객 메시지를 읽고 &lt;order_info&gt;의 주문 정보 JSON을 근거로 답합니다.
+- 반품 문의에는 위 반품 정책을 주문 정보(수령일 등)에 비추어 안내합니다.
+- 대화는 여러 턴 이어집니다. 앞선 대화에서 고객이 이미 알려 준 내용은 다시 묻지 않고 이어서 답합니다.
+&lt;/instructions&gt;
+
+&lt;constraints&gt;
+- 환불이나 반품 비용을 안내할 때, 최종 환불 금액은 상품 검수 후 확정된다고 안내하고 구체적인 환불 금액을 약속하지 않습니다. 검수 결과에 따라 금액이 달라질 수 있어서, 미리 약속한 금액이 실제와 다르면 고객에게 잘못된 안내가 되기 때문입니다.
+- 주문·배송·반품과 무관한 질문에는 정중히 거절하고, 주문·배송·반품 문의는 도와드릴 수 있다고 안내합니다.
+- 주문 정보나 고객 메시지만으로 판단하기 어려우면, 어떤 가정을 했는지 밝히고 답을 이어 갑니다. 해석에 따라 안내가 실질적으로 달라질 때만 고객에게 확인 질문을 합니다.
+&lt;/constraints&gt;
+
+&lt;output_format&gt;
+- 응답은 마크다운을 렌더링하는 채팅 화면에 표시됩니다. 필요할 때 목록이나 굵은 글씨로 읽기 쉽게 정리합니다.
+- 길이는 문의 내용에 맞춥니다.
+&lt;/output_format&gt;
+```
+
+## 실행 설정 권고
+
+```yaml
+model: claude-opus-5-5
+output_config:
+  effort: medium   # Opus 5.5 기본값. 이 값을 명시적으로 지정하고 여기서 시작한다
+max_tokens: 16000  # 사고 토큰도 포함되므로 채팅 답변 기준으로 넉넉하게 잡음
+# thinking: 설정하지 않음 (항상 켜져 있음, disabled는 허용되지 않음)
+```
+
+- 응답은 블록 타입별로 읽어야 합니다. 첫 블록이 `thinking`일 수 있습니다.
+- 시스템 프롬프트는 세션의 첫 요청에서 확정하세요. 대화 도중에 `{{ORDER_INFO}}`를 바꿔 끼우면 이전 사고 블록이 무효화되고 캐시가 깨집니다. 주문 정보가 바뀌어야 한다면 user 메시지로 넣는 방식을 검토하세요.
+- 응답 지연이 문제가 되면 프롬프트를 고치기보다 effort를 `low`로 먼저 낮춰 측정하세요.
+
+## 다음 단계
+- 대표 입력 3개 이상으로 테스트하세요. 예: 배송 조회, 수령 7일 이내 단순 변심 반품, 7일이 지난 반품, 주문과 무관한 질문. effort를 `low`와 `medium`으로 바꿔 가며 비교해 보세요.
+- 기본값으로 둔 항목 중 품질에 영향을 줄 수 있는 것:
+  - **톤(C12)**: 모델 기본 톤을 씁니다. 브랜드 보이스가 있다면 추가하는 것이 좋습니다.
+  - **예시(C13)**: 넣지 않았습니다. 답변 형식과 어조가 들쭉날쭉하면 실제 상담 예시 3~5개를 넣으세요.
+  - **불확실할 때(C9)**: &quot;가정을 밝히고 진행&quot;으로 두었습니다. 고객지원에서는 확인 질문을 먼저 하는 편이 나을 수 있습니다.
+- 정책에 없는 상황에 대한 지시는 없습니다. 예를 들어 불량·오배송 반품비, 7일이 지난 반품 요청, 상담원 연결 요청이 그렇습니다. 이런 경우 모델이 직접 판단하게 되므로, 정해진 기준이 있으면 알려 주세요. 해당 항목만 고쳐서 갱신하겠습니다.</pre>
+</div>
+</details>
+<details class="grader" open>
+<summary><span class="chip chip-fail">✗ fail</span> <span class="grader-name">no-framing</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS FAIL FAIL</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✗ ✗</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">감지된 세션 모델: claude-opus-5-5
+대상 모델: claude-opus-5-5 → Opus 5.5 가이드 적용 (확인일 2026-10-01이라 90일이 지나지 않아 다시 대조하지 않았습니다)
+
+```
+진행 상황:
+- [x] 1. 세션 모델 감지
+- [x] 2. 기본 설정 (API 시스템 / claude-opus-5-5 / 한국어 / 빠른 모드)
+- [x] 3. 모델 가이드 로드 및 확인일 점검
+- [x] 4. 초안 분석 (초안 없음)
+- [x] 5. 구성 요소 인터뷰 (요청에서 모두 확인, 기본값 표 승인)
+- [x] 6. 모델 특화 결정 질문 (M5: 추가하지 않음)
+- [x] 7. 조립
+- [x] 8. 자체 검수
+- [x] 9. 출력
+```
+
+**승인된 기본값**
+
+| 항목 | 기본값 | 근거 |
+|---|---|---|
+| A3 우선순위 | 품질 | - |
+| A4 구조화 출력 | 아니오 | 채팅 UI라서 코드가 파싱하지 않음 |
+| A5 모델 자기 인식 | 아니오 | - |
+| A7 민감 도메인 | 아니오 | - |
+| C6 작업 단계 | 생략 | - |
+| C9 불확실할 때 | 가정을 밝히고 진행 | 해석에 따라 결과가 달라질 때만 확인 |
+| C10 출력 형식 | 마크다운 | 마크다운을 렌더링하는 채팅 UI |
+| C11 출력 길이 | 내용에 맞게 | 최신 모델은 길이를 작업에 맞춰 조절함 |
+| C12 톤 | 생략 (모델 기본) | - |
+| C13 예시 / C14 성공 검증 | 생략 | - |
+| C15 특수 입출력 | 해당 없음 | - |
+
+## 프롬프트 설계 요약
+- 대상 모델: claude-opus-5-5 (세션 모델) · 적용 가이드: 공통 원칙 + Opus 5.5 가이드 (확인일 2026-10-01, 이번 세션에서는 대조하지 않음)
+- 종류: API 시스템 프롬프트 · 언어: 한국어 · 진행 방식: 빠른 모드
+- 반영한 결정:
+  - 범위를 주문·배송·반품 문의로 정하고, 주문과 무관한 질문은 정중히 거절합니다
+  - 환불 금액은 약속하지 않습니다. 최종 금액이 검수 후 확정되기 때문이라는 이유를 함께 넣었습니다
+  - 반품 기한(수령 후 7일)과 단순 변심 반품비(3,000원, 고객 부담)를 배경 사실로 넣었습니다
+  - `{{ORDER_INFO}}`를 런타임 변수로 두었습니다
+  - 멀티턴이지만 이전 답변 재검토를 막는 지시(P6)와 붙여넣은 텍스트 표시(P7)는 넣지 않았습니다
+- 적용한 best practice:
+  - 역할을 첫머리에 한두 문장으로 두었습니다
+  - 배경, 지시, 제약, 입력, 형식을 XML 태그로 나눴습니다
+  - 규칙마다 이유를 붙였습니다
+  - 금지형 문장을 해야 할 행동 중심으로 바꿨습니다
+  - `CRITICAL`이나 `MUST` 같은 과한 강조는 쓰지 않았습니다
+  - 프롬프트에 사고를 지시하는 문구를 넣지 않았습니다. Opus 5.5는 사고가 항상 켜져 있습니다
+
+### system
+
+```markdown
+당신은 온라인 쇼핑몰의 고객지원 상담원입니다. 일반 소비자 고객이 보내는 주문·배송·반품 문의에 답합니다.
+
+&lt;context&gt;
+- 목적: 고객의 주문·배송·반품 문의를 상담원 연결 없이 이 대화 안에서 해결하는 것입니다. 고객이 추가 문의 없이 다음 행동을 알 수 있으면 성공입니다.
+- 사용자: 쇼핑몰을 이용하는 일반 소비자입니다.
+- 반품 정책:
+  - 반품은 상품 수령 후 7일 이내에 신청할 수 있습니다.
+  - 단순 변심으로 반품하면 반품비 3,000원은 고객이 부담합니다.
+&lt;/context&gt;
+
+&lt;order_info&gt;
+{{ORDER_INFO}}
+&lt;/order_info&gt;
+
+&lt;instructions&gt;
+- 고객 메시지를 읽고 &lt;order_info&gt;의 주문 정보 JSON을 근거로 답합니다.
+- 반품 문의에는 위 반품 정책을 주문 정보(수령일 등)에 비추어 안내합니다.
+- 대화는 여러 턴 이어집니다. 앞선 대화에서 고객이 이미 알려 준 내용은 다시 묻지 않고 이어서 답합니다.
+&lt;/instructions&gt;
+
+&lt;constraints&gt;
+- 환불이나 반품 비용을 안내할 때, 최종 환불 금액은 상품 검수 후 확정된다고 안내하고 구체적인 환불 금액을 약속하지 않습니다. 검수 결과에 따라 금액이 달라질 수 있어서, 미리 약속한 금액이 실제와 다르면 고객에게 잘못된 안내가 되기 때문입니다.
+- 주문·배송·반품과 무관한 질문에는 정중히 거절하고, 주문·배송·반품 문의는 도와드릴 수 있다고 안내합니다.
+- 주문 정보나 고객 메시지만으로 판단하기 어려우면, 어떤 가정을 했는지 밝히고 답을 이어 갑니다. 해석에 따라 안내가 실질적으로 달라질 때만 고객에게 확인 질문을 합니다.
+&lt;/constraints&gt;
+
+&lt;output_format&gt;
+- 응답은 마크다운을 렌더링하는 채팅 화면에 표시됩니다. 필요할 때 목록이나 굵은 글씨로 읽기 쉽게 정리합니다.
+- 길이는 문의 내용에 맞춥니다.
+&lt;/output_format&gt;
+```
+
+## 실행 설정 권고
+
+```yaml
+model: claude-opus-5-5
+output_config:
+  effort: medium   # Opus 5.5 기본값. 이 값을 명시적으로 지정하고 여기서 시작한다
+max_tokens: 16000  # 사고 토큰도 포함되므로 채팅 답변 기준으로 넉넉하게 잡음
+# thinking: 설정하지 않음 (항상 켜져 있음, disabled는 허용되지 않음)
+```
+
+- 응답은 블록 타입별로 읽어야 합니다. 첫 블록이 `thinking`일 수 있습니다.
+- 시스템 프롬프트는 세션의 첫 요청에서 확정하세요. 대화 도중에 `{{ORDER_INFO}}`를 바꿔 끼우면 이전 사고 블록이 무효화되고 캐시가 깨집니다. 주문 정보가 바뀌어야 한다면 user 메시지로 넣는 방식을 검토하세요.
+- 응답 지연이 문제가 되면 프롬프트를 고치기보다 effort를 `low`로 먼저 낮춰 측정하세요.
+
+## 다음 단계
+- 대표 입력 3개 이상으로 테스트하세요. 예: 배송 조회, 수령 7일 이내 단순 변심 반품, 7일이 지난 반품, 주문과 무관한 질문. effort를 `low`와 `medium`으로 바꿔 가며 비교해 보세요.
+- 기본값으로 둔 항목 중 품질에 영향을 줄 수 있는 것:
+  - **톤(C12)**: 모델 기본 톤을 씁니다. 브랜드 보이스가 있다면 추가하는 것이 좋습니다.
+  - **예시(C13)**: 넣지 않았습니다. 답변 형식과 어조가 들쭉날쭉하면 실제 상담 예시 3~5개를 넣으세요.
+  - **불확실할 때(C9)**: &quot;가정을 밝히고 진행&quot;으로 두었습니다. 고객지원에서는 확인 질문을 먼저 하는 편이 나을 수 있습니다.
+- 정책에 없는 상황에 대한 지시는 없습니다. 예를 들어 불량·오배송 반품비, 7일이 지난 반품 요청, 상담원 연결 요청이 그렇습니다. 이런 경우 모델이 직접 판단하게 되므로, 정해진 기준이 있으면 알려 주세요. 해당 항목만 고쳐서 갱신하겠습니다.</pre>
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">no-fabrication</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: FAIL PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✗ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">감지된 세션 모델: claude-opus-5-5
+대상 모델: claude-opus-5-5 → Opus 5.5 가이드 적용 (확인일 2026-10-01이라 90일이 지나지 않아 다시 대조하지 않았습니다)
+
+```
+진행 상황:
+- [x] 1. 세션 모델 감지
+- [x] 2. 기본 설정 (API 시스템 / claude-opus-5-5 / 한국어 / 빠른 모드)
+- [x] 3. 모델 가이드 로드 및 확인일 점검
+- [x] 4. 초안 분석 (초안 없음)
+- [x] 5. 구성 요소 인터뷰 (요청에서 모두 확인, 기본값 표 승인)
+- [x] 6. 모델 특화 결정 질문 (M5: 추가하지 않음)
+- [x] 7. 조립
+- [x] 8. 자체 검수
+- [x] 9. 출력
+```
+
+**승인된 기본값**
+
+| 항목 | 기본값 | 근거 |
+|---|---|---|
+| A3 우선순위 | 품질 | - |
+| A4 구조화 출력 | 아니오 | 채팅 UI라서 코드가 파싱하지 않음 |
+| A5 모델 자기 인식 | 아니오 | - |
+| A7 민감 도메인 | 아니오 | - |
+| C6 작업 단계 | 생략 | - |
+| C9 불확실할 때 | 가정을 밝히고 진행 | 해석에 따라 결과가 달라질 때만 확인 |
+| C10 출력 형식 | 마크다운 | 마크다운을 렌더링하는 채팅 UI |
+| C11 출력 길이 | 내용에 맞게 | 최신 모델은 길이를 작업에 맞춰 조절함 |
+| C12 톤 | 생략 (모델 기본) | - |
+| C13 예시 / C14 성공 검증 | 생략 | - |
+| C15 특수 입출력 | 해당 없음 | - |
+
+## 프롬프트 설계 요약
+- 대상 모델: claude-opus-5-5 (세션 모델) · 적용 가이드: 공통 원칙 + Opus 5.5 가이드 (확인일 2026-10-01, 이번 세션에서는 대조하지 않음)
+- 종류: API 시스템 프롬프트 · 언어: 한국어 · 진행 방식: 빠른 모드
+- 반영한 결정:
+  - 범위를 주문·배송·반품 문의로 정하고, 주문과 무관한 질문은 정중히 거절합니다
+  - 환불 금액은 약속하지 않습니다. 최종 금액이 검수 후 확정되기 때문이라는 이유를 함께 넣었습니다
+  - 반품 기한(수령 후 7일)과 단순 변심 반품비(3,000원, 고객 부담)를 배경 사실로 넣었습니다
+  - `{{ORDER_INFO}}`를 런타임 변수로 두었습니다
+  - 멀티턴이지만 이전 답변 재검토를 막는 지시(P6)와 붙여넣은 텍스트 표시(P7)는 넣지 않았습니다
+- 적용한 best practice:
+  - 역할을 첫머리에 한두 문장으로 두었습니다
+  - 배경, 지시, 제약, 입력, 형식을 XML 태그로 나눴습니다
+  - 규칙마다 이유를 붙였습니다
+  - 금지형 문장을 해야 할 행동 중심으로 바꿨습니다
+  - `CRITICAL`이나 `MUST` 같은 과한 강조는 쓰지 않았습니다
+  - 프롬프트에 사고를 지시하는 문구를 넣지 않았습니다. Opus 5.5는 사고가 항상 켜져 있습니다
+
+### system
+
+```markdown
+당신은 온라인 쇼핑몰의 고객지원 상담원입니다. 일반 소비자 고객이 보내는 주문·배송·반품 문의에 답합니다.
+
+&lt;context&gt;
+- 목적: 고객의 주문·배송·반품 문의를 상담원 연결 없이 이 대화 안에서 해결하는 것입니다. 고객이 추가 문의 없이 다음 행동을 알 수 있으면 성공입니다.
+- 사용자: 쇼핑몰을 이용하는 일반 소비자입니다.
+- 반품 정책:
+  - 반품은 상품 수령 후 7일 이내에 신청할 수 있습니다.
+  - 단순 변심으로 반품하면 반품비 3,000원은 고객이 부담합니다.
+&lt;/context&gt;
+
+&lt;order_info&gt;
+{{ORDER_INFO}}
+&lt;/order_info&gt;
+
+&lt;instructions&gt;
+- 고객 메시지를 읽고 &lt;order_info&gt;의 주문 정보 JSON을 근거로 답합니다.
+- 반품 문의에는 위 반품 정책을 주문 정보(수령일 등)에 비추어 안내합니다.
+- 대화는 여러 턴 이어집니다. 앞선 대화에서 고객이 이미 알려 준 내용은 다시 묻지 않고 이어서 답합니다.
+&lt;/instructions&gt;
+
+&lt;constraints&gt;
+- 환불이나 반품 비용을 안내할 때, 최종 환불 금액은 상품 검수 후 확정된다고 안내하고 구체적인 환불 금액을 약속하지 않습니다. 검수 결과에 따라 금액이 달라질 수 있어서, 미리 약속한 금액이 실제와 다르면 고객에게 잘못된 안내가 되기 때문입니다.
+- 주문·배송·반품과 무관한 질문에는 정중히 거절하고, 주문·배송·반품 문의는 도와드릴 수 있다고 안내합니다.
+- 주문 정보나 고객 메시지만으로 판단하기 어려우면, 어떤 가정을 했는지 밝히고 답을 이어 갑니다. 해석에 따라 안내가 실질적으로 달라질 때만 고객에게 확인 질문을 합니다.
+&lt;/constraints&gt;
+
+&lt;output_format&gt;
+- 응답은 마크다운을 렌더링하는 채팅 화면에 표시됩니다. 필요할 때 목록이나 굵은 글씨로 읽기 쉽게 정리합니다.
+- 길이는 문의 내용에 맞춥니다.
+&lt;/output_format&gt;
+```
+
+## 실행 설정 권고
+
+```yaml
+model: claude-opus-5-5
+output_config:
+  effort: medium   # Opus 5.5 기본값. 이 값을 명시적으로 지정하고 여기서 시작한다
+max_tokens: 16000  # 사고 토큰도 포함되므로 채팅 답변 기준으로 넉넉하게 잡음
+# thinking: 설정하지 않음 (항상 켜져 있음, disabled는 허용되지 않음)
+```
+
+- 응답은 블록 타입별로 읽어야 합니다. 첫 블록이 `thinking`일 수 있습니다.
+- 시스템 프롬프트는 세션의 첫 요청에서 확정하세요. 대화 도중에 `{{ORDER_INFO}}`를 바꿔 끼우면 이전 사고 블록이 무효화되고 캐시가 깨집니다. 주문 정보가 바뀌어야 한다면 user 메시지로 넣는 방식을 검토하세요.
+- 응답 지연이 문제가 되면 프롬프트를 고치기보다 effort를 `low`로 먼저 낮춰 측정하세요.
+
+## 다음 단계
+- 대표 입력 3개 이상으로 테스트하세요. 예: 배송 조회, 수령 7일 이내 단순 변심 반품, 7일이 지난 반품, 주문과 무관한 질문. effort를 `low`와 `medium`으로 바꿔 가며 비교해 보세요.
+- 기본값으로 둔 항목 중 품질에 영향을 줄 수 있는 것:
+  - **톤(C12)**: 모델 기본 톤을 씁니다. 브랜드 보이스가 있다면 추가하는 것이 좋습니다.
+  - **예시(C13)**: 넣지 않았습니다. 답변 형식과 어조가 들쭉날쭉하면 실제 상담 예시 3~5개를 넣으세요.
+  - **불확실할 때(C9)**: &quot;가정을 밝히고 진행&quot;으로 두었습니다. 고객지원에서는 확인 질문을 먼저 하는 편이 나을 수 있습니다.
+- 정책에 없는 상황에 대한 지시는 없습니다. 예를 들어 불량·오배송 반품비, 7일이 지난 반품 요청, 상담원 연결 요청이 그렇습니다. 이런 경우 모델이 직접 판단하게 되므로, 정해진 기준이 있으면 알려 주세요. 해당 항목만 고쳐서 갱신하겠습니다.</pre>
+</div>
+</details></div>
+</div>
+</section>
+</details>
+<details class="section" open>
+<summary>Prompt</summary>
+<div class="md"><p>고객 문의에 답하는 API 시스템 프롬프트 만들어줘. 답은 아래와 같아.</p>
+<ul>
+<li>목적: 쇼핑몰 고객의 주문·배송·반품 문의에 답한다. 성공 = 상담원 연결 없이 해결</li>
+<li>사용자: 일반 소비자. 역할: 쇼핑몰 고객지원 상담원</li>
+<li>배경: 반품은 수령 후 7일 이내, 단순 변심 반품비 3,000원은 고객 부담</li>
+<li>입력: 고객 메시지와 {{ORDER_INFO}}(주문 정보 JSON)</li>
+<li>규칙: 환불 금액을 약속하지 않는다. 이유: 최종 금액은 검수 후 확정된다</li>
+<li>범위 밖: 주문과 무관한 질문은 정중히 거절한다</li>
+<li>배포 채널: 마크다운 채팅 UI. 대화: 멀티턴. 외부 텍스트 붙여넣기: 없음
+대상 모델은 세션 모델, 프롬프트 언어는 한국어, 빠른 모드로 하고, 기본값 표는 모두 승인한다. 모델 특화 결정 질문은 모두 '추가하지 않음 / 아니오'로 답한다. 더 묻지 말고 바로 최종 결과를 내줘.</li>
+</ul>
+</div>
+</details>
+<details class="section" open>
+<summary>Graders — what "good" means for this case</summary>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">skill-fired</span><span class="badge">tool_used</span></div>
+<div class="config"><div class="kv"><span>tool</span><code>&quot;Skill&quot;</code></div><div class="kv"><span>input_match</span><code>&quot;\&quot;skill\&quot;\\s*:\\s*\&quot;(?:[\\w-]+:)?prompt-builder\&quot;&quot;</code></div></div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">output-structure</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 설계 요약 → 완성 프롬프트(markdown 코드블록) → 실행 설정 권고 → 다음 단계 순서로 출력한다.
+FAIL: 네 부분 중 하나가 빠졌거나 순서가 다르다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">no-framing</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: API 시스템 프롬프트이므로 C16을 묻지 않고, 완성 프롬프트에 framing-problems 호출 지시가 없다.
+FAIL: C16을 묻거나 framing-problems 호출 지시를 넣는다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">no-fabrication</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 받은 값(반품 7일, 반품비 3,000원, 환불 금액 약속 금지 등) 외의 정책이나 수치를 지어내지 않는다.
+FAIL: 받지 않은 정책·수치·연락처 등을 지어 넣는다.</p>
+</div>
+</div>
+</details>
+</article>
+<article class="case" id="case-2">
+<div class="case-head">
+<h2>bugfix-template-framing</h2>
+<span class="muted mono">evals/prompt-builder/bugfix-template-framing</span>
+<span class="spacer"></span>
+
+
+
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span><i class="tick" style="left:0.0%"></i></span>
+<span class="num case-score">100%</span>
+</div>
+
+<details class="section" open>
+<summary>Results</summary>
+<section class="arm">
+<div class="arm-head">
+<span class="arm-label">Runs</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span></span>
+<span class="num">100%</span>
+<span class="muted num">100% of runs perfect</span>
+</div>
+<div class="run">
+<div class="run-head">
+<span class="run-title">Run 1</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span></span>
+<span class="num">100%</span>
+<span class="muted num">7 turns · $0.33 · 06:01:27 UTC</span>
+</div>
+
+<div class="graders"><details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">skill-fired</span>  </summary>
+<div class="grader-body">
+<p class="explanation">Skill called 1x (expected 1..∞)</p>
+
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">c16-recapped</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">## 프롬프트 설계 요약
+- 대상 모델: claude-opus-5-5 (세션 모델) · 적용 가이드: 공통 원칙 + Opus 5.5 가이드 (확인일 2026-10-01, 이번 세션에서 출처 문서와 다시 대조하지는 않음. 확인일이 90일 이내라 점검 대상이 아님)
+- 종류: 단발 작업 · 언어: 한국어 · 진행 방식: 빠른 모드
+- 반영한 결정:
+  - 성공 기준: 재현 테스트를 추가하고 그 테스트가 통과함
+  - 독자는 리포트를 올린 개발자이고, 산출물은 코드와 짧은 결과 보고
+  - 변수 템플릿: `{{BUG_REPORT}}` 하나
+  - 실행 시 구체화(C16)를 켬: 고치기 전에 framing-problems로 문제부터 정리함
+  - 기본값 표 전체 승인: 마크다운, 길이는 내용에 맞게, 정보가 모자라면 가정을 밝히고 진행. 역할·규칙·예시·인용은 생략
+  - 모델 특화 결정 질문: 조건에 맞는 항목이 없어 추가한 스니펫 없음
+- 적용한 best practice:
+  - 리포트는 `&lt;bug_report&gt;` 태그로 위에 두고 지시는 아래에 둠
+  - 구체화 지시를 작업 지시보다 앞에 두고 네 가지 보조 규칙을 함께 넣음
+  - 순서가 중요한 작업이라 번호 단계로 씀
+  - 하지 말 것보다 할 것을 적고, 과한 강조 표현은 쓰지 않음
+  - prefill이나 사고를 끄는 설정에 의존하지 않음 (Opus 5.5 기준)
+
+## 완성 프롬프트
+
+````markdown
+&lt;bug_report&gt;
+{{BUG_REPORT}}
+&lt;/bug_report&gt;
+
+&lt;context&gt;
+위 버그 리포트는 이 저장소의 개발자가 올린 것이다. 이 저장소는 TypeScript 웹 앱이고 테스트는 vitest로 돌린다.
+이번 작업의 목적은 증상만 막는 것이 아니라 원인부터 짚고 고치는 것이다. 작업은 재현 테스트를 추가하고 그 테스트가 통과하면 끝난다. 결과는 리포트를 올린 개발자가 읽는다.
+&lt;/context&gt;
+
+&lt;framing&gt;
+고치기 전에 framing-problems 스킬로 이 버그 리포트를 먼저 구체화한다. 구체화할 때 다음을 지킨다.
+1. 이 프롬프트에 적힌 배경(TypeScript 웹 앱, vitest)과 목적, 성공 기준은 확인된 사실로 쓰고 다시 묻지 않는다.
+2. 리포트에 수정 방법이 적혀 있어도 그것은 제안 해법이다. 바로 따르지 말고 다른 후보와 비교한다.
+3. 구체화 기록이 확정되면 그 기록에 적힌 목표와 해법(R5)에 따라 아래 작업 단계를 진행한다.
+4. 작업 중에 개발자가 전제를 바로잡으면 framing-problems의 되돌아가기 절차로 기록을 고친 뒤 이어서 진행한다.
+&lt;/framing&gt;
+
+&lt;instructions&gt;
+구체화 기록이 확정되면 다음 순서로 진행한다.
+1. 리포트의 증상을 재현하는 vitest 테스트를 작성하고, 수정 전 코드에서 이 테스트가 실패하는지 확인한다. 테스트가 실패해야 그 버그를 정말 재현했다고 볼 수 있다.
+2. 구체화 기록에서 확정한 원인을 고친다.
+3. 재현 테스트가 통과하는지 확인한다.
+리포트만으로 정보가 모자라면 무엇을 가정했는지 밝히고 진행한다.
+&lt;/instructions&gt;
+
+&lt;output_format&gt;
+작업을 마치면 리포트를 올린 개발자에게 마크다운으로 결과를 보고한다. 원인, 바꾼 코드, 추가한 재현 테스트와 그 실행 결과를 넣는다. 길이는 내용에 맞춘다. 진행 중에 둔 가정이 있으면 함께 적는다.
+&lt;/output_format&gt;
+
+위 버그 리포트를 framing-problems로 구체화하는 것부터 시작하라.
+````
+
+## 다음 단계
+- 대표적인 버그 리포트를 3건 이상 넣어 테스트해 보세요. 예를 들어 재현이 쉬운 것, 재현 정보가 부족한 것, 리포트에 잘못된 수정안이 들어 있는 것을 섞으면 좋습니다. 실행 모델이 Opus 5.5이므로 이 세션에서 바로 시험할 수 있습니다.
+- 이 프롬프트를 실행할 환경에는 framing-problems 스킬이 설치돼 있어야 합니다.
+- 작업 단계(C6)는 따로 받은 답이 없었습니다. 그래서 알려 주신 성공 기준과 구체화 요구만으로 &quot;재현 테스트 작성 → 원인 수정 → 테스트 통과&quot; 3단계를 짰습니다. 팀에서 정해 둔 절차가 따로 있다면 알려 주세요. 예를 들어 전체 테스트 스위트 실행, lint, 커밋 규칙 같은 것입니다.
+- 기본값으로 처리한 항목 가운데 결과 품질에 영향을 줄 수 있는 것:
+  - 규칙(C7)을 생략해서 수정 범위에 제한이 없습니다. 리팩터링을 막는다든지, 손대면 안 되는 디렉터리가 있다든지 하는 규칙이 있으면 추가하는 편이 좋습니다.
+  - 정보가 모자랄 때(C9) 질문하지 않고 가정을 밝힌 채 진행합니다. 질문부터 하게 하려면 이 항목을 바꾸면 됩니다.
+- 고치고 싶은 항목이 있으면 그 항목만 다시 받아서 반영하겠습니다.</pre>
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">framing-instruction</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">## 프롬프트 설계 요약
+- 대상 모델: claude-opus-5-5 (세션 모델) · 적용 가이드: 공통 원칙 + Opus 5.5 가이드 (확인일 2026-10-01, 이번 세션에서 출처 문서와 다시 대조하지는 않음. 확인일이 90일 이내라 점검 대상이 아님)
+- 종류: 단발 작업 · 언어: 한국어 · 진행 방식: 빠른 모드
+- 반영한 결정:
+  - 성공 기준: 재현 테스트를 추가하고 그 테스트가 통과함
+  - 독자는 리포트를 올린 개발자이고, 산출물은 코드와 짧은 결과 보고
+  - 변수 템플릿: `{{BUG_REPORT}}` 하나
+  - 실행 시 구체화(C16)를 켬: 고치기 전에 framing-problems로 문제부터 정리함
+  - 기본값 표 전체 승인: 마크다운, 길이는 내용에 맞게, 정보가 모자라면 가정을 밝히고 진행. 역할·규칙·예시·인용은 생략
+  - 모델 특화 결정 질문: 조건에 맞는 항목이 없어 추가한 스니펫 없음
+- 적용한 best practice:
+  - 리포트는 `&lt;bug_report&gt;` 태그로 위에 두고 지시는 아래에 둠
+  - 구체화 지시를 작업 지시보다 앞에 두고 네 가지 보조 규칙을 함께 넣음
+  - 순서가 중요한 작업이라 번호 단계로 씀
+  - 하지 말 것보다 할 것을 적고, 과한 강조 표현은 쓰지 않음
+  - prefill이나 사고를 끄는 설정에 의존하지 않음 (Opus 5.5 기준)
+
+## 완성 프롬프트
+
+````markdown
+&lt;bug_report&gt;
+{{BUG_REPORT}}
+&lt;/bug_report&gt;
+
+&lt;context&gt;
+위 버그 리포트는 이 저장소의 개발자가 올린 것이다. 이 저장소는 TypeScript 웹 앱이고 테스트는 vitest로 돌린다.
+이번 작업의 목적은 증상만 막는 것이 아니라 원인부터 짚고 고치는 것이다. 작업은 재현 테스트를 추가하고 그 테스트가 통과하면 끝난다. 결과는 리포트를 올린 개발자가 읽는다.
+&lt;/context&gt;
+
+&lt;framing&gt;
+고치기 전에 framing-problems 스킬로 이 버그 리포트를 먼저 구체화한다. 구체화할 때 다음을 지킨다.
+1. 이 프롬프트에 적힌 배경(TypeScript 웹 앱, vitest)과 목적, 성공 기준은 확인된 사실로 쓰고 다시 묻지 않는다.
+2. 리포트에 수정 방법이 적혀 있어도 그것은 제안 해법이다. 바로 따르지 말고 다른 후보와 비교한다.
+3. 구체화 기록이 확정되면 그 기록에 적힌 목표와 해법(R5)에 따라 아래 작업 단계를 진행한다.
+4. 작업 중에 개발자가 전제를 바로잡으면 framing-problems의 되돌아가기 절차로 기록을 고친 뒤 이어서 진행한다.
+&lt;/framing&gt;
+
+&lt;instructions&gt;
+구체화 기록이 확정되면 다음 순서로 진행한다.
+1. 리포트의 증상을 재현하는 vitest 테스트를 작성하고, 수정 전 코드에서 이 테스트가 실패하는지 확인한다. 테스트가 실패해야 그 버그를 정말 재현했다고 볼 수 있다.
+2. 구체화 기록에서 확정한 원인을 고친다.
+3. 재현 테스트가 통과하는지 확인한다.
+리포트만으로 정보가 모자라면 무엇을 가정했는지 밝히고 진행한다.
+&lt;/instructions&gt;
+
+&lt;output_format&gt;
+작업을 마치면 리포트를 올린 개발자에게 마크다운으로 결과를 보고한다. 원인, 바꾼 코드, 추가한 재현 테스트와 그 실행 결과를 넣는다. 길이는 내용에 맞춘다. 진행 중에 둔 가정이 있으면 함께 적는다.
+&lt;/output_format&gt;
+
+위 버그 리포트를 framing-problems로 구체화하는 것부터 시작하라.
+````
+
+## 다음 단계
+- 대표적인 버그 리포트를 3건 이상 넣어 테스트해 보세요. 예를 들어 재현이 쉬운 것, 재현 정보가 부족한 것, 리포트에 잘못된 수정안이 들어 있는 것을 섞으면 좋습니다. 실행 모델이 Opus 5.5이므로 이 세션에서 바로 시험할 수 있습니다.
+- 이 프롬프트를 실행할 환경에는 framing-problems 스킬이 설치돼 있어야 합니다.
+- 작업 단계(C6)는 따로 받은 답이 없었습니다. 그래서 알려 주신 성공 기준과 구체화 요구만으로 &quot;재현 테스트 작성 → 원인 수정 → 테스트 통과&quot; 3단계를 짰습니다. 팀에서 정해 둔 절차가 따로 있다면 알려 주세요. 예를 들어 전체 테스트 스위트 실행, lint, 커밋 규칙 같은 것입니다.
+- 기본값으로 처리한 항목 가운데 결과 품질에 영향을 줄 수 있는 것:
+  - 규칙(C7)을 생략해서 수정 범위에 제한이 없습니다. 리팩터링을 막는다든지, 손대면 안 되는 디렉터리가 있다든지 하는 규칙이 있으면 추가하는 편이 좋습니다.
+  - 정보가 모자랄 때(C9) 질문하지 않고 가정을 밝힌 채 진행합니다. 질문부터 하게 하려면 이 항목을 바꾸면 됩니다.
+- 고치고 싶은 항목이 있으면 그 항목만 다시 받아서 반영하겠습니다.</pre>
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">request-variable</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">## 프롬프트 설계 요약
+- 대상 모델: claude-opus-5-5 (세션 모델) · 적용 가이드: 공통 원칙 + Opus 5.5 가이드 (확인일 2026-10-01, 이번 세션에서 출처 문서와 다시 대조하지는 않음. 확인일이 90일 이내라 점검 대상이 아님)
+- 종류: 단발 작업 · 언어: 한국어 · 진행 방식: 빠른 모드
+- 반영한 결정:
+  - 성공 기준: 재현 테스트를 추가하고 그 테스트가 통과함
+  - 독자는 리포트를 올린 개발자이고, 산출물은 코드와 짧은 결과 보고
+  - 변수 템플릿: `{{BUG_REPORT}}` 하나
+  - 실행 시 구체화(C16)를 켬: 고치기 전에 framing-problems로 문제부터 정리함
+  - 기본값 표 전체 승인: 마크다운, 길이는 내용에 맞게, 정보가 모자라면 가정을 밝히고 진행. 역할·규칙·예시·인용은 생략
+  - 모델 특화 결정 질문: 조건에 맞는 항목이 없어 추가한 스니펫 없음
+- 적용한 best practice:
+  - 리포트는 `&lt;bug_report&gt;` 태그로 위에 두고 지시는 아래에 둠
+  - 구체화 지시를 작업 지시보다 앞에 두고 네 가지 보조 규칙을 함께 넣음
+  - 순서가 중요한 작업이라 번호 단계로 씀
+  - 하지 말 것보다 할 것을 적고, 과한 강조 표현은 쓰지 않음
+  - prefill이나 사고를 끄는 설정에 의존하지 않음 (Opus 5.5 기준)
+
+## 완성 프롬프트
+
+````markdown
+&lt;bug_report&gt;
+{{BUG_REPORT}}
+&lt;/bug_report&gt;
+
+&lt;context&gt;
+위 버그 리포트는 이 저장소의 개발자가 올린 것이다. 이 저장소는 TypeScript 웹 앱이고 테스트는 vitest로 돌린다.
+이번 작업의 목적은 증상만 막는 것이 아니라 원인부터 짚고 고치는 것이다. 작업은 재현 테스트를 추가하고 그 테스트가 통과하면 끝난다. 결과는 리포트를 올린 개발자가 읽는다.
+&lt;/context&gt;
+
+&lt;framing&gt;
+고치기 전에 framing-problems 스킬로 이 버그 리포트를 먼저 구체화한다. 구체화할 때 다음을 지킨다.
+1. 이 프롬프트에 적힌 배경(TypeScript 웹 앱, vitest)과 목적, 성공 기준은 확인된 사실로 쓰고 다시 묻지 않는다.
+2. 리포트에 수정 방법이 적혀 있어도 그것은 제안 해법이다. 바로 따르지 말고 다른 후보와 비교한다.
+3. 구체화 기록이 확정되면 그 기록에 적힌 목표와 해법(R5)에 따라 아래 작업 단계를 진행한다.
+4. 작업 중에 개발자가 전제를 바로잡으면 framing-problems의 되돌아가기 절차로 기록을 고친 뒤 이어서 진행한다.
+&lt;/framing&gt;
+
+&lt;instructions&gt;
+구체화 기록이 확정되면 다음 순서로 진행한다.
+1. 리포트의 증상을 재현하는 vitest 테스트를 작성하고, 수정 전 코드에서 이 테스트가 실패하는지 확인한다. 테스트가 실패해야 그 버그를 정말 재현했다고 볼 수 있다.
+2. 구체화 기록에서 확정한 원인을 고친다.
+3. 재현 테스트가 통과하는지 확인한다.
+리포트만으로 정보가 모자라면 무엇을 가정했는지 밝히고 진행한다.
+&lt;/instructions&gt;
+
+&lt;output_format&gt;
+작업을 마치면 리포트를 올린 개발자에게 마크다운으로 결과를 보고한다. 원인, 바꾼 코드, 추가한 재현 테스트와 그 실행 결과를 넣는다. 길이는 내용에 맞춘다. 진행 중에 둔 가정이 있으면 함께 적는다.
+&lt;/output_format&gt;
+
+위 버그 리포트를 framing-problems로 구체화하는 것부터 시작하라.
+````
+
+## 다음 단계
+- 대표적인 버그 리포트를 3건 이상 넣어 테스트해 보세요. 예를 들어 재현이 쉬운 것, 재현 정보가 부족한 것, 리포트에 잘못된 수정안이 들어 있는 것을 섞으면 좋습니다. 실행 모델이 Opus 5.5이므로 이 세션에서 바로 시험할 수 있습니다.
+- 이 프롬프트를 실행할 환경에는 framing-problems 스킬이 설치돼 있어야 합니다.
+- 작업 단계(C6)는 따로 받은 답이 없었습니다. 그래서 알려 주신 성공 기준과 구체화 요구만으로 &quot;재현 테스트 작성 → 원인 수정 → 테스트 통과&quot; 3단계를 짰습니다. 팀에서 정해 둔 절차가 따로 있다면 알려 주세요. 예를 들어 전체 테스트 스위트 실행, lint, 커밋 규칙 같은 것입니다.
+- 기본값으로 처리한 항목 가운데 결과 품질에 영향을 줄 수 있는 것:
+  - 규칙(C7)을 생략해서 수정 범위에 제한이 없습니다. 리팩터링을 막는다든지, 손대면 안 되는 디렉터리가 있다든지 하는 규칙이 있으면 추가하는 편이 좋습니다.
+  - 정보가 모자랄 때(C9) 질문하지 않고 가정을 밝힌 채 진행합니다. 질문부터 하게 하려면 이 항목을 바꾸면 됩니다.
+- 고치고 싶은 항목이 있으면 그 항목만 다시 받아서 반영하겠습니다.</pre>
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">framing-not-run</span>  </summary>
+<div class="grader-body">
+<p class="explanation">Skill called 0x (expected 0..0)</p>
+
+</div>
+</details></div>
+</div>
+</section>
+</details>
+<details class="section" open>
+<summary>Prompt</summary>
+<div class="md"><p>버그 수정 요청이 올 때마다 쓸 단발 작업 프롬프트 템플릿 만들어줘. 실행하면 바로 고치지 말고 문제부터 구체화하게 해줘. 답은 아래와 같아.</p>
+<ul>
+<li>목적: 들어온 버그 리포트를 원인부터 짚고 고친다. 성공 = 재현 테스트가 추가되고 통과</li>
+<li>독자: 리포트를 올린 개발자</li>
+<li>배경: TypeScript 웹 앱, 테스트는 vitest</li>
+<li>자료: 버그 리포트 한 건</li>
+<li>재사용: 변수를 바꿔 가며 쓰는 템플릿</li>
+<li>산출물: 코드
+대상 모델은 세션 모델, 프롬프트 언어는 한국어, 빠른 모드로 하고, 기본값 표는 모두 승인한다. 모델 특화 결정 질문은 모두 '추가하지 않음 / 아니오'로 답한다. 더 묻지 말고 바로 최종 결과를 내줘.</li>
+</ul>
+</div>
+</details>
+<details class="section" open>
+<summary>Graders — what "good" means for this case</summary>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">skill-fired</span><span class="badge">tool_used</span></div>
+<div class="config"><div class="kv"><span>tool</span><code>&quot;Skill&quot;</code></div><div class="kv"><span>input_match</span><code>&quot;\&quot;skill\&quot;\\s*:\\s*\&quot;(?:[\\w-]+:)?prompt-builder\&quot;&quot;</code></div></div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">c16-recapped</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: C16(실행 시 구체화)을 묻지 않고 '예'로 되짚는다.
+FAIL: C16을 다시 묻는다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">framing-instruction</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 완성 프롬프트의 작업 지시보다 앞에 framing-problems 호출 지시가 있고, 네 가지(프롬프트 내용은 확인된 사실로 씀, 적힌 해법은 보류, 확정된 기록의 R5에 따라 작업, 정정 시 되돌아가기)를 모두 담는다.
+FAIL: 호출 지시가 없거나 작업 지시 뒤에 있거나 네 가지 중 하나라도 빠졌다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">request-variable</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 버그 리포트를 {{REQUEST}} 같은 변수로 두고 변수 목록을 보여 준다.
+FAIL: 버그 리포트를 변수로 두지 않는다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">framing-not-run</span><span class="badge">tool_used</span></div>
+<div class="config"><div class="kv"><span>tool</span><code>&quot;Skill&quot;</code></div><div class="kv"><span>input_match</span><code>&quot;\&quot;skill\&quot;\\s*:\\s*\&quot;(?:[\\w-]+:)?framing-problems\&quot;&quot;</code></div><div class="kv"><span>min</span><code>0</code></div><div class="kv"><span>max</span><code>0</code></div><div class="kv"><span>arm</span><code>&quot;both&quot;</code></div></div>
+</div>
+</details>
+</article>
+<article class="case" id="case-3">
+<div class="case-head">
+<h2>conflict-and-tone</h2>
+<span class="muted mono">evals/prompt-builder/conflict-and-tone</span>
+<span class="spacer"></span>
+
+
+
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span><i class="tick" style="left:0.0%"></i></span>
+<span class="num case-score">100%</span>
+</div>
+
+<details class="section" open>
+<summary>Results</summary>
+<section class="arm">
+<div class="arm-head">
+<span class="arm-label">Runs</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span></span>
+<span class="num">100%</span>
+<span class="muted num">100% of runs perfect</span>
+</div>
+<div class="run">
+<div class="run-head">
+<span class="run-title">Run 1</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span></span>
+<span class="num">100%</span>
+<span class="muted num">4 turns · $0.19 · 06:01:27 UTC</span>
+</div>
+
+<div class="graders"><details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">skill-fired</span>  </summary>
+<div class="grader-body">
+<p class="explanation">Skill called 1x (expected 1..∞)</p>
+
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">surfaces-conflict</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">감지된 세션 모델: `claude-opus-5-5`
+
+```
+진행 상황:
+- [x] 1. 세션 모델 감지
+- [ ] 2. 기본 설정 (종류, 대상 모델, 언어, 진행 방식)  ← 지금
+- [ ] 3. 모델 가이드 로드 및 확인일 점검
+- [ ] 4. 초안 분석 (없음, 건너뜀)
+- [ ] 5. 구성 요소 인터뷰
+- [ ] 6. 모델 특화 결정 질문
+- [ ] 7. 조립
+- [ ] 8. 자체 검수
+- [ ] 9. 출력
+```
+
+**확인된 것:** 종류는 에이전트/하네스 프롬프트입니다.
+
+### 먼저 정해야 할 충돌
+&quot;사람 없이 돌아간다&quot;는 조건과 &quot;모든 변경은 실행 전에 꼭 확인받는다&quot;는 조건은 함께 성립하지 않습니다. 확인해 줄 사람이 없으면 에이전트는 매번 멈춰서 기다리게 됩니다. 어느 쪽을 따를지 골라 주세요.
+
+- (a) **무인 실행 + 승인 게이트**: 빌드, 테스트, 상태 확인 같은 읽기·검증 작업은 혼자 진행합니다. 실제 변경(배포, 설정 변경, 롤백, 삭제 등)을 하기 직전에는 승인 요청을 보내고(예: Slack, 티켓) 승인이 올 때까지 멈춥니다.
+- (b) **무인 계획 + 사람 실행**: 에이전트는 변경을 직접 하지 않습니다. 배포 계획과 dry-run 결과까지만 만들어 승인 대기열에 올리고, 실행은 승인을 받은 뒤 별도로 이뤄집니다.
+- (c) **사람이 대화하며 진행**: 사람이 세션을 지켜보고 변경할 때마다 그 자리에서 승인합니다. 이 경우 &quot;사람 없이&quot;라는 조건은 빠집니다.
+
+### 기본 설정
+1. **대상 모델:** 이 프롬프트를 실제로 어떤 모델에서 돌리나요?
+   (a) claude-opus-5-5 (세션 모델) (b) Sonnet 5.5 (c) Haiku 4.5 (d) Fable 5.1 / 직접 입력
+2. **프롬프트 언어:** (a) 한국어 (b) 영어
+3. **진행 방식:**
+   (a) 빠른 모드: 필수 항목만 묻고, 나머지는 기본값 표로 한 번에 승인받습니다.
+   (b) 상세 인터뷰: 모든 항목을 라운드별로 묻습니다.
+4. **톤:** &quot;알아서&quot;라고 하셨는데, 톤에 따라 보고와 승인 요청 메시지의 문체가 달라집니다. 아래 중 하나를 골라 주세요.
+   (a) 기술적·간결: 로그나 운영 보고처럼 사실, 수치, 다음 조치만 적습니다.
+   (b) 격식: 완결된 문장으로, 사내 보고 문서처럼 씁니다.
+   (c) 모델 기본: 톤을 따로 지시하지 않습니다.
+
+번호별로 답해 주시면 다음 라운드로 넘어가겠습니다. 다음 라운드에서는 목적, 배포 대상 환경, 사용할 도구 등을 묻습니다.</pre>
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">tone-candidates</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">감지된 세션 모델: `claude-opus-5-5`
+
+```
+진행 상황:
+- [x] 1. 세션 모델 감지
+- [ ] 2. 기본 설정 (종류, 대상 모델, 언어, 진행 방식)  ← 지금
+- [ ] 3. 모델 가이드 로드 및 확인일 점검
+- [ ] 4. 초안 분석 (없음, 건너뜀)
+- [ ] 5. 구성 요소 인터뷰
+- [ ] 6. 모델 특화 결정 질문
+- [ ] 7. 조립
+- [ ] 8. 자체 검수
+- [ ] 9. 출력
+```
+
+**확인된 것:** 종류는 에이전트/하네스 프롬프트입니다.
+
+### 먼저 정해야 할 충돌
+&quot;사람 없이 돌아간다&quot;는 조건과 &quot;모든 변경은 실행 전에 꼭 확인받는다&quot;는 조건은 함께 성립하지 않습니다. 확인해 줄 사람이 없으면 에이전트는 매번 멈춰서 기다리게 됩니다. 어느 쪽을 따를지 골라 주세요.
+
+- (a) **무인 실행 + 승인 게이트**: 빌드, 테스트, 상태 확인 같은 읽기·검증 작업은 혼자 진행합니다. 실제 변경(배포, 설정 변경, 롤백, 삭제 등)을 하기 직전에는 승인 요청을 보내고(예: Slack, 티켓) 승인이 올 때까지 멈춥니다.
+- (b) **무인 계획 + 사람 실행**: 에이전트는 변경을 직접 하지 않습니다. 배포 계획과 dry-run 결과까지만 만들어 승인 대기열에 올리고, 실행은 승인을 받은 뒤 별도로 이뤄집니다.
+- (c) **사람이 대화하며 진행**: 사람이 세션을 지켜보고 변경할 때마다 그 자리에서 승인합니다. 이 경우 &quot;사람 없이&quot;라는 조건은 빠집니다.
+
+### 기본 설정
+1. **대상 모델:** 이 프롬프트를 실제로 어떤 모델에서 돌리나요?
+   (a) claude-opus-5-5 (세션 모델) (b) Sonnet 5.5 (c) Haiku 4.5 (d) Fable 5.1 / 직접 입력
+2. **프롬프트 언어:** (a) 한국어 (b) 영어
+3. **진행 방식:**
+   (a) 빠른 모드: 필수 항목만 묻고, 나머지는 기본값 표로 한 번에 승인받습니다.
+   (b) 상세 인터뷰: 모든 항목을 라운드별로 묻습니다.
+4. **톤:** &quot;알아서&quot;라고 하셨는데, 톤에 따라 보고와 승인 요청 메시지의 문체가 달라집니다. 아래 중 하나를 골라 주세요.
+   (a) 기술적·간결: 로그나 운영 보고처럼 사실, 수치, 다음 조치만 적습니다.
+   (b) 격식: 완결된 문장으로, 사내 보고 문서처럼 씁니다.
+   (c) 모델 기본: 톤을 따로 지시하지 않습니다.
+
+번호별로 답해 주시면 다음 라운드로 넘어가겠습니다. 다음 라운드에서는 목적, 배포 대상 환경, 사용할 도구 등을 묻습니다.</pre>
+</div>
+</details></div>
+</div>
+</section>
+</details>
+<details class="section" open>
+<summary>Prompt</summary>
+<div class="md"><p>사람 없이 돌아가는 배포 자동화 에이전트 프롬프트 만들어줘. 모든 변경은 실행 전에 꼭 확인받게 하고, 톤은 알아서 해줘</p>
+</div>
+</details>
+<details class="section" open>
+<summary>Graders — what "good" means for this case</summary>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">skill-fired</span><span class="badge">tool_used</span></div>
+<div class="config"><div class="kv"><span>tool</span><code>&quot;Skill&quot;</code></div><div class="kv"><span>input_match</span><code>&quot;\&quot;skill\&quot;\\s*:\\s*\&quot;(?:[\\w-]+:)?prompt-builder\&quot;&quot;</code></div></div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">surfaces-conflict</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: '사람 없이 돌아감(무인)'과 '모든 변경 전 확인'이 충돌한다고 보여 주고 어느 쪽을 우선할지 묻는다.
+FAIL: 충돌을 짚지 않거나 한쪽을 조용히 고른다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">tone-candidates</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: '톤은 알아서'에 대해 후보 2~3개를 보여 주고 고르게 하거나, 톤 라운드에서 그렇게 하겠다고 밝힌다. 톤을 조용히 정하지 않는다.
+FAIL: 톤을 사용자 확인 없이 정해 버린다.</p>
+</div>
+</div>
+</details>
+</article>
+<article class="case" id="case-4">
+<div class="case-head">
+<h2>draft-fix</h2>
+<span class="muted mono">evals/prompt-builder/draft-fix</span>
+<span class="spacer"></span>
+
+
+
+<span class="meter m-accent" aria-hidden="true"><span style="width:75.0%"></span><i class="tick" style="left:0.0%"></i></span>
+<span class="num case-score">75%</span>
+</div>
+
+<details class="section" open>
+<summary>Results</summary>
+<section class="arm">
+<div class="arm-head">
+<span class="arm-label">Runs</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:75.0%"></span></span>
+<span class="num">75%</span>
+<span class="muted num">0% of runs perfect</span>
+</div>
+<div class="run">
+<div class="run-head">
+<span class="run-title">Run 1</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:75.0%"></span></span>
+<span class="num">75%</span>
+<span class="muted num">7 turns · $0.33 · 06:01:27 UTC</span>
+</div>
+
+<div class="graders"><details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">skill-fired</span>  </summary>
+<div class="grader-body">
+<p class="explanation">Skill called 1x (expected 1..∞)</p>
+
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">extracted-table</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">감지된 세션 모델: `claude-opus-5-5` → Opus 5.5 가이드 적용 (확인일 2026-10-01, 오늘 기준 90일 이내라 다시 대조하지 않았습니다)
+
+```
+진행 상황:
+- [x] 1. 세션 모델 감지
+- [~] 2. 기본 설정: 대상 모델·언어·진행 방식은 확인됨, 프롬프트 종류는 아직 정해지지 않음
+- [x] 3. 모델 가이드 로드
+- [~] 4. 초안 분석 ← 지금 단계
+- [ ] 5. 구성 요소 인터뷰 (빠른 모드, 기본값 표는 승인됨)
+- [x] 6. 모델 특화 결정 질문: 모두 &apos;추가하지 않음 / 아니오&apos;로 처리
+- [ ] 7~9. 조립 · 검수 · 출력
+```
+
+**확인됨:** 대상 모델은 claude-opus-5-5(세션 모델), 프롬프트 언어는 영어입니다. 빠른 모드로 진행하고, 기본값 표는 승인된 것으로 처리합니다. 모델 특화 결정 질문은 모두 &quot;아니오&quot;로 처리합니다.
+
+### 초안 분석
+
+| 항목 | 초안에서 뽑은 값 | 상태 |
+|---|---|---|
+| C3 역할 | &quot;a code reviewer&quot; | 확인됨 |
+| C7 규칙 | 심각도가 높은 이슈만 보고 | **모호**: &quot;high-severity&quot;의 기준과 이 규칙을 두는 이유가 없음 |
+| C1 목적과 성공 기준 | - | 없음 |
+| C4 배경 맥락 | - | 없음 |
+| C5 입력 | - | 없음 (diff인지, 파일인지, PR인지 알 수 없음) |
+| 출력 형식·길이 등 | - | 승인된 기본값을 씀 (마크다운, 내용에 맞는 길이) |
+| &quot;CRITICAL:&quot; 강조 | 있음 | 평이한 표현으로 바꿉니다 (강한 강조는 과잉 반응을 부르므로 공통 검수 기준에 따름) |
+
+### 제거할 문구 (하나씩 결정해 주세요)
+
+- **R1. &quot;Think step by step and write your reasoning before the answer&quot;**: 제거를 강하게 권합니다. Opus 5.5는 사고가 항상 켜져 있습니다. 응답 본문에 추론을 쓰게 하면 `reasoning_extraction` 안전 분류기에 걸려 거부(`refusal`)될 수 있습니다. 추론 과정을 봐야 한다면 API의 `thinking.display: &quot;summarized&quot;`를 쓰세요. (제거 / 유지)
+- **R2. &quot;Double-check your answer before responding&quot;**: 제거를 권합니다. Opus 5 계열은 스스로 검증하는 모델입니다. 대신 구체적인 검증 기준(예: &quot;보고 전에 각 이슈가 실제 코드 경로에서 재현되는지 확인&quot;)을 주는 편이 효과적입니다. (제거 / 구체적 기준으로 교체: 기준을 알려 주세요 / 그대로 유지)
+
+### 질문 (번호대로 답해 주세요)
+
+1. **종류(B0)**: 이 프롬프트를 어디에 쓰나요?
+   (a) API 시스템 프롬프트: 앱이나 서비스에서 리뷰 요청을 받음
+   (b) 에이전트·하네스 프롬프트: 도구로 저장소를 직접 읽고 리뷰함
+   (c) 단발 작업 프롬프트: diff를 붙여 한 번 리뷰를 요청함
+2. **목적과 성공 기준(C1)**: 리뷰로 무엇을 막거나 얻으려 하나요? 성공한 리뷰 결과는 어떤 모습인가요?
+3. **&quot;high-severity&quot;의 기준(C7)**: 어떤 이슈를 포함하고 어떤 이슈를 빼나요? (예: 보안, 데이터 손실, 크래시는 포함 / 스타일, 네이밍은 제외) 그리고 심각한 것만 보고하게 하는 **이유**는 무엇인가요? 노이즈를 줄이려는 것인지, 리뷰어 시간이 부족해서인지 등을 알려 주세요.
+4. **입력(C5)**: 실행할 때 무엇이 들어오나요? (diff, 파일 전체, PR 설명 등) 언어나 스택, 대략적인 분량도 알려 주세요.
+5. **배경 맥락(C4)**: 팀 코딩 규칙, 도메인, 아키텍처처럼 리뷰어가 알아야 할 정보가 있나요? 없으면 &quot;없음&quot;이라고 답해 주세요.
+6. **출력 독자(C2)**: 리뷰 결과는 누가 읽나요? 작성자 본인, 시니어 리뷰어, 자동화 도구 중 어느 쪽인가요?
+
+1번 답에 따라 필수 항목이 몇 개 더 생깁니다. API는 표시 채널·대화 형태·외부 텍스트 여부, 에이전트는 도구 목록·실행 방식·확인이 필요한 행동·완료 조건, 단발은 재사용 여부입니다. 이 항목들은 다음 라운드에서 한 번에 묻겠습니다.</pre>
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">removal-review</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">감지된 세션 모델: `claude-opus-5-5` → Opus 5.5 가이드 적용 (확인일 2026-10-01, 오늘 기준 90일 이내라 다시 대조하지 않았습니다)
+
+```
+진행 상황:
+- [x] 1. 세션 모델 감지
+- [~] 2. 기본 설정: 대상 모델·언어·진행 방식은 확인됨, 프롬프트 종류는 아직 정해지지 않음
+- [x] 3. 모델 가이드 로드
+- [~] 4. 초안 분석 ← 지금 단계
+- [ ] 5. 구성 요소 인터뷰 (빠른 모드, 기본값 표는 승인됨)
+- [x] 6. 모델 특화 결정 질문: 모두 &apos;추가하지 않음 / 아니오&apos;로 처리
+- [ ] 7~9. 조립 · 검수 · 출력
+```
+
+**확인됨:** 대상 모델은 claude-opus-5-5(세션 모델), 프롬프트 언어는 영어입니다. 빠른 모드로 진행하고, 기본값 표는 승인된 것으로 처리합니다. 모델 특화 결정 질문은 모두 &quot;아니오&quot;로 처리합니다.
+
+### 초안 분석
+
+| 항목 | 초안에서 뽑은 값 | 상태 |
+|---|---|---|
+| C3 역할 | &quot;a code reviewer&quot; | 확인됨 |
+| C7 규칙 | 심각도가 높은 이슈만 보고 | **모호**: &quot;high-severity&quot;의 기준과 이 규칙을 두는 이유가 없음 |
+| C1 목적과 성공 기준 | - | 없음 |
+| C4 배경 맥락 | - | 없음 |
+| C5 입력 | - | 없음 (diff인지, 파일인지, PR인지 알 수 없음) |
+| 출력 형식·길이 등 | - | 승인된 기본값을 씀 (마크다운, 내용에 맞는 길이) |
+| &quot;CRITICAL:&quot; 강조 | 있음 | 평이한 표현으로 바꿉니다 (강한 강조는 과잉 반응을 부르므로 공통 검수 기준에 따름) |
+
+### 제거할 문구 (하나씩 결정해 주세요)
+
+- **R1. &quot;Think step by step and write your reasoning before the answer&quot;**: 제거를 강하게 권합니다. Opus 5.5는 사고가 항상 켜져 있습니다. 응답 본문에 추론을 쓰게 하면 `reasoning_extraction` 안전 분류기에 걸려 거부(`refusal`)될 수 있습니다. 추론 과정을 봐야 한다면 API의 `thinking.display: &quot;summarized&quot;`를 쓰세요. (제거 / 유지)
+- **R2. &quot;Double-check your answer before responding&quot;**: 제거를 권합니다. Opus 5 계열은 스스로 검증하는 모델입니다. 대신 구체적인 검증 기준(예: &quot;보고 전에 각 이슈가 실제 코드 경로에서 재현되는지 확인&quot;)을 주는 편이 효과적입니다. (제거 / 구체적 기준으로 교체: 기준을 알려 주세요 / 그대로 유지)
+
+### 질문 (번호대로 답해 주세요)
+
+1. **종류(B0)**: 이 프롬프트를 어디에 쓰나요?
+   (a) API 시스템 프롬프트: 앱이나 서비스에서 리뷰 요청을 받음
+   (b) 에이전트·하네스 프롬프트: 도구로 저장소를 직접 읽고 리뷰함
+   (c) 단발 작업 프롬프트: diff를 붙여 한 번 리뷰를 요청함
+2. **목적과 성공 기준(C1)**: 리뷰로 무엇을 막거나 얻으려 하나요? 성공한 리뷰 결과는 어떤 모습인가요?
+3. **&quot;high-severity&quot;의 기준(C7)**: 어떤 이슈를 포함하고 어떤 이슈를 빼나요? (예: 보안, 데이터 손실, 크래시는 포함 / 스타일, 네이밍은 제외) 그리고 심각한 것만 보고하게 하는 **이유**는 무엇인가요? 노이즈를 줄이려는 것인지, 리뷰어 시간이 부족해서인지 등을 알려 주세요.
+4. **입력(C5)**: 실행할 때 무엇이 들어오나요? (diff, 파일 전체, PR 설명 등) 언어나 스택, 대략적인 분량도 알려 주세요.
+5. **배경 맥락(C4)**: 팀 코딩 규칙, 도메인, 아키텍처처럼 리뷰어가 알아야 할 정보가 있나요? 없으면 &quot;없음&quot;이라고 답해 주세요.
+6. **출력 독자(C2)**: 리뷰 결과는 누가 읽나요? 작성자 본인, 시니어 리뷰어, 자동화 도구 중 어느 쪽인가요?
+
+1번 답에 따라 필수 항목이 몇 개 더 생깁니다. API는 표시 채널·대화 형태·외부 텍스트 여부, 에이전트는 도구 목록·실행 방식·확인이 필요한 행동·완료 조건, 단발은 재사용 여부입니다. 이 항목들은 다음 라운드에서 한 번에 묻겠습니다.</pre>
+</div>
+</details>
+<details class="grader" open>
+<summary><span class="chip chip-fail">✗ fail</span> <span class="grader-name">asks-gaps-only</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS FAIL FAIL</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✗ ✗</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">감지된 세션 모델: `claude-opus-5-5` → Opus 5.5 가이드 적용 (확인일 2026-10-01, 오늘 기준 90일 이내라 다시 대조하지 않았습니다)
+
+```
+진행 상황:
+- [x] 1. 세션 모델 감지
+- [~] 2. 기본 설정: 대상 모델·언어·진행 방식은 확인됨, 프롬프트 종류는 아직 정해지지 않음
+- [x] 3. 모델 가이드 로드
+- [~] 4. 초안 분석 ← 지금 단계
+- [ ] 5. 구성 요소 인터뷰 (빠른 모드, 기본값 표는 승인됨)
+- [x] 6. 모델 특화 결정 질문: 모두 &apos;추가하지 않음 / 아니오&apos;로 처리
+- [ ] 7~9. 조립 · 검수 · 출력
+```
+
+**확인됨:** 대상 모델은 claude-opus-5-5(세션 모델), 프롬프트 언어는 영어입니다. 빠른 모드로 진행하고, 기본값 표는 승인된 것으로 처리합니다. 모델 특화 결정 질문은 모두 &quot;아니오&quot;로 처리합니다.
+
+### 초안 분석
+
+| 항목 | 초안에서 뽑은 값 | 상태 |
+|---|---|---|
+| C3 역할 | &quot;a code reviewer&quot; | 확인됨 |
+| C7 규칙 | 심각도가 높은 이슈만 보고 | **모호**: &quot;high-severity&quot;의 기준과 이 규칙을 두는 이유가 없음 |
+| C1 목적과 성공 기준 | - | 없음 |
+| C4 배경 맥락 | - | 없음 |
+| C5 입력 | - | 없음 (diff인지, 파일인지, PR인지 알 수 없음) |
+| 출력 형식·길이 등 | - | 승인된 기본값을 씀 (마크다운, 내용에 맞는 길이) |
+| &quot;CRITICAL:&quot; 강조 | 있음 | 평이한 표현으로 바꿉니다 (강한 강조는 과잉 반응을 부르므로 공통 검수 기준에 따름) |
+
+### 제거할 문구 (하나씩 결정해 주세요)
+
+- **R1. &quot;Think step by step and write your reasoning before the answer&quot;**: 제거를 강하게 권합니다. Opus 5.5는 사고가 항상 켜져 있습니다. 응답 본문에 추론을 쓰게 하면 `reasoning_extraction` 안전 분류기에 걸려 거부(`refusal`)될 수 있습니다. 추론 과정을 봐야 한다면 API의 `thinking.display: &quot;summarized&quot;`를 쓰세요. (제거 / 유지)
+- **R2. &quot;Double-check your answer before responding&quot;**: 제거를 권합니다. Opus 5 계열은 스스로 검증하는 모델입니다. 대신 구체적인 검증 기준(예: &quot;보고 전에 각 이슈가 실제 코드 경로에서 재현되는지 확인&quot;)을 주는 편이 효과적입니다. (제거 / 구체적 기준으로 교체: 기준을 알려 주세요 / 그대로 유지)
+
+### 질문 (번호대로 답해 주세요)
+
+1. **종류(B0)**: 이 프롬프트를 어디에 쓰나요?
+   (a) API 시스템 프롬프트: 앱이나 서비스에서 리뷰 요청을 받음
+   (b) 에이전트·하네스 프롬프트: 도구로 저장소를 직접 읽고 리뷰함
+   (c) 단발 작업 프롬프트: diff를 붙여 한 번 리뷰를 요청함
+2. **목적과 성공 기준(C1)**: 리뷰로 무엇을 막거나 얻으려 하나요? 성공한 리뷰 결과는 어떤 모습인가요?
+3. **&quot;high-severity&quot;의 기준(C7)**: 어떤 이슈를 포함하고 어떤 이슈를 빼나요? (예: 보안, 데이터 손실, 크래시는 포함 / 스타일, 네이밍은 제외) 그리고 심각한 것만 보고하게 하는 **이유**는 무엇인가요? 노이즈를 줄이려는 것인지, 리뷰어 시간이 부족해서인지 등을 알려 주세요.
+4. **입력(C5)**: 실행할 때 무엇이 들어오나요? (diff, 파일 전체, PR 설명 등) 언어나 스택, 대략적인 분량도 알려 주세요.
+5. **배경 맥락(C4)**: 팀 코딩 규칙, 도메인, 아키텍처처럼 리뷰어가 알아야 할 정보가 있나요? 없으면 &quot;없음&quot;이라고 답해 주세요.
+6. **출력 독자(C2)**: 리뷰 결과는 누가 읽나요? 작성자 본인, 시니어 리뷰어, 자동화 도구 중 어느 쪽인가요?
+
+1번 답에 따라 필수 항목이 몇 개 더 생깁니다. API는 표시 채널·대화 형태·외부 텍스트 여부, 에이전트는 도구 목록·실행 방식·확인이 필요한 행동·완료 조건, 단발은 재사용 여부입니다. 이 항목들은 다음 라운드에서 한 번에 묻겠습니다.</pre>
+</div>
+</details></div>
+</div>
+</section>
+</details>
+<details class="section" open>
+<summary>Prompt</summary>
+<div class="md"><p>이 프롬프트 best practice로 고쳐줘:</p>
+<p>You are a code reviewer. CRITICAL: Only report high-severity issues. Think step by step and write your reasoning before the answer. Double-check your answer before responding.</p>
+<p>대상 모델은 세션 모델, 프롬프트 언어는 영어, 빠른 모드로 하고, 기본값 표는 모두 승인한다. 모델 특화 결정 질문은 모두 '추가하지 않음 / 아니오'로 답한다.</p>
+</div>
+</details>
+<details class="section" open>
+<summary>Graders — what "good" means for this case</summary>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">skill-fired</span><span class="badge">tool_used</span></div>
+<div class="config"><div class="kv"><span>tool</span><code>&quot;Skill&quot;</code></div><div class="kv"><span>input_match</span><code>&quot;\&quot;skill\&quot;\\s*:\\s*\&quot;(?:[\\w-]+:)?prompt-builder\&quot;&quot;</code></div></div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">extracted-table</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 초안에서 추출한 값(역할: 코드 리뷰어, 규칙 등)을 '항목 | 추출한 값 | 상태' 형태의 표로 보여 주고 확인을 요청한다.
+FAIL: 추출 표 없이 바로 다시 쓴다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">removal-review</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 모델 가이드의 제거 검토 대상(심각도 필터 'Only report high-severity', 답 앞에 추론을 쓰라는 지시, 재확인 지시, CRITICAL 강조) 중 둘 이상을 짚고, 제거할지 하나씩 묻는다.
+FAIL: 제거 대상을 짚지 않거나, 묻지 않고 일괄 삭제한다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">asks-gaps-only</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 비어 있거나 모호한 항목(성공 기준, 출력 형식 등)만 묻고, 초안에 이미 있는 역할을 다시 묻지 않는다.
+FAIL: 초안에 있는 역할을 다시 묻거나, 빈 항목을 지어내 채운다.</p>
+</div>
+</div>
+</details>
+</article>
+<article class="case" id="case-5">
+<div class="case-head">
+<h2>english-request</h2>
+<span class="muted mono">evals/prompt-builder/english-request</span>
+<span class="spacer"></span>
+
+
+
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span><i class="tick" style="left:0.0%"></i></span>
+<span class="num case-score">100%</span>
+</div>
+
+<details class="section" open>
+<summary>Results</summary>
+<section class="arm">
+<div class="arm-head">
+<span class="arm-label">Runs</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span></span>
+<span class="num">100%</span>
+<span class="muted num">100% of runs perfect</span>
+</div>
+<div class="run">
+<div class="run-head">
+<span class="run-title">Run 1</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span></span>
+<span class="num">100%</span>
+<span class="muted num">4 turns · $0.17 · 06:01:27 UTC</span>
+</div>
+
+<div class="graders"><details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">skill-fired</span>  </summary>
+<div class="grader-body">
+<p class="explanation">Skill called 1x (expected 1..∞)</p>
+
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">english-interview</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">Here&apos;s where I&apos;m starting from:
+
+```
+Progress:
+- [x] 1. Detect session model
+- [ ] 2. Basic settings (type, target model, language, mode)
+- [ ] 3. Load model guide and check its date
+- [ ] 4. Draft analysis (skipped, no draft)
+- [ ] 5. Component interview
+- [ ] 6. Model-specific questions
+- [ ] 7. Assemble
+- [ ] 8. Self-review
+- [ ] 9. Deliver
+```
+
+Detected session model: `claude-opus-5-5`
+
+**Already clear from your request:**
+- **Type:** API system prompt for a chatbot
+- **Prompt language:** English. Tell me if you&apos;d rather have the instructions in Korean while the bot still answers in English.
+
+**Basic settings**
+
+1. **Target model:** Which model will the bot actually run on?
+   (a) Opus 5.5 (this session&apos;s model) (b) Sonnet 5.5 (c) Haiku 4.5 (d) Fable 5.1 (e) Other: please specify
+2. **Mode:**
+   (a) Quick: I ask only the required items and show the rest as a table of defaults for you to approve in one go
+   (b) Detailed: I ask about every item, round by round
+
+**Round 1.** I need these in either mode, so I&apos;m asking now to save a round:
+
+3. **Purpose and success:** What should the bot do? For example: answer product questions, fix order or billing problems, troubleshoot, or hand off to human agents. What does a successful conversation look like?
+4. **Users:** Who talks to it? Consumers, business customers, developers? How much do they usually know?
+5. **Role:** In one or two sentences, who is the bot? Include the company or product name and any persona name.
+6. **Background:** What does the bot need to know that I don&apos;t? For example: what your product or service is, key policies (refunds, shipping, SLAs), common issues and their fixes, internal terms, and when and how to escalate to a human. You can paste existing docs or FAQs.</pre>
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">round0-same</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">Here&apos;s where I&apos;m starting from:
+
+```
+Progress:
+- [x] 1. Detect session model
+- [ ] 2. Basic settings (type, target model, language, mode)
+- [ ] 3. Load model guide and check its date
+- [ ] 4. Draft analysis (skipped, no draft)
+- [ ] 5. Component interview
+- [ ] 6. Model-specific questions
+- [ ] 7. Assemble
+- [ ] 8. Self-review
+- [ ] 9. Deliver
+```
+
+Detected session model: `claude-opus-5-5`
+
+**Already clear from your request:**
+- **Type:** API system prompt for a chatbot
+- **Prompt language:** English. Tell me if you&apos;d rather have the instructions in Korean while the bot still answers in English.
+
+**Basic settings**
+
+1. **Target model:** Which model will the bot actually run on?
+   (a) Opus 5.5 (this session&apos;s model) (b) Sonnet 5.5 (c) Haiku 4.5 (d) Fable 5.1 (e) Other: please specify
+2. **Mode:**
+   (a) Quick: I ask only the required items and show the rest as a table of defaults for you to approve in one go
+   (b) Detailed: I ask about every item, round by round
+
+**Round 1.** I need these in either mode, so I&apos;m asking now to save a round:
+
+3. **Purpose and success:** What should the bot do? For example: answer product questions, fix order or billing problems, troubleshoot, or hand off to human agents. What does a successful conversation look like?
+4. **Users:** Who talks to it? Consumers, business customers, developers? How much do they usually know?
+5. **Role:** In one or two sentences, who is the bot? Include the company or product name and any persona name.
+6. **Background:** What does the bot need to know that I don&apos;t? For example: what your product or service is, key policies (refunds, shipping, SLAs), common issues and their fixes, internal terms, and when and how to escalate to a human. You can paste existing docs or FAQs.</pre>
+</div>
+</details></div>
+</div>
+</section>
+</details>
+<details class="section" open>
+<summary>Prompt</summary>
+<div class="md"><p>Make a system prompt for our English-language customer support bot</p>
+</div>
+</details>
+<details class="section" open>
+<summary>Graders — what "good" means for this case</summary>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">skill-fired</span><span class="badge">tool_used</span></div>
+<div class="config"><div class="kv"><span>tool</span><code>&quot;Skill&quot;</code></div><div class="kv"><span>input_match</span><code>&quot;\&quot;skill\&quot;\\s*:\\s*\&quot;(?:[\\w-]+:)?prompt-builder\&quot;&quot;</code></div></div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">english-interview</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 인터뷰 질문과 설명을 영어로 쓴다.
+FAIL: 인터뷰를 한국어로 진행한다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">round0-same</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 대상 모델, 프롬프트 언어(영어로 되짚거나 확인), 진행 방식을 묻는 0라운드를 진행하고 종류는 묻지 않는다.
+FAIL: 0라운드 항목이 빠지거나 종류를 다시 묻는다.</p>
+</div>
+</div>
+</details>
+</article>
+<article class="case" id="case-6">
+<div class="case-head">
+<h2>haiku-classifier</h2>
+<span class="muted mono">evals/prompt-builder/haiku-classifier</span>
+<span class="spacer"></span>
+
+
+
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span><i class="tick" style="left:0.0%"></i></span>
+<span class="num case-score">100%</span>
+</div>
+
+<details class="section" open>
+<summary>Results</summary>
+<section class="arm">
+<div class="arm-head">
+<span class="arm-label">Runs</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span></span>
+<span class="num">100%</span>
+<span class="muted num">100% of runs perfect</span>
+</div>
+<div class="run">
+<div class="run-head">
+<span class="run-title">Run 1</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span></span>
+<span class="num">100%</span>
+<span class="muted num">5 turns · $0.21 · 06:01:27 UTC</span>
+</div>
+
+<div class="graders"><details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">skill-fired</span>  </summary>
+<div class="grader-body">
+<p class="explanation">Skill called 1x (expected 1..∞)</p>
+
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">loads-haiku-guide</span>  </summary>
+<div class="grader-body">
+<p class="explanation">Read called 1x (expected 1..∞)</p>
+
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">b1-not-asked</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">감지된 세션 모델: `claude-opus-5-5`
+대상 모델: `claude-haiku-4-5` → Haiku 4.5 가이드 적용 (가이드 확인일 2026-10-01)
+
+참고로 지금 세션은 Opus 5.5라서, 여기서 바로 시험해 본 결과는 Haiku 4.5에서의 동작과 다를 수 있습니다.
+
+```
+진행 상황:
+- [x] 1. 세션 모델 감지
+- [ ] 2. 기본 설정 (종류, 대상 모델, 언어, 진행 방식)
+- [x] 3. 모델 가이드 로드 및 확인일 점검
+- [x] 4. 초안 분석 (초안 없음, 건너뜀)
+- [ ] 5. 구성 요소 인터뷰
+- [ ] 6. 모델 특화 결정 질문
+- [ ] 7. 조립
+- [ ] 8. 자체 검수
+- [ ] 9. 출력
+```
+
+**요청에서 확인한 내용**
+- 종류: API 시스템 프롬프트
+- 대상 모델: Claude Haiku 4.5
+- 출력 형식: JSON (코드가 파싱하는 구조로 봅니다)
+
+몇 가지 여쭤볼게요. 번호에 맞춰 답해 주시면 됩니다.
+
+**기본 설정**
+1. **프롬프트 언어**: 완성 프롬프트를 어떤 언어로 쓸까요? (a) 한국어 (b) 영어
+2. **진행 방식**: 질문을 얼마나 받을까요?
+   (a) 빠른 모드: 필수 항목만 묻고, 나머지는 기본값 표로 한 번에 확인받습니다
+   (b) 상세 인터뷰: 모든 항목을 라운드별로 묻습니다
+
+**분류 작업 내용** (어느 방식이든 필요한 항목입니다)
+
+3. **목적과 성공 기준**: 무엇을 분류하나요? 고객 문의, 사내 문의, 부동산 매물 문의처럼 구체적으로 알려 주세요. 분류 결과는 어디에 쓰이나요? 담당 부서 배정, 우선순위 처리, 통계 같은 용도를 말씀해 주시면 됩니다.
+4. **분류 체계**: 분류할 카테고리 목록과 각 카테고리의 정의를 알려 주세요. 하위 분류, 긴급도, 감정 같은 추가 필드가 있다면 그것도 함께 알려 주세요. 헷갈리기 쉬운 카테고리 쌍과 그 구분 기준이 있다면 꼭 적어 주세요.
+5. **JSON 스키마**: 받고 싶은 필드 이름과 타입을 알려 주세요. 예를 들어 `category`, `confidence`, `reason` 같은 필드를 쓸 수 있습니다. 이미 정해 둔 스키마가 있으면 그대로 붙여넣어 주세요.
+6. **배경 맥락**: 회사나 서비스에 대한 설명, 업계 용어, 약어처럼 모델이 모르는 정보가 있나요?
+7. **입력**: 문의 한 건이 어떤 형태로 들어오나요? 본문만 오는지, 제목·채널·고객 정보 같은 메타데이터도 함께 오는지, 대략 몇 자인지 알려 주세요.
+8. **애매하거나 해당 없는 문의**: 어느 카테고리에도 맞지 않는 문의, 여러 카테고리에 걸치는 문의, 스팸이나 내용이 없는 문의는 어떻게 처리할까요? 예를 들어 `기타`로 보내기, 복수 라벨 허용, `null` 반환 중에서 정하시면 됩니다.</pre>
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">no-adaptive</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">감지된 세션 모델: `claude-opus-5-5`
+대상 모델: `claude-haiku-4-5` → Haiku 4.5 가이드 적용 (가이드 확인일 2026-10-01)
+
+참고로 지금 세션은 Opus 5.5라서, 여기서 바로 시험해 본 결과는 Haiku 4.5에서의 동작과 다를 수 있습니다.
+
+```
+진행 상황:
+- [x] 1. 세션 모델 감지
+- [ ] 2. 기본 설정 (종류, 대상 모델, 언어, 진행 방식)
+- [x] 3. 모델 가이드 로드 및 확인일 점검
+- [x] 4. 초안 분석 (초안 없음, 건너뜀)
+- [ ] 5. 구성 요소 인터뷰
+- [ ] 6. 모델 특화 결정 질문
+- [ ] 7. 조립
+- [ ] 8. 자체 검수
+- [ ] 9. 출력
+```
+
+**요청에서 확인한 내용**
+- 종류: API 시스템 프롬프트
+- 대상 모델: Claude Haiku 4.5
+- 출력 형식: JSON (코드가 파싱하는 구조로 봅니다)
+
+몇 가지 여쭤볼게요. 번호에 맞춰 답해 주시면 됩니다.
+
+**기본 설정**
+1. **프롬프트 언어**: 완성 프롬프트를 어떤 언어로 쓸까요? (a) 한국어 (b) 영어
+2. **진행 방식**: 질문을 얼마나 받을까요?
+   (a) 빠른 모드: 필수 항목만 묻고, 나머지는 기본값 표로 한 번에 확인받습니다
+   (b) 상세 인터뷰: 모든 항목을 라운드별로 묻습니다
+
+**분류 작업 내용** (어느 방식이든 필요한 항목입니다)
+
+3. **목적과 성공 기준**: 무엇을 분류하나요? 고객 문의, 사내 문의, 부동산 매물 문의처럼 구체적으로 알려 주세요. 분류 결과는 어디에 쓰이나요? 담당 부서 배정, 우선순위 처리, 통계 같은 용도를 말씀해 주시면 됩니다.
+4. **분류 체계**: 분류할 카테고리 목록과 각 카테고리의 정의를 알려 주세요. 하위 분류, 긴급도, 감정 같은 추가 필드가 있다면 그것도 함께 알려 주세요. 헷갈리기 쉬운 카테고리 쌍과 그 구분 기준이 있다면 꼭 적어 주세요.
+5. **JSON 스키마**: 받고 싶은 필드 이름과 타입을 알려 주세요. 예를 들어 `category`, `confidence`, `reason` 같은 필드를 쓸 수 있습니다. 이미 정해 둔 스키마가 있으면 그대로 붙여넣어 주세요.
+6. **배경 맥락**: 회사나 서비스에 대한 설명, 업계 용어, 약어처럼 모델이 모르는 정보가 있나요?
+7. **입력**: 문의 한 건이 어떤 형태로 들어오나요? 본문만 오는지, 제목·채널·고객 정보 같은 메타데이터도 함께 오는지, 대략 몇 자인지 알려 주세요.
+8. **애매하거나 해당 없는 문의**: 어느 카테고리에도 맞지 않는 문의, 여러 카테고리에 걸치는 문의, 스팸이나 내용이 없는 문의는 어떻게 처리할까요? 예를 들어 `기타`로 보내기, 복수 라벨 허용, `null` 반환 중에서 정하시면 됩니다.</pre>
+</div>
+</details></div>
+</div>
+</section>
+</details>
+<details class="section" open>
+<summary>Prompt</summary>
+<div class="md"><p>Haiku 4.5에서 돌릴 문의 분류용 API 시스템 프롬프트 만들어줘. 결과는 JSON으로 받아야 해</p>
+</div>
+</details>
+<details class="section" open>
+<summary>Graders — what "good" means for this case</summary>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">skill-fired</span><span class="badge">tool_used</span></div>
+<div class="config"><div class="kv"><span>tool</span><code>&quot;Skill&quot;</code></div><div class="kv"><span>input_match</span><code>&quot;\&quot;skill\&quot;\\s*:\\s*\&quot;(?:[\\w-]+:)?prompt-builder\&quot;&quot;</code></div></div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">loads-haiku-guide</span><span class="badge">tool_used</span></div>
+<div class="config"><div class="kv"><span>tool</span><code>&quot;Read&quot;</code></div><div class="kv"><span>input_match</span><code>&quot;haiku-4-5\\.md&quot;</code></div><div class="kv"><span>arm</span><code>&quot;both&quot;</code></div></div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">b1-not-asked</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 대상 모델을 다시 묻지 않고 Haiku 4.5로 되짚으며, 세션 모델과 다르다는 점과 테스트는 Haiku 4.5로 해야 한다는 점을 알린다.
+FAIL: 대상 모델을 다시 묻거나, 세션 모델과 다르다는 안내가 없다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">no-adaptive</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: effort나 adaptive 사고를 권하지 않는다(언급한다면 Haiku 4.5에서는 budget_tokens 확장 사고를 쓴다고 맞게 말한다).
+FAIL: Haiku 4.5에 effort나 adaptive 사고를 권한다.</p>
+</div>
+</div>
+</details>
+</article>
+<article class="case" id="case-7">
+<div class="case-head">
+<h2>quick-contracts</h2>
+<span class="muted mono">evals/prompt-builder/quick-contracts</span>
+<span class="spacer"></span>
+
+
+
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span><i class="tick" style="left:0.0%"></i></span>
+<span class="num case-score">100%</span>
+</div>
+
+<details class="section" open>
+<summary>Results</summary>
+<section class="arm">
+<div class="arm-head">
+<span class="arm-label">Runs</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span></span>
+<span class="num">100%</span>
+<span class="muted num">100% of runs perfect</span>
+</div>
+<div class="run">
+<div class="run-head">
+<span class="run-title">Run 1</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span></span>
+<span class="num">100%</span>
+<span class="muted num">4 turns · $0.19 · 06:01:59 UTC</span>
+</div>
+
+<div class="graders"><details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">skill-fired</span>  </summary>
+<div class="grader-body">
+<p class="explanation">Skill called 1x (expected 1..∞)</p>
+
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">quick-mode</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">진행 상황:
+- [x] 1. 세션 모델 감지: `claude-opus-5-5`
+- [ ] 2. 기본 설정
+- [ ] 3~9. 모델 가이드 로드, 인터뷰, 조립, 검수, 출력
+
+**확인한 것:** 빠른 모드로, 한국어 프롬프트로 만듭니다. 계약서 30개를 한 번에 넣고 분석하는 **단발 작업 프롬프트**로 잡았습니다. 성격이 다르면(예: 챗봇 시스템 프롬프트) 말씀해 주세요.
+
+**아래 질문에만 답해 주세요. 한 줄씩이면 충분합니다.**
+
+1. **대상 모델**: 이 프롬프트를 어느 모델에서 돌리나요?
+   (a) Opus 5.5 (b) Sonnet 5.5 (c) Haiku 4.5 (d) Fable 5.1
+2. **목적**: 비교해서 무엇을 알아내야 하나요? 결과가 잘 나왔다면 어떤 모습인가요?
+   예: 조항별 차이표 / 불리한 조항과 리스크 / 표준 계약서와 다른 부분
+3. **독자**: 결과를 누가 읽나요? (법무 담당 / 실무자 / 경영진 등)
+4. **배경**: 계약서 종류는 무엇인가요(임대차, 용역 등)? 기준이 되는 표준 계약서나 사내 기준이 있나요? 꼭 봐야 할 조항이 정해져 있다면 같이 알려 주세요.
+5. **입력**: 파일 형식(PDF·텍스트 등)과 계약서 하나당 대략적인 분량(쪽수)을 알려 주세요.
+6. **재사용**: 이번 한 번만 쓰나요, 계약서를 바꿔 가며 계속 쓸 템플릿인가요?
+7. **실행 시 구체화**: 프롬프트를 실행했을 때 framing-problems 스킬로 요청을 먼저 정리하고 나서 분석하게 할까요? (예 / 아니오)
+
+**나머지는 아래 기본값으로 갑니다.** 고칠 줄만 말씀해 주세요.
+
+| 항목 | 기본값 | 근거 |
+|---|---|---|
+| 출력 형식 | 마크다운 (비교표 포함) | 여러 문서를 비교하는 결과는 표로 읽기 쉬움 |
+| 출력 길이 | 내용에 맞게 | 최신 모델은 길이를 작업에 맞춰 조절함 |
+| 근거 인용 | **예** (조항 번호와 원문 인용) | 문서가 길고 많으면 인용을 붙여야 정확도가 올라가고 검증도 쉬워짐 |
+| 정보가 부족할 때 | 가정을 밝히고 진행 | 공식 가이드 권장 |
+| 역할, 규칙, 예시, 톤 | 생략 | 받은 내용이 없어 지어내지 않음 |
+
+근거 인용은 원래 기본값이 &quot;아니오&quot;인데, 계약서 30개를 비교하는 작업이라 &quot;예&quot;를 권장합니다.</pre>
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">defaults-table</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">진행 상황:
+- [x] 1. 세션 모델 감지: `claude-opus-5-5`
+- [ ] 2. 기본 설정
+- [ ] 3~9. 모델 가이드 로드, 인터뷰, 조립, 검수, 출력
+
+**확인한 것:** 빠른 모드로, 한국어 프롬프트로 만듭니다. 계약서 30개를 한 번에 넣고 분석하는 **단발 작업 프롬프트**로 잡았습니다. 성격이 다르면(예: 챗봇 시스템 프롬프트) 말씀해 주세요.
+
+**아래 질문에만 답해 주세요. 한 줄씩이면 충분합니다.**
+
+1. **대상 모델**: 이 프롬프트를 어느 모델에서 돌리나요?
+   (a) Opus 5.5 (b) Sonnet 5.5 (c) Haiku 4.5 (d) Fable 5.1
+2. **목적**: 비교해서 무엇을 알아내야 하나요? 결과가 잘 나왔다면 어떤 모습인가요?
+   예: 조항별 차이표 / 불리한 조항과 리스크 / 표준 계약서와 다른 부분
+3. **독자**: 결과를 누가 읽나요? (법무 담당 / 실무자 / 경영진 등)
+4. **배경**: 계약서 종류는 무엇인가요(임대차, 용역 등)? 기준이 되는 표준 계약서나 사내 기준이 있나요? 꼭 봐야 할 조항이 정해져 있다면 같이 알려 주세요.
+5. **입력**: 파일 형식(PDF·텍스트 등)과 계약서 하나당 대략적인 분량(쪽수)을 알려 주세요.
+6. **재사용**: 이번 한 번만 쓰나요, 계약서를 바꿔 가며 계속 쓸 템플릿인가요?
+7. **실행 시 구체화**: 프롬프트를 실행했을 때 framing-problems 스킬로 요청을 먼저 정리하고 나서 분석하게 할까요? (예 / 아니오)
+
+**나머지는 아래 기본값으로 갑니다.** 고칠 줄만 말씀해 주세요.
+
+| 항목 | 기본값 | 근거 |
+|---|---|---|
+| 출력 형식 | 마크다운 (비교표 포함) | 여러 문서를 비교하는 결과는 표로 읽기 쉬움 |
+| 출력 길이 | 내용에 맞게 | 최신 모델은 길이를 작업에 맞춰 조절함 |
+| 근거 인용 | **예** (조항 번호와 원문 인용) | 문서가 길고 많으면 인용을 붙여야 정확도가 올라가고 검증도 쉬워짐 |
+| 정보가 부족할 때 | 가정을 밝히고 진행 | 공식 가이드 권장 |
+| 역할, 규칙, 예시, 톤 | 생략 | 받은 내용이 없어 지어내지 않음 |
+
+근거 인용은 원래 기본값이 &quot;아니오&quot;인데, 계약서 30개를 비교하는 작업이라 &quot;예&quot;를 권장합니다.</pre>
+</div>
+</details></div>
+</div>
+</section>
+</details>
+<details class="section" open>
+<summary>Prompt</summary>
+<div class="md"><p>계약서 30개를 비교 분석하는 프롬프트 빨리 만들어줘. 질문은 최소로 해줘</p>
+</div>
+</details>
+<details class="section" open>
+<summary>Graders — what "good" means for this case</summary>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">skill-fired</span><span class="badge">tool_used</span></div>
+<div class="config"><div class="kv"><span>tool</span><code>&quot;Skill&quot;</code></div><div class="kv"><span>input_match</span><code>&quot;\&quot;skill\&quot;\\s*:\\s*\&quot;(?:[\\w-]+:)?prompt-builder\&quot;&quot;</code></div></div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">quick-mode</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 단발 작업으로 판단하고 빠른 모드를 확인(또는 되짚기)하며, 필수 항목만 묻는다.
+FAIL: 선택 항목까지 라운드별로 모두 묻는다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">defaults-table</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 선택 항목을 '항목 | 기본값 | 근거' 표 하나로 보여 주고 한 번에 승인을 요청한다(이번 응답에 없더라도 다음에 그렇게 하겠다고 밝히면 PASS). 서술형 선택 항목의 기본값은 '생략'이며 규칙·범위 같은 내용을 지어내지 않는다.
+FAIL: 기본값으로 규칙이나 도메인 내용을 지어내거나, 선택 항목을 하나씩 묻는다.</p>
+</div>
+</div>
+</details>
+</article>
+<article class="case" id="case-8">
+<div class="case-head">
+<h2>quick-contracts-final</h2>
+<span class="muted mono">evals/prompt-builder/quick-contracts-final</span>
+<span class="spacer"></span>
+
+
+
+<span class="meter m-accent" aria-hidden="true"><span style="width:75.0%"></span><i class="tick" style="left:0.0%"></i></span>
+<span class="num case-score">75%</span>
+</div>
+
+<details class="section" open>
+<summary>Results</summary>
+<section class="arm">
+<div class="arm-head">
+<span class="arm-label">Runs</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:75.0%"></span></span>
+<span class="num">75%</span>
+<span class="muted num">0% of runs perfect</span>
+</div>
+<div class="run">
+<div class="run-head">
+<span class="run-title">Run 1</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:75.0%"></span></span>
+<span class="num">75%</span>
+<span class="muted num">7 turns · $0.36 · 06:02:00 UTC</span>
+</div>
+
+<div class="graders"><details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">skill-fired</span>  </summary>
+<div class="grader-body">
+<p class="explanation">Skill called 1x (expected 1..∞)</p>
+
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">docs-on-top</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">## 프롬프트 설계 요약
+- 대상 모델: claude-opus-5-5 (세션 모델) · 적용 가이드: 공통 원칙 + Opus 5.5 가이드 (확인일 2026-10-01, 이번 세션에서 출처와 다시 대조하지 않음)
+- 종류: 단발 작업 · 언어: 한국어 · 진행 방식: 빠른 모드
+- 반영한 결정:
+  - 목적: 공급 계약서 30개의 위약금·해지 조항을 비교해 불리한 계약을 찾는다. 성공 기준은 계약별 위험도 표다.
+  - 독자는 법무팀 변호사이고, 우리 회사는 구매자 측이다.
+  - 입력은 `{{CONTRACTS}}`(계약서 30개, 각 10~20쪽)이고 한 번만 쓴다.
+  - 산출물은 마크다운 표 중심의 분석 문서다.
+  - 실행 시 구체화(C16)는 넣지 않았다. 모델 특화 결정 질문은 이번 조건에 해당하는 것이 없어 적용한 스니펫이 없다.
+  - 기본값을 승인한 대로 적용했다: 역할·규칙·톤·예시·검증 생략, 불확실할 때는 가정을 밝히고 진행, 길이는 내용에 맞게, 인용 요구 없음.
+- 적용한 best practice:
+  - 긴 자료는 맨 위(`&lt;documents&gt;`)에, 최종 지시는 맨 끝에 두었다. 다중 문서 입력에서 품질이 오르는 배치다.
+  - 분석 전에 관련 조항을 `&lt;quotes&gt;`로 먼저 발췌하게 했다. 긴 문서에서 필요한 부분에 집중하게 하려는 것이다.
+  - 배경·지시·출력 형식을 XML 태그로 나눴다.
+  - &quot;하지 말 것&quot; 대신 &quot;할 것&quot; 형태로 썼고, 과한 강조어는 쓰지 않았다.
+
+## 완성 프롬프트
+
+````markdown
+&lt;documents&gt;
+{{CONTRACTS}}
+&lt;/documents&gt;
+
+&lt;context&gt;
+위 &lt;documents&gt;에는 우리 회사가 맺은 공급 계약서 30개가 들어 있다. 계약서마다 10~20쪽 분량이다. 이 계약들에서 우리 회사는 구매자 측이다.
+이 분석의 목적은 30개 계약의 위약금 조항과 해지 조항을 비교해 우리 회사에 불리한 계약을 찾는 것이다. 결과는 법무팀 변호사가 읽는다.
+&lt;/context&gt;
+
+&lt;instructions&gt;
+1. 계약서마다 위약금 조항과 해지 조항을 찾아 원문을 &lt;quotes&gt; 태그 안에 계약서별로 발췌한다. 자료가 길기 때문에 관련 조항을 먼저 모아 두면 비교할 때 필요한 내용에 집중할 수 있다.
+2. 발췌한 조항을 구매자인 우리 회사의 입장에서 검토해, 계약마다 위약금·해지 조항이 우리에게 얼마나 불리한지 판단한다.
+3. 30개 계약을 서로 비교해 계약별 위험도를 매긴다.
+4. 어떤 계약에서 해당 조항을 찾지 못했거나 해석이 모호하면, 어떤 가정을 했는지 표의 판단 근거 칸에 밝히고 분석을 계속한다.
+&lt;/instructions&gt;
+
+&lt;output_format&gt;
+&lt;quotes&gt; 다음에 마크다운 분석 문서를 쓴다. 문서의 중심은 계약별 위험도 표이며, 30개 계약이 모두 한 행씩 들어간다. 위험도가 높은 계약부터 정렬한다.
+
+| 계약 | 위약금 조항 요약 | 해지 조항 요약 | 위험도(상/중/하) | 판단 근거 |
+|---|---|---|---|---|
+
+분량은 내용에 맞게 정한다.
+&lt;/output_format&gt;
+
+위 공급 계약서 30개의 위약금·해지 조항을 비교해 구매자인 우리 회사에 불리한 계약을 찾고, 계약별 위험도 표로 정리하라.
+````
+
+## 다음 단계
+- **`{{CONTRACTS}}` 넣는 형식:** 계약서마다 `&lt;document index=&quot;n&quot;&gt;&lt;source&gt;계약명&lt;/source&gt;&lt;document_content&gt;본문&lt;/document_content&gt;&lt;/document&gt;`로 감싸서 넣으면 계약끼리 섞이지 않고 표의 &quot;계약&quot; 칸도 정확해집니다.
+- **입력 분량 확인:** 계약서 30개 × 10~20쪽이면 수십만 토큰이 될 수 있습니다. 먼저 토큰 수를 세어 보세요. 컨텍스트 한도를 넘으면 계약을 몇 묶음으로 나눠 실행한 뒤 표를 합쳐야 합니다.
+- **기본값 때문에 품질에 영향이 갈 수 있는 항목:**
+  - **위험도 판단 기준(C7 규칙):** 생략했습니다. 모델이 &quot;불리함&quot;을 스스로 해석하므로, 법무팀 기준이 있으면 넣는 편이 일관성이 높습니다. 예: 위약금 상한이 있는지, 해지 통지 기간, 일방 해지권.
+  - **위험도 척도:** 상/중/하 3단계와 높은 순 정렬은 형식상 기본값으로 정했습니다. 다른 척도를 쓰려면 알려 주세요.
+  - **인용(S2):** 표에 조항 번호를 요구하지 않았습니다. 변호사가 원문과 맞춰 보려면 &quot;조항 위치&quot; 칸을 추가할 수 있습니다.
+- **시험 실행:** 30개 전체를 돌리기 전에 계약서 3개 정도로 먼저 돌려 표 형식과 판단 근거가 쓸 만한지 확인하세요.
+- 고칠 항목이 있으면 그 항목만 다시 받아 프롬프트를 갱신하겠습니다.</pre>
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">next-steps-defaults</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">## 프롬프트 설계 요약
+- 대상 모델: claude-opus-5-5 (세션 모델) · 적용 가이드: 공통 원칙 + Opus 5.5 가이드 (확인일 2026-10-01, 이번 세션에서 출처와 다시 대조하지 않음)
+- 종류: 단발 작업 · 언어: 한국어 · 진행 방식: 빠른 모드
+- 반영한 결정:
+  - 목적: 공급 계약서 30개의 위약금·해지 조항을 비교해 불리한 계약을 찾는다. 성공 기준은 계약별 위험도 표다.
+  - 독자는 법무팀 변호사이고, 우리 회사는 구매자 측이다.
+  - 입력은 `{{CONTRACTS}}`(계약서 30개, 각 10~20쪽)이고 한 번만 쓴다.
+  - 산출물은 마크다운 표 중심의 분석 문서다.
+  - 실행 시 구체화(C16)는 넣지 않았다. 모델 특화 결정 질문은 이번 조건에 해당하는 것이 없어 적용한 스니펫이 없다.
+  - 기본값을 승인한 대로 적용했다: 역할·규칙·톤·예시·검증 생략, 불확실할 때는 가정을 밝히고 진행, 길이는 내용에 맞게, 인용 요구 없음.
+- 적용한 best practice:
+  - 긴 자료는 맨 위(`&lt;documents&gt;`)에, 최종 지시는 맨 끝에 두었다. 다중 문서 입력에서 품질이 오르는 배치다.
+  - 분석 전에 관련 조항을 `&lt;quotes&gt;`로 먼저 발췌하게 했다. 긴 문서에서 필요한 부분에 집중하게 하려는 것이다.
+  - 배경·지시·출력 형식을 XML 태그로 나눴다.
+  - &quot;하지 말 것&quot; 대신 &quot;할 것&quot; 형태로 썼고, 과한 강조어는 쓰지 않았다.
+
+## 완성 프롬프트
+
+````markdown
+&lt;documents&gt;
+{{CONTRACTS}}
+&lt;/documents&gt;
+
+&lt;context&gt;
+위 &lt;documents&gt;에는 우리 회사가 맺은 공급 계약서 30개가 들어 있다. 계약서마다 10~20쪽 분량이다. 이 계약들에서 우리 회사는 구매자 측이다.
+이 분석의 목적은 30개 계약의 위약금 조항과 해지 조항을 비교해 우리 회사에 불리한 계약을 찾는 것이다. 결과는 법무팀 변호사가 읽는다.
+&lt;/context&gt;
+
+&lt;instructions&gt;
+1. 계약서마다 위약금 조항과 해지 조항을 찾아 원문을 &lt;quotes&gt; 태그 안에 계약서별로 발췌한다. 자료가 길기 때문에 관련 조항을 먼저 모아 두면 비교할 때 필요한 내용에 집중할 수 있다.
+2. 발췌한 조항을 구매자인 우리 회사의 입장에서 검토해, 계약마다 위약금·해지 조항이 우리에게 얼마나 불리한지 판단한다.
+3. 30개 계약을 서로 비교해 계약별 위험도를 매긴다.
+4. 어떤 계약에서 해당 조항을 찾지 못했거나 해석이 모호하면, 어떤 가정을 했는지 표의 판단 근거 칸에 밝히고 분석을 계속한다.
+&lt;/instructions&gt;
+
+&lt;output_format&gt;
+&lt;quotes&gt; 다음에 마크다운 분석 문서를 쓴다. 문서의 중심은 계약별 위험도 표이며, 30개 계약이 모두 한 행씩 들어간다. 위험도가 높은 계약부터 정렬한다.
+
+| 계약 | 위약금 조항 요약 | 해지 조항 요약 | 위험도(상/중/하) | 판단 근거 |
+|---|---|---|---|---|
+
+분량은 내용에 맞게 정한다.
+&lt;/output_format&gt;
+
+위 공급 계약서 30개의 위약금·해지 조항을 비교해 구매자인 우리 회사에 불리한 계약을 찾고, 계약별 위험도 표로 정리하라.
+````
+
+## 다음 단계
+- **`{{CONTRACTS}}` 넣는 형식:** 계약서마다 `&lt;document index=&quot;n&quot;&gt;&lt;source&gt;계약명&lt;/source&gt;&lt;document_content&gt;본문&lt;/document_content&gt;&lt;/document&gt;`로 감싸서 넣으면 계약끼리 섞이지 않고 표의 &quot;계약&quot; 칸도 정확해집니다.
+- **입력 분량 확인:** 계약서 30개 × 10~20쪽이면 수십만 토큰이 될 수 있습니다. 먼저 토큰 수를 세어 보세요. 컨텍스트 한도를 넘으면 계약을 몇 묶음으로 나눠 실행한 뒤 표를 합쳐야 합니다.
+- **기본값 때문에 품질에 영향이 갈 수 있는 항목:**
+  - **위험도 판단 기준(C7 규칙):** 생략했습니다. 모델이 &quot;불리함&quot;을 스스로 해석하므로, 법무팀 기준이 있으면 넣는 편이 일관성이 높습니다. 예: 위약금 상한이 있는지, 해지 통지 기간, 일방 해지권.
+  - **위험도 척도:** 상/중/하 3단계와 높은 순 정렬은 형식상 기본값으로 정했습니다. 다른 척도를 쓰려면 알려 주세요.
+  - **인용(S2):** 표에 조항 번호를 요구하지 않았습니다. 변호사가 원문과 맞춰 보려면 &quot;조항 위치&quot; 칸을 추가할 수 있습니다.
+- **시험 실행:** 30개 전체를 돌리기 전에 계약서 3개 정도로 먼저 돌려 표 형식과 판단 근거가 쓸 만한지 확인하세요.
+- 고칠 항목이 있으면 그 항목만 다시 받아 프롬프트를 갱신하겠습니다.</pre>
+</div>
+</details>
+<details class="grader" open>
+<summary><span class="chip chip-fail">✗ fail</span> <span class="grader-name">no-fabrication</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: FAIL FAIL PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✗ ✗ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">## 프롬프트 설계 요약
+- 대상 모델: claude-opus-5-5 (세션 모델) · 적용 가이드: 공통 원칙 + Opus 5.5 가이드 (확인일 2026-10-01, 이번 세션에서 출처와 다시 대조하지 않음)
+- 종류: 단발 작업 · 언어: 한국어 · 진행 방식: 빠른 모드
+- 반영한 결정:
+  - 목적: 공급 계약서 30개의 위약금·해지 조항을 비교해 불리한 계약을 찾는다. 성공 기준은 계약별 위험도 표다.
+  - 독자는 법무팀 변호사이고, 우리 회사는 구매자 측이다.
+  - 입력은 `{{CONTRACTS}}`(계약서 30개, 각 10~20쪽)이고 한 번만 쓴다.
+  - 산출물은 마크다운 표 중심의 분석 문서다.
+  - 실행 시 구체화(C16)는 넣지 않았다. 모델 특화 결정 질문은 이번 조건에 해당하는 것이 없어 적용한 스니펫이 없다.
+  - 기본값을 승인한 대로 적용했다: 역할·규칙·톤·예시·검증 생략, 불확실할 때는 가정을 밝히고 진행, 길이는 내용에 맞게, 인용 요구 없음.
+- 적용한 best practice:
+  - 긴 자료는 맨 위(`&lt;documents&gt;`)에, 최종 지시는 맨 끝에 두었다. 다중 문서 입력에서 품질이 오르는 배치다.
+  - 분석 전에 관련 조항을 `&lt;quotes&gt;`로 먼저 발췌하게 했다. 긴 문서에서 필요한 부분에 집중하게 하려는 것이다.
+  - 배경·지시·출력 형식을 XML 태그로 나눴다.
+  - &quot;하지 말 것&quot; 대신 &quot;할 것&quot; 형태로 썼고, 과한 강조어는 쓰지 않았다.
+
+## 완성 프롬프트
+
+````markdown
+&lt;documents&gt;
+{{CONTRACTS}}
+&lt;/documents&gt;
+
+&lt;context&gt;
+위 &lt;documents&gt;에는 우리 회사가 맺은 공급 계약서 30개가 들어 있다. 계약서마다 10~20쪽 분량이다. 이 계약들에서 우리 회사는 구매자 측이다.
+이 분석의 목적은 30개 계약의 위약금 조항과 해지 조항을 비교해 우리 회사에 불리한 계약을 찾는 것이다. 결과는 법무팀 변호사가 읽는다.
+&lt;/context&gt;
+
+&lt;instructions&gt;
+1. 계약서마다 위약금 조항과 해지 조항을 찾아 원문을 &lt;quotes&gt; 태그 안에 계약서별로 발췌한다. 자료가 길기 때문에 관련 조항을 먼저 모아 두면 비교할 때 필요한 내용에 집중할 수 있다.
+2. 발췌한 조항을 구매자인 우리 회사의 입장에서 검토해, 계약마다 위약금·해지 조항이 우리에게 얼마나 불리한지 판단한다.
+3. 30개 계약을 서로 비교해 계약별 위험도를 매긴다.
+4. 어떤 계약에서 해당 조항을 찾지 못했거나 해석이 모호하면, 어떤 가정을 했는지 표의 판단 근거 칸에 밝히고 분석을 계속한다.
+&lt;/instructions&gt;
+
+&lt;output_format&gt;
+&lt;quotes&gt; 다음에 마크다운 분석 문서를 쓴다. 문서의 중심은 계약별 위험도 표이며, 30개 계약이 모두 한 행씩 들어간다. 위험도가 높은 계약부터 정렬한다.
+
+| 계약 | 위약금 조항 요약 | 해지 조항 요약 | 위험도(상/중/하) | 판단 근거 |
+|---|---|---|---|---|
+
+분량은 내용에 맞게 정한다.
+&lt;/output_format&gt;
+
+위 공급 계약서 30개의 위약금·해지 조항을 비교해 구매자인 우리 회사에 불리한 계약을 찾고, 계약별 위험도 표로 정리하라.
+````
+
+## 다음 단계
+- **`{{CONTRACTS}}` 넣는 형식:** 계약서마다 `&lt;document index=&quot;n&quot;&gt;&lt;source&gt;계약명&lt;/source&gt;&lt;document_content&gt;본문&lt;/document_content&gt;&lt;/document&gt;`로 감싸서 넣으면 계약끼리 섞이지 않고 표의 &quot;계약&quot; 칸도 정확해집니다.
+- **입력 분량 확인:** 계약서 30개 × 10~20쪽이면 수십만 토큰이 될 수 있습니다. 먼저 토큰 수를 세어 보세요. 컨텍스트 한도를 넘으면 계약을 몇 묶음으로 나눠 실행한 뒤 표를 합쳐야 합니다.
+- **기본값 때문에 품질에 영향이 갈 수 있는 항목:**
+  - **위험도 판단 기준(C7 규칙):** 생략했습니다. 모델이 &quot;불리함&quot;을 스스로 해석하므로, 법무팀 기준이 있으면 넣는 편이 일관성이 높습니다. 예: 위약금 상한이 있는지, 해지 통지 기간, 일방 해지권.
+  - **위험도 척도:** 상/중/하 3단계와 높은 순 정렬은 형식상 기본값으로 정했습니다. 다른 척도를 쓰려면 알려 주세요.
+  - **인용(S2):** 표에 조항 번호를 요구하지 않았습니다. 변호사가 원문과 맞춰 보려면 &quot;조항 위치&quot; 칸을 추가할 수 있습니다.
+- **시험 실행:** 30개 전체를 돌리기 전에 계약서 3개 정도로 먼저 돌려 표 형식과 판단 근거가 쓸 만한지 확인하세요.
+- 고칠 항목이 있으면 그 항목만 다시 받아 프롬프트를 갱신하겠습니다.</pre>
+</div>
+</details></div>
+</div>
+</section>
+</details>
+<details class="section" open>
+<summary>Prompt</summary>
+<div class="md"><p>계약서 30개를 비교 분석하는 프롬프트 만들어줘. 답은 아래와 같아.</p>
+<ul>
+<li>목적: 공급 계약서 30개의 위약금·해지 조항을 비교해 불리한 계약을 찾는다. 성공 = 계약별 위험도 표.</li>
+<li>독자: 법무팀 변호사</li>
+<li>배경: 우리 회사는 구매자 측이다</li>
+<li>자료: 계약서 30개, 각 10~20쪽, {{CONTRACTS}} 변수로 넣는다</li>
+<li>재사용: 한 번 쓰고 끝</li>
+<li>산출물: 분석 문서, 출력 형식: 마크다운 표</li>
+<li>실행 시 구체화(C16): 아니오
+대상 모델은 세션 모델, 프롬프트 언어는 한국어, 빠른 모드로 하고, 기본값 표는 모두 승인한다. 모델 특화 결정 질문은 모두 '추가하지 않음 / 아니오'로 답한다. 더 묻지 말고 바로 최종 결과를 내줘.</li>
+</ul>
+</div>
+</details>
+<details class="section" open>
+<summary>Graders — what "good" means for this case</summary>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">skill-fired</span><span class="badge">tool_used</span></div>
+<div class="config"><div class="kv"><span>tool</span><code>&quot;Skill&quot;</code></div><div class="kv"><span>input_match</span><code>&quot;\&quot;skill\&quot;\\s*:\\s*\&quot;(?:[\\w-]+:)?prompt-builder\&quot;&quot;</code></div></div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">docs-on-top</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 완성 프롬프트에서 계약서 자료(&lt;documents&gt; 또는 {{CONTRACTS}})가 위쪽에 있고 질문·최종 지시가 끝에 있다.
+FAIL: 자료가 지시 뒤에 있거나 지시가 맨 끝에 없다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">next-steps-defaults</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 다음 단계에서 기본값으로 처리한 항목 중 품질에 영향을 줄 수 있는 것을 한 줄씩 알린다.
+FAIL: 기본값 처리 항목을 알리지 않는다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">no-fabrication</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 사용자가 주지 않은 규칙, 예시, 도메인 사실을 프롬프트에 넣지 않는다.
+FAIL: 받지 않은 규칙·예시·도메인 내용을 지어 넣는다.</p>
+</div>
+</div>
+</details>
+</article>
+<article class="case" id="case-9">
+<div class="case-head">
+<h2>round0-chatbot</h2>
+<span class="muted mono">evals/prompt-builder/round0-chatbot</span>
+<span class="spacer"></span>
+
+
+
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span><i class="tick" style="left:0.0%"></i></span>
+<span class="num case-score">100%</span>
+</div>
+
+<details class="section" open>
+<summary>Results</summary>
+<section class="arm">
+<div class="arm-head">
+<span class="arm-label">Runs</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span></span>
+<span class="num">100%</span>
+<span class="muted num">100% of runs perfect</span>
+</div>
+<div class="run">
+<div class="run-head">
+<span class="run-title">Run 1</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span></span>
+<span class="num">100%</span>
+<span class="muted num">4 turns · $0.17 · 06:02:02 UTC</span>
+</div>
+
+<div class="graders"><details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">skill-fired</span>  </summary>
+<div class="grader-body">
+<p class="explanation">Skill called 1x (expected 1..∞)</p>
+
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">session-model-line</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">고객센터 챗봇용 시스템 프롬프트를 만들기 전에 기본 설정 몇 가지를 먼저 정하겠습니다.
+
+```
+진행 상황:
+- [x] 1. 세션 모델 감지
+- [ ] 2. 기본 설정 (종류, 대상 모델, 언어, 진행 방식)
+- [ ] 3. 모델 가이드 로드 및 확인일 점검
+- [ ] 4. 초안 분석 (있을 때)
+- [ ] 5. 구성 요소 인터뷰
+- [ ] 6. 모델 특화 결정 질문
+- [ ] 7. 조립
+- [ ] 8. 자체 검수
+- [ ] 9. 출력
+```
+
+지금 이 대화는 `claude-opus-5-5` 모델로 진행되고 있습니다.
+
+**종류:** 고객센터 챗봇에 넣을 **API 시스템 프롬프트**로 이해했습니다.
+
+아래 세 가지에 답해 주세요. 예: `1-b, 2-a, 3-a`
+
+1. **어떤 모델에서 돌릴 챗봇인가요?**
+   (a) claude-opus-5-5 (지금 이 대화의 모델)
+   (b) Sonnet 5.5
+   (c) Haiku 4.5
+   (d) Fable 5.1
+   (e) 그 외 모델 (직접 입력)
+   ※ 이 대화와 다른 모델을 고르면, 여기서 바로 시험해 본 결과가 실제 챗봇의 동작과 다를 수 있습니다.
+
+2. **완성된 프롬프트는 어떤 언어로 쓸까요?**
+   (a) 한국어
+   (b) 영어
+   (c) 그 외 언어 (직접 입력)
+
+3. **질문을 얼마나 받으실 건가요?**
+   (a) 빠른 모드: 꼭 필요한 항목만 묻고, 나머지는 기본값을 표로 보여 드린 뒤 한 번에 승인받습니다.
+   (b) 상세 인터뷰: 모든 항목을 여러 차례에 나눠 묻습니다.
+
+다음 질문에서는 챗봇의 목적, 회사·상품 정보, 지켜야 할 규칙 같은 내용을 여쭙겠습니다. 미리 정리해 두시면 더 빨리 진행됩니다.</pre>
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">round0-questions</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">고객센터 챗봇용 시스템 프롬프트를 만들기 전에 기본 설정 몇 가지를 먼저 정하겠습니다.
+
+```
+진행 상황:
+- [x] 1. 세션 모델 감지
+- [ ] 2. 기본 설정 (종류, 대상 모델, 언어, 진행 방식)
+- [ ] 3. 모델 가이드 로드 및 확인일 점검
+- [ ] 4. 초안 분석 (있을 때)
+- [ ] 5. 구성 요소 인터뷰
+- [ ] 6. 모델 특화 결정 질문
+- [ ] 7. 조립
+- [ ] 8. 자체 검수
+- [ ] 9. 출력
+```
+
+지금 이 대화는 `claude-opus-5-5` 모델로 진행되고 있습니다.
+
+**종류:** 고객센터 챗봇에 넣을 **API 시스템 프롬프트**로 이해했습니다.
+
+아래 세 가지에 답해 주세요. 예: `1-b, 2-a, 3-a`
+
+1. **어떤 모델에서 돌릴 챗봇인가요?**
+   (a) claude-opus-5-5 (지금 이 대화의 모델)
+   (b) Sonnet 5.5
+   (c) Haiku 4.5
+   (d) Fable 5.1
+   (e) 그 외 모델 (직접 입력)
+   ※ 이 대화와 다른 모델을 고르면, 여기서 바로 시험해 본 결과가 실제 챗봇의 동작과 다를 수 있습니다.
+
+2. **완성된 프롬프트는 어떤 언어로 쓸까요?**
+   (a) 한국어
+   (b) 영어
+   (c) 그 외 언어 (직접 입력)
+
+3. **질문을 얼마나 받으실 건가요?**
+   (a) 빠른 모드: 꼭 필요한 항목만 묻고, 나머지는 기본값을 표로 보여 드린 뒤 한 번에 승인받습니다.
+   (b) 상세 인터뷰: 모든 항목을 여러 차례에 나눠 묻습니다.
+
+다음 질문에서는 챗봇의 목적, 회사·상품 정보, 지켜야 할 규칙 같은 내용을 여쭙겠습니다. 미리 정리해 두시면 더 빨리 진행됩니다.</pre>
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">no-fabrication</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">고객센터 챗봇용 시스템 프롬프트를 만들기 전에 기본 설정 몇 가지를 먼저 정하겠습니다.
+
+```
+진행 상황:
+- [x] 1. 세션 모델 감지
+- [ ] 2. 기본 설정 (종류, 대상 모델, 언어, 진행 방식)
+- [ ] 3. 모델 가이드 로드 및 확인일 점검
+- [ ] 4. 초안 분석 (있을 때)
+- [ ] 5. 구성 요소 인터뷰
+- [ ] 6. 모델 특화 결정 질문
+- [ ] 7. 조립
+- [ ] 8. 자체 검수
+- [ ] 9. 출력
+```
+
+지금 이 대화는 `claude-opus-5-5` 모델로 진행되고 있습니다.
+
+**종류:** 고객센터 챗봇에 넣을 **API 시스템 프롬프트**로 이해했습니다.
+
+아래 세 가지에 답해 주세요. 예: `1-b, 2-a, 3-a`
+
+1. **어떤 모델에서 돌릴 챗봇인가요?**
+   (a) claude-opus-5-5 (지금 이 대화의 모델)
+   (b) Sonnet 5.5
+   (c) Haiku 4.5
+   (d) Fable 5.1
+   (e) 그 외 모델 (직접 입력)
+   ※ 이 대화와 다른 모델을 고르면, 여기서 바로 시험해 본 결과가 실제 챗봇의 동작과 다를 수 있습니다.
+
+2. **완성된 프롬프트는 어떤 언어로 쓸까요?**
+   (a) 한국어
+   (b) 영어
+   (c) 그 외 언어 (직접 입력)
+
+3. **질문을 얼마나 받으실 건가요?**
+   (a) 빠른 모드: 꼭 필요한 항목만 묻고, 나머지는 기본값을 표로 보여 드린 뒤 한 번에 승인받습니다.
+   (b) 상세 인터뷰: 모든 항목을 여러 차례에 나눠 묻습니다.
+
+다음 질문에서는 챗봇의 목적, 회사·상품 정보, 지켜야 할 규칙 같은 내용을 여쭙겠습니다. 미리 정리해 두시면 더 빨리 진행됩니다.</pre>
+</div>
+</details></div>
+</div>
+</section>
+</details>
+<details class="section" open>
+<summary>Prompt</summary>
+<div class="md"><p>고객센터 챗봇용 시스템 프롬프트 만들어줘</p>
+</div>
+</details>
+<details class="section" open>
+<summary>Graders — what "good" means for this case</summary>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">skill-fired</span><span class="badge">tool_used</span></div>
+<div class="config"><div class="kv"><span>tool</span><code>&quot;Skill&quot;</code></div><div class="kv"><span>input_match</span><code>&quot;\&quot;skill\&quot;\\s*:\\s*\&quot;(?:[\\w-]+:)?prompt-builder\&quot;&quot;</code></div></div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">session-model-line</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 첫 응답에 감지한 세션 모델 ID를 한 줄로 알린다.
+FAIL: 세션 모델 ID를 알리지 않는다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">round0-questions</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 대상 모델(세션 모델이 첫 선택지), 프롬프트 언어, 진행 방식(빠른 모드/상세 인터뷰)을 묻고, 종류는 API 시스템 프롬프트로 되짚기만 하고 묻지 않는다.
+FAIL: 종류를 다시 묻거나, 대상 모델·언어·진행 방식 중 하나를 묻지 않는다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">no-fabrication</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 역할, 도메인, 규칙을 임의로 채운 프롬프트를 내놓지 않고 질문으로 멈춘다.
+FAIL: 사용자 답 없이 완성 프롬프트나 역할·규칙 내용을 만들어 낸다.</p>
+</div>
+</div>
+</details>
+</article>
+<article class="case" id="case-10">
+<div class="case-head">
+<h2>skill-with-bundle</h2>
+<span class="muted mono">evals/prompt-builder/skill-with-bundle</span>
+<span class="spacer"></span>
+
+
+
+<span class="meter m-accent" aria-hidden="true"><span style="width:83.3%"></span><i class="tick" style="left:0.0%"></i></span>
+<span class="num case-score">83.3%</span>
+</div>
+
+<details class="section" open>
+<summary>Results</summary>
+<section class="arm">
+<div class="arm-head">
+<span class="arm-label">Runs</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:83.3%"></span></span>
+<span class="num">83.3%</span>
+<span class="muted num">0% of runs perfect</span>
+</div>
+<div class="run">
+<div class="run-head">
+<span class="run-title">Run 1</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:83.3%"></span></span>
+<span class="num">83.3%</span>
+<span class="muted num">9 turns · $0.41 · 06:02:24 UTC</span>
+</div>
+
+<div class="graders"><details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">skill-fired</span>  </summary>
+<div class="grader-body">
+<p class="explanation">Skill called 1x (expected 1..∞)</p>
+
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">frontmatter</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">## 프롬프트 설계 요약
+- 대상 모델: claude-sonnet-5-5, claude-opus-5-5 (사용자 지정) · 적용 가이드: 공통 + Sonnet 5.5 / Opus 5.5 (확인일 2026-10-01, 이번 세션 대조 안 함)
+- 종류: SKILL.md · 언어: 한국어 · 진행 방식: 빠른 모드 (기본값 모두 승인)
+- 반영한 결정:
+  - 이름 `summarizing-meetings`. 트리거는 &quot;회의록 요약해줘&quot;, &quot;회의 정리해줘&quot;
+  - 출력은 결정 사항, 액션 아이템, 논의 요약 세 섹션
+  - 자유도는 중간이어서 템플릿으로 구조만 고정하고 표현은 맡김. 고정된 절차는 넣지 않음
+  - 번들 파일은 `reference/template.md` 하나
+- 적용한 best practice:
+  - description은 3인칭으로 쓰고 무엇을 하는지와 언제 실행하는지를 함께 넣음
+  - 점진적 공개: SKILL.md는 짧게 두고 형식은 템플릿 파일에서 한 단계 깊이로 참조
+  - 금지형 대신 할 일 형태로 쓰고, 규칙마다 이유를 붙임
+  - 평가 시나리오 3개는 스킬 본문이 아니라 아래 안내에 둠
+  - Sonnet 5.5와 Opus 5.5 가이드의 &quot;제거 검토&quot;와 &quot;검수 항목&quot; 기준에 걸리는 문구 없음 (사고 지시, 추론 노출 지시 없음)
+
+## 완성 프롬프트
+
+### SKILL.md
+````markdown
+---
+name: summarizing-meetings
+description: 회의록 텍스트를 결정 사항, 액션 아이템, 논의 요약으로 정리한다. &quot;회의록 요약해줘&quot;, &quot;회의 정리해줘&quot; 요청이나 회의록을 붙여넣고 정리를 요청할 때 사용한다.
+---
+
+# 회의록 요약
+
+회의록 텍스트를 [reference/template.md](reference/template.md)의 구조로 정리한다. 템플릿은 섹션 구성과 순서를 정한다. 각 항목의 문장 표현과 묶는 방식은 회의 내용에 맞게 정한다.
+
+## 정리 기준
+
+- **결정 사항**: 회의에서 합의되거나 확정된 것만 적는다. 논의만 하고 결론이 나지 않은 안건은 논의 요약에 둔다. 독자가 결정 사항만 보고 무엇이 확정됐는지 알 수 있어야 하기 때문이다.
+- **액션 아이템**: 누가 무엇을 언제까지 하는지 적는다. 회의록에 담당자나 기한이 없으면 &quot;미정&quot;으로 표시한다. 없는 정보를 추측해 채우면 잘못된 책임이 생기기 때문이다.
+- **논의 요약**: 안건별로 주요 의견과 쟁점을 짧게 정리한다.
+
+## 예외 처리
+
+- 결정 사항이나 액션 아이템이 없는 회의면 해당 섹션에 &quot;없음&quot;이라고 적고 섹션은 남긴다. 섹션이 빠지면 독자가 누락인지 실제로 없는 것인지 구분할 수 없기 때문이다.
+- 회의록이 영어 등 다른 언어로 되어 있어도 같은 템플릿으로 정리한다. 고유명사와 용어는 원문 표기를 유지한다.
+- 발언자나 맥락이 불분명한 부분은 어떻게 해석했는지 밝히고 진행한다.
+````
+
+### reference/template.md
+````markdown
+# 회의록 요약 템플릿
+
+```markdown
+## 결정 사항
+- &lt;확정된 내용&gt;
+
+## 액션 아이템
+| 담당자 | 할 일 | 기한 |
+|---|---|---|
+| &lt;이름 또는 미정&gt; | &lt;할 일&gt; | &lt;날짜 또는 미정&gt; |
+
+## 논의 요약
+### &lt;안건&gt;
+- &lt;주요 의견과 쟁점&gt;
+```
+
+해당 내용이 없는 섹션에는 &quot;없음&quot;이라고 적는다.
+````
+
+## 다음 단계
+- **평가**: 아래 세 가지 시나리오로 Sonnet 5.5와 Opus 5.5에서 각각 테스트하고, 스킬 없이 돌린 결과와 비교해 보세요. 이 세션의 모델은 Opus 5.5여서 Sonnet 5.5 동작은 따로 확인해야 합니다.
+  1. 30분 주간 회의록 요약
+  2. 액션 아이템 없는 회의
+  3. 영어 회의록
+- **추정해 넣은 항목** (확인이 필요합니다):
+  - 액션 아이템을 담당자·할 일·기한 표로 만든 것은 제가 고른 형식입니다.
+  - 영어 회의록도 한국어 템플릿으로 정리하고 용어는 원문대로 두는 것은 제가 정한 기본값입니다. 원문 언어로 요약하길 원하시면 바꾸겠습니다.
+- **빠른 모드 기본값의 영향**: 예시를 생략했습니다. 3번 시나리오에서 출력 언어가 흔들리면 예시를 추가하는 게 좋습니다.
+- **저장**: 아직 파일로 저장하지 않았습니다. 사용자 스킬(`~/.claude/skills/summarizing-meetings/`)과 프로젝트 스킬(`.claude/skills/summarizing-meetings/`) 중 위치를 정해 주시면 두 파일을 저장하겠습니다.
+- 고칠 부분이 있으면 그 항목만 말씀해 주세요. 해당 부분만 다시 반영하겠습니다.</pre>
+</div>
+</details>
+<details class="grader" open>
+<summary><span class="chip chip-fail">✗ fail</span> <span class="grader-name">separate-blocks</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: FAIL FAIL PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✗ ✗ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">## 프롬프트 설계 요약
+- 대상 모델: claude-sonnet-5-5, claude-opus-5-5 (사용자 지정) · 적용 가이드: 공통 + Sonnet 5.5 / Opus 5.5 (확인일 2026-10-01, 이번 세션 대조 안 함)
+- 종류: SKILL.md · 언어: 한국어 · 진행 방식: 빠른 모드 (기본값 모두 승인)
+- 반영한 결정:
+  - 이름 `summarizing-meetings`. 트리거는 &quot;회의록 요약해줘&quot;, &quot;회의 정리해줘&quot;
+  - 출력은 결정 사항, 액션 아이템, 논의 요약 세 섹션
+  - 자유도는 중간이어서 템플릿으로 구조만 고정하고 표현은 맡김. 고정된 절차는 넣지 않음
+  - 번들 파일은 `reference/template.md` 하나
+- 적용한 best practice:
+  - description은 3인칭으로 쓰고 무엇을 하는지와 언제 실행하는지를 함께 넣음
+  - 점진적 공개: SKILL.md는 짧게 두고 형식은 템플릿 파일에서 한 단계 깊이로 참조
+  - 금지형 대신 할 일 형태로 쓰고, 규칙마다 이유를 붙임
+  - 평가 시나리오 3개는 스킬 본문이 아니라 아래 안내에 둠
+  - Sonnet 5.5와 Opus 5.5 가이드의 &quot;제거 검토&quot;와 &quot;검수 항목&quot; 기준에 걸리는 문구 없음 (사고 지시, 추론 노출 지시 없음)
+
+## 완성 프롬프트
+
+### SKILL.md
+````markdown
+---
+name: summarizing-meetings
+description: 회의록 텍스트를 결정 사항, 액션 아이템, 논의 요약으로 정리한다. &quot;회의록 요약해줘&quot;, &quot;회의 정리해줘&quot; 요청이나 회의록을 붙여넣고 정리를 요청할 때 사용한다.
+---
+
+# 회의록 요약
+
+회의록 텍스트를 [reference/template.md](reference/template.md)의 구조로 정리한다. 템플릿은 섹션 구성과 순서를 정한다. 각 항목의 문장 표현과 묶는 방식은 회의 내용에 맞게 정한다.
+
+## 정리 기준
+
+- **결정 사항**: 회의에서 합의되거나 확정된 것만 적는다. 논의만 하고 결론이 나지 않은 안건은 논의 요약에 둔다. 독자가 결정 사항만 보고 무엇이 확정됐는지 알 수 있어야 하기 때문이다.
+- **액션 아이템**: 누가 무엇을 언제까지 하는지 적는다. 회의록에 담당자나 기한이 없으면 &quot;미정&quot;으로 표시한다. 없는 정보를 추측해 채우면 잘못된 책임이 생기기 때문이다.
+- **논의 요약**: 안건별로 주요 의견과 쟁점을 짧게 정리한다.
+
+## 예외 처리
+
+- 결정 사항이나 액션 아이템이 없는 회의면 해당 섹션에 &quot;없음&quot;이라고 적고 섹션은 남긴다. 섹션이 빠지면 독자가 누락인지 실제로 없는 것인지 구분할 수 없기 때문이다.
+- 회의록이 영어 등 다른 언어로 되어 있어도 같은 템플릿으로 정리한다. 고유명사와 용어는 원문 표기를 유지한다.
+- 발언자나 맥락이 불분명한 부분은 어떻게 해석했는지 밝히고 진행한다.
+````
+
+### reference/template.md
+````markdown
+# 회의록 요약 템플릿
+
+```markdown
+## 결정 사항
+- &lt;확정된 내용&gt;
+
+## 액션 아이템
+| 담당자 | 할 일 | 기한 |
+|---|---|---|
+| &lt;이름 또는 미정&gt; | &lt;할 일&gt; | &lt;날짜 또는 미정&gt; |
+
+## 논의 요약
+### &lt;안건&gt;
+- &lt;주요 의견과 쟁점&gt;
+```
+
+해당 내용이 없는 섹션에는 &quot;없음&quot;이라고 적는다.
+````
+
+## 다음 단계
+- **평가**: 아래 세 가지 시나리오로 Sonnet 5.5와 Opus 5.5에서 각각 테스트하고, 스킬 없이 돌린 결과와 비교해 보세요. 이 세션의 모델은 Opus 5.5여서 Sonnet 5.5 동작은 따로 확인해야 합니다.
+  1. 30분 주간 회의록 요약
+  2. 액션 아이템 없는 회의
+  3. 영어 회의록
+- **추정해 넣은 항목** (확인이 필요합니다):
+  - 액션 아이템을 담당자·할 일·기한 표로 만든 것은 제가 고른 형식입니다.
+  - 영어 회의록도 한국어 템플릿으로 정리하고 용어는 원문대로 두는 것은 제가 정한 기본값입니다. 원문 언어로 요약하길 원하시면 바꾸겠습니다.
+- **빠른 모드 기본값의 영향**: 예시를 생략했습니다. 3번 시나리오에서 출력 언어가 흔들리면 예시를 추가하는 게 좋습니다.
+- **저장**: 아직 파일로 저장하지 않았습니다. 사용자 스킬(`~/.claude/skills/summarizing-meetings/`)과 프로젝트 스킬(`.claude/skills/summarizing-meetings/`) 중 위치를 정해 주시면 두 파일을 저장하겠습니다.
+- 고칠 부분이 있으면 그 항목만 말씀해 주세요. 해당 부분만 다시 반영하겠습니다.</pre>
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">asks-save-location</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">## 프롬프트 설계 요약
+- 대상 모델: claude-sonnet-5-5, claude-opus-5-5 (사용자 지정) · 적용 가이드: 공통 + Sonnet 5.5 / Opus 5.5 (확인일 2026-10-01, 이번 세션 대조 안 함)
+- 종류: SKILL.md · 언어: 한국어 · 진행 방식: 빠른 모드 (기본값 모두 승인)
+- 반영한 결정:
+  - 이름 `summarizing-meetings`. 트리거는 &quot;회의록 요약해줘&quot;, &quot;회의 정리해줘&quot;
+  - 출력은 결정 사항, 액션 아이템, 논의 요약 세 섹션
+  - 자유도는 중간이어서 템플릿으로 구조만 고정하고 표현은 맡김. 고정된 절차는 넣지 않음
+  - 번들 파일은 `reference/template.md` 하나
+- 적용한 best practice:
+  - description은 3인칭으로 쓰고 무엇을 하는지와 언제 실행하는지를 함께 넣음
+  - 점진적 공개: SKILL.md는 짧게 두고 형식은 템플릿 파일에서 한 단계 깊이로 참조
+  - 금지형 대신 할 일 형태로 쓰고, 규칙마다 이유를 붙임
+  - 평가 시나리오 3개는 스킬 본문이 아니라 아래 안내에 둠
+  - Sonnet 5.5와 Opus 5.5 가이드의 &quot;제거 검토&quot;와 &quot;검수 항목&quot; 기준에 걸리는 문구 없음 (사고 지시, 추론 노출 지시 없음)
+
+## 완성 프롬프트
+
+### SKILL.md
+````markdown
+---
+name: summarizing-meetings
+description: 회의록 텍스트를 결정 사항, 액션 아이템, 논의 요약으로 정리한다. &quot;회의록 요약해줘&quot;, &quot;회의 정리해줘&quot; 요청이나 회의록을 붙여넣고 정리를 요청할 때 사용한다.
+---
+
+# 회의록 요약
+
+회의록 텍스트를 [reference/template.md](reference/template.md)의 구조로 정리한다. 템플릿은 섹션 구성과 순서를 정한다. 각 항목의 문장 표현과 묶는 방식은 회의 내용에 맞게 정한다.
+
+## 정리 기준
+
+- **결정 사항**: 회의에서 합의되거나 확정된 것만 적는다. 논의만 하고 결론이 나지 않은 안건은 논의 요약에 둔다. 독자가 결정 사항만 보고 무엇이 확정됐는지 알 수 있어야 하기 때문이다.
+- **액션 아이템**: 누가 무엇을 언제까지 하는지 적는다. 회의록에 담당자나 기한이 없으면 &quot;미정&quot;으로 표시한다. 없는 정보를 추측해 채우면 잘못된 책임이 생기기 때문이다.
+- **논의 요약**: 안건별로 주요 의견과 쟁점을 짧게 정리한다.
+
+## 예외 처리
+
+- 결정 사항이나 액션 아이템이 없는 회의면 해당 섹션에 &quot;없음&quot;이라고 적고 섹션은 남긴다. 섹션이 빠지면 독자가 누락인지 실제로 없는 것인지 구분할 수 없기 때문이다.
+- 회의록이 영어 등 다른 언어로 되어 있어도 같은 템플릿으로 정리한다. 고유명사와 용어는 원문 표기를 유지한다.
+- 발언자나 맥락이 불분명한 부분은 어떻게 해석했는지 밝히고 진행한다.
+````
+
+### reference/template.md
+````markdown
+# 회의록 요약 템플릿
+
+```markdown
+## 결정 사항
+- &lt;확정된 내용&gt;
+
+## 액션 아이템
+| 담당자 | 할 일 | 기한 |
+|---|---|---|
+| &lt;이름 또는 미정&gt; | &lt;할 일&gt; | &lt;날짜 또는 미정&gt; |
+
+## 논의 요약
+### &lt;안건&gt;
+- &lt;주요 의견과 쟁점&gt;
+```
+
+해당 내용이 없는 섹션에는 &quot;없음&quot;이라고 적는다.
+````
+
+## 다음 단계
+- **평가**: 아래 세 가지 시나리오로 Sonnet 5.5와 Opus 5.5에서 각각 테스트하고, 스킬 없이 돌린 결과와 비교해 보세요. 이 세션의 모델은 Opus 5.5여서 Sonnet 5.5 동작은 따로 확인해야 합니다.
+  1. 30분 주간 회의록 요약
+  2. 액션 아이템 없는 회의
+  3. 영어 회의록
+- **추정해 넣은 항목** (확인이 필요합니다):
+  - 액션 아이템을 담당자·할 일·기한 표로 만든 것은 제가 고른 형식입니다.
+  - 영어 회의록도 한국어 템플릿으로 정리하고 용어는 원문대로 두는 것은 제가 정한 기본값입니다. 원문 언어로 요약하길 원하시면 바꾸겠습니다.
+- **빠른 모드 기본값의 영향**: 예시를 생략했습니다. 3번 시나리오에서 출력 언어가 흔들리면 예시를 추가하는 게 좋습니다.
+- **저장**: 아직 파일로 저장하지 않았습니다. 사용자 스킬(`~/.claude/skills/summarizing-meetings/`)과 프로젝트 스킬(`.claude/skills/summarizing-meetings/`) 중 위치를 정해 주시면 두 파일을 저장하겠습니다.
+- 고칠 부분이 있으면 그 항목만 말씀해 주세요. 해당 부분만 다시 반영하겠습니다.</pre>
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">evals-included</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">## 프롬프트 설계 요약
+- 대상 모델: claude-sonnet-5-5, claude-opus-5-5 (사용자 지정) · 적용 가이드: 공통 + Sonnet 5.5 / Opus 5.5 (확인일 2026-10-01, 이번 세션 대조 안 함)
+- 종류: SKILL.md · 언어: 한국어 · 진행 방식: 빠른 모드 (기본값 모두 승인)
+- 반영한 결정:
+  - 이름 `summarizing-meetings`. 트리거는 &quot;회의록 요약해줘&quot;, &quot;회의 정리해줘&quot;
+  - 출력은 결정 사항, 액션 아이템, 논의 요약 세 섹션
+  - 자유도는 중간이어서 템플릿으로 구조만 고정하고 표현은 맡김. 고정된 절차는 넣지 않음
+  - 번들 파일은 `reference/template.md` 하나
+- 적용한 best practice:
+  - description은 3인칭으로 쓰고 무엇을 하는지와 언제 실행하는지를 함께 넣음
+  - 점진적 공개: SKILL.md는 짧게 두고 형식은 템플릿 파일에서 한 단계 깊이로 참조
+  - 금지형 대신 할 일 형태로 쓰고, 규칙마다 이유를 붙임
+  - 평가 시나리오 3개는 스킬 본문이 아니라 아래 안내에 둠
+  - Sonnet 5.5와 Opus 5.5 가이드의 &quot;제거 검토&quot;와 &quot;검수 항목&quot; 기준에 걸리는 문구 없음 (사고 지시, 추론 노출 지시 없음)
+
+## 완성 프롬프트
+
+### SKILL.md
+````markdown
+---
+name: summarizing-meetings
+description: 회의록 텍스트를 결정 사항, 액션 아이템, 논의 요약으로 정리한다. &quot;회의록 요약해줘&quot;, &quot;회의 정리해줘&quot; 요청이나 회의록을 붙여넣고 정리를 요청할 때 사용한다.
+---
+
+# 회의록 요약
+
+회의록 텍스트를 [reference/template.md](reference/template.md)의 구조로 정리한다. 템플릿은 섹션 구성과 순서를 정한다. 각 항목의 문장 표현과 묶는 방식은 회의 내용에 맞게 정한다.
+
+## 정리 기준
+
+- **결정 사항**: 회의에서 합의되거나 확정된 것만 적는다. 논의만 하고 결론이 나지 않은 안건은 논의 요약에 둔다. 독자가 결정 사항만 보고 무엇이 확정됐는지 알 수 있어야 하기 때문이다.
+- **액션 아이템**: 누가 무엇을 언제까지 하는지 적는다. 회의록에 담당자나 기한이 없으면 &quot;미정&quot;으로 표시한다. 없는 정보를 추측해 채우면 잘못된 책임이 생기기 때문이다.
+- **논의 요약**: 안건별로 주요 의견과 쟁점을 짧게 정리한다.
+
+## 예외 처리
+
+- 결정 사항이나 액션 아이템이 없는 회의면 해당 섹션에 &quot;없음&quot;이라고 적고 섹션은 남긴다. 섹션이 빠지면 독자가 누락인지 실제로 없는 것인지 구분할 수 없기 때문이다.
+- 회의록이 영어 등 다른 언어로 되어 있어도 같은 템플릿으로 정리한다. 고유명사와 용어는 원문 표기를 유지한다.
+- 발언자나 맥락이 불분명한 부분은 어떻게 해석했는지 밝히고 진행한다.
+````
+
+### reference/template.md
+````markdown
+# 회의록 요약 템플릿
+
+```markdown
+## 결정 사항
+- &lt;확정된 내용&gt;
+
+## 액션 아이템
+| 담당자 | 할 일 | 기한 |
+|---|---|---|
+| &lt;이름 또는 미정&gt; | &lt;할 일&gt; | &lt;날짜 또는 미정&gt; |
+
+## 논의 요약
+### &lt;안건&gt;
+- &lt;주요 의견과 쟁점&gt;
+```
+
+해당 내용이 없는 섹션에는 &quot;없음&quot;이라고 적는다.
+````
+
+## 다음 단계
+- **평가**: 아래 세 가지 시나리오로 Sonnet 5.5와 Opus 5.5에서 각각 테스트하고, 스킬 없이 돌린 결과와 비교해 보세요. 이 세션의 모델은 Opus 5.5여서 Sonnet 5.5 동작은 따로 확인해야 합니다.
+  1. 30분 주간 회의록 요약
+  2. 액션 아이템 없는 회의
+  3. 영어 회의록
+- **추정해 넣은 항목** (확인이 필요합니다):
+  - 액션 아이템을 담당자·할 일·기한 표로 만든 것은 제가 고른 형식입니다.
+  - 영어 회의록도 한국어 템플릿으로 정리하고 용어는 원문대로 두는 것은 제가 정한 기본값입니다. 원문 언어로 요약하길 원하시면 바꾸겠습니다.
+- **빠른 모드 기본값의 영향**: 예시를 생략했습니다. 3번 시나리오에서 출력 언어가 흔들리면 예시를 추가하는 게 좋습니다.
+- **저장**: 아직 파일로 저장하지 않았습니다. 사용자 스킬(`~/.claude/skills/summarizing-meetings/`)과 프로젝트 스킬(`.claude/skills/summarizing-meetings/`) 중 위치를 정해 주시면 두 파일을 저장하겠습니다.
+- 고칠 부분이 있으면 그 항목만 말씀해 주세요. 해당 부분만 다시 반영하겠습니다.</pre>
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">no-write-before-approval</span>  </summary>
+<div class="grader-body">
+<p class="explanation">Write called 0x (expected 0..0)</p>
+
+</div>
+</details></div>
+</div>
+</section>
+</details>
+<details class="section" open>
+<summary>Prompt</summary>
+<div class="md"><p>회의록 요약 스킬 만들어줘. SKILL.md랑 요약 템플릿 참조 파일도 같이 필요해. 답은 아래와 같아.</p>
+<ul>
+<li>사용 모델: Sonnet 5.5, Opus 5.5</li>
+<li>이름: summarizing-meetings</li>
+<li>하는 일과 트리거: 회의록 텍스트를 결정 사항·액션 아이템·논의 요약으로 정리. "회의록 요약해줘", "회의 정리해줘"에 실행</li>
+<li>자유도: 중간. 절차: 없음</li>
+<li>번들 파일: reference/template.md (요약 템플릿)</li>
+<li>평가 시나리오: 1) 30분 주간 회의록 요약 2) 액션 아이템 없는 회의 3) 영어 회의록</li>
+<li>프롬프트 언어 한국어, 빠른 모드, 기본값 모두 승인. 더 묻지 말고 결과를 보여 줘. 저장 위치는 아직 정하지 않았어.</li>
+</ul>
+</div>
+</details>
+<details class="section" open>
+<summary>Graders — what "good" means for this case</summary>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">skill-fired</span><span class="badge">tool_used</span></div>
+<div class="config"><div class="kv"><span>tool</span><code>&quot;Skill&quot;</code></div><div class="kv"><span>input_match</span><code>&quot;\&quot;skill\&quot;\\s*:\\s*\&quot;(?:[\\w-]+:)?prompt-builder\&quot;&quot;</code></div></div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">frontmatter</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: SKILL.md frontmatter의 name이 summarizing-meetings이고, description이 3인칭으로 무엇을 하는지와 언제 쓰는지를 모두 담는다.
+FAIL: name 규칙을 어기거나 description에 '무엇'이나 '언제'가 빠졌거나 1·2인칭이다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">separate-blocks</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: SKILL.md와 reference/template.md를 각각 '### &lt;상대 경로&gt;' 제목이 붙은 별도 코드블록으로 보여 준다.
+FAIL: 두 파일을 한 블록에 넣거나 경로 제목이 없다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">asks-save-location</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 저장할지와 위치(사용자 스킬 / 프로젝트 스킬 / 저장 안 함)를 묻는다.
+FAIL: 저장 위치를 묻지 않는다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">evals-included</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 평가 시나리오 3개를 결과물이나 안내에 포함한다.
+FAIL: 평가 시나리오가 빠졌다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">no-write-before-approval</span><span class="badge">tool_used</span></div>
+<div class="config"><div class="kv"><span>tool</span><code>&quot;Write&quot;</code></div><div class="kv"><span>min</span><code>0</code></div><div class="kv"><span>max</span><code>0</code></div><div class="kv"><span>arm</span><code>&quot;both&quot;</code></div></div>
+</div>
+</details>
+</article>
+<article class="case" id="case-11">
+<div class="case-head">
+<h2>sonnet55-low-effort</h2>
+<span class="muted mono">evals/prompt-builder/sonnet55-low-effort</span>
+<span class="spacer"></span>
+
+
+
+<span class="meter m-accent" aria-hidden="true"><span style="width:75.0%"></span><i class="tick" style="left:0.0%"></i></span>
+<span class="num case-score">75%</span>
+</div>
+
+<details class="section" open>
+<summary>Results</summary>
+<section class="arm">
+<div class="arm-head">
+<span class="arm-label">Runs</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:75.0%"></span></span>
+<span class="num">75%</span>
+<span class="muted num">0% of runs perfect</span>
+</div>
+<div class="run">
+<div class="run-head">
+<span class="run-title">Run 1</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:75.0%"></span></span>
+<span class="num">75%</span>
+<span class="muted num">7 turns · $0.36 · 06:02:29 UTC</span>
+</div>
+
+<div class="graders"><details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">skill-fired</span>  </summary>
+<div class="grader-body">
+<p class="explanation">Skill called 1x (expected 1..∞)</p>
+
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">loads-sonnet55-guide</span>  </summary>
+<div class="grader-body">
+<p class="explanation">Read called 1x (expected 1..∞)</p>
+
+</div>
+</details>
+<details class="grader" open>
+<summary><span class="chip chip-fail">✗ fail</span> <span class="grader-name">not-sonnet5-guide</span>  </summary>
+<div class="grader-body">
+<p class="explanation">pattern found (expected absent)</p>
+
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">asks-low-effort-decisions</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">진행 상황:
+- [x] 1. 세션 모델 감지: `claude-opus-5-5`
+- [x] 2. 기본 설정: 에이전트 프롬프트, 대상 모델 Sonnet 5.5, 한국어, 빠른 모드 (요청에서 확인)
+- [x] 3. 모델 가이드 로드: `claude-sonnet-5-5` → Sonnet 5.5 가이드 적용 (확인일 2026-10-01, 90일 안이라 다시 대조하지 않음)
+- [x] 4. 초안 분석: 초안 없음
+- [ ] 5. 구성 요소 인터뷰 ← 지금
+- [ ] 6. 모델 특화 결정 질문 ← 같이 묻습니다
+- [ ] 7~9. 조립, 검수, 출력
+
+이 세션은 Opus 5.5라서 여기서 시험한 결과는 Sonnet 5.5와 다를 수 있습니다.
+
+**받은 답 정리:** 목적과 성공 기준(C1), 역할(C3), 배경(C4), 실행 방식(G2, 대화형), 기본 성향(G3, 신중), 확인 필요 행동(G4, git push), 완료 조건(G5, `go test ./...`), 작업 영역(G11, 코딩), 코딩 세부(G13), 실행 시 구체화(C16=아니오)는 모두 확인했습니다. 성공 검증(C14)은 G5의 `go test ./...`로 처리합니다.
+
+---
+
+### A. 필수 항목: 아직 비어 있거나 모호한 것
+
+1. **입력(C5):** 실행할 때 에이전트가 받는 입력은 무엇인가요? 예를 들어 이슈 본문, 재현 절차, 에러 로그, 대상 패키지 경로 등입니다. 매번 바뀌는 값이 있으면 `{{ISSUE}}` 같은 변수로 둘지도 알려 주세요.
+2. **도구 사용 시점(G1):** 도구 이름(Bash, Read, Edit)만 받았습니다. 도구별로 정할 규칙이 있나요? 예를 들어 Bash로 써도 되는 명령 범위나 Edit 전에 Read를 먼저 할지 같은 것입니다. 없으면 &quot;없음&quot;이라고 답해 주세요.
+3. **PR 생성 방식과 확인 범위(G4):** PR은 어떻게 만드나요?
+   - (a) 에이전트가 `gh pr create`까지 한다. push와 PR 생성 모두 확인을 받는다.
+   - (b) 에이전트는 커밋과 PR 설명 초안까지만 쓰고, push와 PR 생성은 사람이 한다.
+   - (c) 그 외 (직접 입력)
+4. **브랜치·커밋 규칙:** 브랜치 이름이나 커밋 메시지에 사내 규칙이 있나요? 있으면 규칙과 그 이유를 적어 주세요. 없으면 &quot;생략&quot;이라고 답해 주세요.
+
+### B. 모델 특화 결정 질문 (Sonnet 5.5 + effort low)
+
+5. **끝까지 진행과 범위 제한(M1):**
+   - (a) 계속 진행 + 범위 제한
+   - (b) 범위 제한만 (권장)
+   - (c) 넣지 않음
+
+   effort `low`에서는 작업 도중 확인을 구하며 멈추는 일이 있습니다. (a)는 이를 줄이는 대신 세션이 길어지고 비용이 늘어납니다. 대화형에 신중 성향이라면 (b)가 맞습니다.
+6. **변경 검증 후에만 완료 보고(M9):** 넣을까요? (예 (권장) / 아니오)
+
+   `low`에서는 변경을 검증하지 않고 완료라고 보고하는 경향이 있습니다. 완료 조건이 테스트 통과라면 넣는 편이 좋습니다.
+7. **아이디어·계획만 요청했을 때 만들지 않기(M3):** 넣을까요? (예 / 아니오)
+8. **진행 보고 시점(M6):** 첫 도구 호출 전에 한 줄, 작업이 끝나면 &quot;찾은 것, 한 것, 다음 할 일&quot;을 요약하게 할까요? (예 (권장) / 아니오)
+
+### C. 기본값 표: 바꿀 행만 알려 주세요
+
+| 항목 | 기본값 | 근거 |
+|---|---|---|
+| C2 대상 사용자 | 생략 | 서술형이라 기본값을 지어내지 않습니다 |
+| C6 작업 단계 | 생략 | 같음 |
+| C7 추가 규칙 | 생략 (4번 답만 반영) | 같음 |
+| C8 범위 밖 요청 | 생략 | 같음 |
+| C9 불확실할 때 | 가정을 밝히고 진행 (G3 신중 성향 유지) | 해석에 따라 결과가 달라질 때만 확인하라는 공식 권장 |
+| C10 출력 형식 | 마크다운 | - |
+| C11 출력 길이 | 내용에 맞게 | 최신 모델은 길이를 작업에 맞춰 조절합니다 |
+| C12 톤 | 모델 기본 | - |
+| C13 예시 | 생략 | - |
+| C15 특수 입출력 | 해당 없음 | - |
+| G6 진행 보고 | 시작 한 줄 + 중요한 발견 + 마지막 요약 | 8번 답과 연동됩니다 |
+| G7 서브에이전트 | 허용 안 함 | 도구 목록에 서브에이전트 도구가 없습니다 |
+| G8 범위 통제 | 요청 밖 수정은 하지 않고 제안만 | 공식 권장. 5번 답과 연동됩니다 |
+| G9 상태 관리 | 없음 | 대화형 단기 작업 |
+| G10 컨텍스트 압축 | 모름 → 압축 안내를 넣지 않음 | - |
+| G12 시간 예산 | 없음 | - |
+| M4 사고 설정 | 적응형 유지 | 기본값. `low`에서는 단순한 요청에 사고를 대부분 건너뜁니다 |
+| M8 작업 중 사용자 메시지 위치 | 실행 설정 권고에 일반 원칙만 적음 | 대화형이라 해당될 수 있습니다 |
+
+참고: 공식 가이드는 잘 정의된 에이전트 코딩 작업에 `medium`을 권장합니다. `low`를 유지해도 괜찮고, 6번 검증 지시가 그 위험을 일부 메워 줍니다.</pre>
+</div>
+</details></div>
+</div>
+</section>
+</details>
+<details class="section" open>
+<summary>Prompt</summary>
+<div class="md"><p>Sonnet 5.5로 돌릴 코딩 에이전트 프롬프트 만들어줘. 비용 때문에 effort는 low로 쓸 거야.
+프롬프트 언어는 한국어, 빠른 모드. 인터뷰 답:</p>
+<ul>
+<li>목적: 사내 API 서버의 버그 수정 PR 작성. 성공 = 테스트 통과하는 PR</li>
+<li>역할: 백엔드 엔지니어</li>
+<li>배경: Go 1.22 모노레포</li>
+<li>도구: Bash, Read, Edit</li>
+<li>실행 방식: 사람이 대화하며 진행. 기본 성향: 신중</li>
+<li>확인 필요 행동: git push</li>
+<li>완료 조건: go test ./... 통과</li>
+<li>작업 영역: 코딩. 코딩 세부: 테스트 통과가 완료 조건에 포함</li>
+<li>실행 시 구체화(C16): 아니오</li>
+</ul>
+</div>
+</details>
+<details class="section" open>
+<summary>Graders — what "good" means for this case</summary>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">skill-fired</span><span class="badge">tool_used</span></div>
+<div class="config"><div class="kv"><span>tool</span><code>&quot;Skill&quot;</code></div><div class="kv"><span>input_match</span><code>&quot;\&quot;skill\&quot;\\s*:\\s*\&quot;(?:[\\w-]+:)?prompt-builder\&quot;&quot;</code></div></div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">loads-sonnet55-guide</span><span class="badge">tool_used</span></div>
+<div class="config"><div class="kv"><span>tool</span><code>&quot;Read&quot;</code></div><div class="kv"><span>input_match</span><code>&quot;sonnet-5-5\\.md&quot;</code></div><div class="kv"><span>arm</span><code>&quot;both&quot;</code></div></div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">not-sonnet5-guide</span><span class="badge">regex</span></div>
+<div class="config"><div class="kv"><span>target</span><code>&quot;trace&quot;</code></div><div class="kv"><span>pattern</span><code>&quot;models/sonnet-5\\.md&quot;</code></div><div class="kv"><span>flags</span><code>&quot;&quot;</code></div><div class="kv"><span>match</span><code>&quot;not_contains&quot;</code></div><div class="kv"><span>arm</span><code>&quot;both&quot;</code></div></div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">asks-low-effort-decisions</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: low effort 코딩이므로 변경 검증 지시와 끝까지 진행·범위 제한 지시를 넣을지 묻거나, 그 결정이 반영됐음을 밝힌다.
+FAIL: low effort 관련 결정 질문 없이 진행한다.</p>
+</div>
+</div>
+</details>
+</article>
+<article class="case" id="case-12">
+<div class="case-head">
+<h2>unattended-agent</h2>
+<span class="muted mono">evals/prompt-builder/unattended-agent</span>
+<span class="spacer"></span>
+
+
+
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span><i class="tick" style="left:0.0%"></i></span>
+<span class="num case-score">100%</span>
+</div>
+
+<details class="section" open>
+<summary>Results</summary>
+<section class="arm">
+<div class="arm-head">
+<span class="arm-label">Runs</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span></span>
+<span class="num">100%</span>
+<span class="muted num">100% of runs perfect</span>
+</div>
+<div class="run">
+<div class="run-head">
+<span class="run-title">Run 1</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span></span>
+<span class="num">100%</span>
+<span class="muted num">7 turns · $0.39 · 06:02:30 UTC</span>
+</div>
+
+<div class="graders"><details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">skill-fired</span>  </summary>
+<div class="grader-body">
+<p class="explanation">Skill called 1x (expected 1..∞)</p>
+
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">keeps-confirmation</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">## 프롬프트 설계 요약
+- 대상 모델: claude-opus-5-5 (세션 모델) · 적용 가이드: 공통 + Opus 5.5 가이드 (확인일 2026-10-01, 이번 세션에서는 대조하지 않음. 90일이 지나지 않음)
+- 종류: 에이전트·하네스 · 언어: 한국어 · 진행 방식: 빠른 모드 (기본값 표 모두 승인)
+- 반영한 결정:
+  - 무인 자율 실행이고, 모호하면 적극적으로 실행합니다.
+  - 확인이 필요한 행동은 원격 push, 파일 삭제, 의존성 메이저 버전 변경입니다. 밤사이 확인해 줄 사람이 없으므로 이 행동은 하지 않고 최종 보고의 &quot;승인 대기&quot;에 남기게 했습니다.
+  - 완료 조건은 pytest 전체 통과 후 로컬 커밋입니다.
+  - 조기 종료 방지 지시(P1)를 넣었습니다.
+  - 기본값으로 정한 항목: 진행 보고는 시작 한 줄, 중요한 발견, 마지막 요약입니다. 요청 밖 수정은 하지 않고 제안만 합니다. 정보가 모호하면 가정을 밝히고 진행합니다. 출력은 마크다운이고 길이는 내용에 맞춥니다.
+- 적용한 best practice:
+  - 규칙마다 이유를 붙였습니다.
+  - 되돌릴 수 있는 작업과 되돌리기 어려운 작업을 나눴습니다. `--no-verify` 같은 파괴적인 지름길은 금지했습니다.
+  - 테스트만 통과시키는 하드코딩을 금지했습니다. 테스트가 틀렸으면 우회하지 않고 보고하게 했습니다.
+  - 요청 밖 변경은 제안으로만 남기게 해서 과잉 엔지니어링을 막았습니다.
+  - Opus 5.5의 `end_turn` 조기 종료 성향에 맞춘 무인 계속 지시(P1)를 넣었고, 위험 행동 확인이 이 지시보다 우선한다는 점을 유지했습니다.
+  - 아침에 읽을 개발자를 기준으로 최종 보고 형식을 정했습니다.
+
+## 완성 프롬프트
+
+````markdown
+당신은 레거시 마이그레이션 엔지니어다. 사내 레포 legacy-billing을 Python 2에서 Python 3.11로 옮기는 일을 사람 없이 밤새 혼자 진행한다.
+
+&lt;context&gt;
+- 대상 레포: legacy-billing (사내 레포, 현재 Python 2 코드베이스)
+- 목표: 코드를 Python 3.11에서 동작하도록 마이그레이션한다. 성공 기준은 Python 3.11 환경에서 pytest 전체 테스트가 통과하는 것이다.
+- 결과를 보는 사람: 아침에 출근해 결과를 확인하는 백엔드 개발자. 이 사람은 밤사이 진행 과정을 지켜보지 않았으므로, 최종 보고만 읽고도 무엇이 바뀌었고 무엇이 남았는지 알 수 있어야 한다.
+- 작업 중에는 질문에 답해 줄 사람이 없다. 일상적인 판단은 스스로 내리고, 판단의 근거가 된 가정은 최종 보고에 남긴다.
+&lt;/context&gt;
+
+&lt;instructions&gt;
+1. 첫 도구 호출 전에 무엇을 할지 한 줄로 말한다.
+2. 레포 구조와 테스트 구성을 읽고, Python 3.11에서 pytest를 실행해 현재 실패 목록을 확인한다. 빠진 정보는 추측하지 말고 도구로 확인한다.
+3. 실패 원인을 고치며 마이그레이션을 진행한다. 제안에 그치지 말고 직접 고친다. 의도가 분명하지 않으면 가장 유용한 해석을 골라 진행하고, 그 가정을 기록한다.
+4. 의미 있는 단위로 수정할 때마다 pytest를 다시 실행해 진행을 확인한다.
+5. 작업 중 중요한 발견(설계상 문제, 테스트 자체의 오류, 승인이 필요한 변경 등)이 있으면 다음 도구 호출과 같은 메시지에 짧게 적고 작업을 계속한다.
+6. pytest 전체가 통과하면 변경 사항을 로컬 git에 커밋한다.
+7. 마지막으로 &lt;output_format&gt;에 따라 최종 보고를 쓴다.
+&lt;/instructions&gt;
+
+&lt;constraints&gt;
+- 테스트만 통과시키는 해법을 쓰지 않는다. 특정 테스트 입력에 맞춘 하드코딩이나 테스트를 건너뛰게 하는 처리 대신, 모든 유효한 입력에서 올바르게 동작하는 일반적인 해법을 쓴다. 성공 기준은 테스트 통과지만, 진짜 목적은 Python 3.11에서 제대로 동작하는 코드이기 때문이다.
+- 테스트 자체가 틀렸다고 판단되면 테스트를 고쳐 우회하지 않는다. 최종 보고에 근거와 함께 남긴다. 아침에 개발자가 판단해야 할 사항이기 때문이다.
+- 마이그레이션에 필요한 것과 테스트 통과에 명백히 필요한 것만 바꾼다. 관련 없는 리팩터링, 건드리지 않은 코드에 주석·타입 추가, 일어날 수 없는 경우를 위한 방어 코드, 일회성 추상화는 하지 않는다. 대신 개선 제안은 최종 보고의 &quot;제안&quot;에 적는다. 리뷰할 변경 범위가 작아야 아침에 검토하기 쉽기 때문이다.
+- 장애물을 파괴적인 지름길로 넘지 않는다. 예를 들어 `--no-verify`로 훅을 건너뛰지 않는다. 원인을 해결하거나, 해결할 수 없으면 보고한다.
+&lt;/constraints&gt;
+
+&lt;tools&gt;
+- Bash: pytest 실행과 상태 확인에 쓴다. 서로 의존하지 않는 확인 작업은 한 번에 병렬로 하고, 앞 결과가 다음 명령의 인자가 되면 순서대로 한다.
+- Read / Edit: 코드를 읽고 고칠 때 쓴다. 고치기 전에 해당 파일을 먼저 읽는다.
+- git: 로컬 커밋에 쓴다.
+&lt;/tools&gt;
+
+&lt;autonomy&gt;
+- 로컬에서 되돌릴 수 있는 작업(코드 수정, 테스트 실행, 로컬 커밋)은 확인 없이 바로 한다.
+- 아래 행동은 확인을 받아야 한다. 밤사이에는 확인해 줄 사람이 없으므로 실행하지 않는다. 필요하다고 판단되면 최종 보고의 &quot;승인 대기&quot; 항목에 무엇을, 왜 해야 하는지 적고, 그 행동 없이 할 수 있는 나머지 작업을 계속한다.
+  - 원격 저장소로 push
+  - 파일 삭제
+  - 의존성의 메이저 버전 변경
+- 완료 조건: Python 3.11 환경에서 pytest 전체가 통과하고, 그 상태가 로컬 git에 커밋되었을 때 끝난다. 승인 대기 항목 때문에 전체 통과가 불가능하면, 할 수 있는 작업을 모두 마친 뒤 남은 실패와 그 이유를 보고하고 끝낸다.
+&lt;/autonomy&gt;
+
+&lt;output_format&gt;
+최종 보고는 마크다운으로 쓰고, 길이는 내용에 맞춘다. 다음 순서로 쓴다.
+1. 결과: pytest 최종 결과(통과/실패 수)와 커밋 해시
+2. 주요 변경: 무엇을 왜 바꿨는지
+3. 승인 대기: 확인이 필요해서 실행하지 않은 행동과 그 이유
+4. 남은 문제: 통과하지 못한 테스트, 틀렸다고 판단한 테스트와 근거
+5. 가정: 스스로 내린 판단과 그 근거
+6. 제안: 범위 밖이라 하지 않은 개선 사항
+&lt;/output_format&gt;
+
+당신이 일해 주는 사용자가 남긴 상시 지시다. 턴을 끝내는 방식에 관한 것이다. 도구 호출이 없는 메시지를 보내면 턴이 끝나고, 다시 요청받기 전까지 작업이 멈춘다. 사용자는 요청한 작업이 남아 있는데 다음 네 가지 방식으로 턴이 끝나는 것을 보았고, 어느 것도 원하지 않는다.
+1. 한 일을 길게 요약하고 다음 단계를 예고만 한 채 도구 호출 없이 끝내기
+2. &quot;다른 방향을 원하지 않으시면 계속하겠습니다&quot;처럼 오지 않을 답을 기다리며 멈추기
+3. 나머지 작업을 막지도 않는 결정 사항 목록을 사용자에게 넘기기
+4. 턴이 길어졌거나 한 단계를 마쳤다는 이유로 보고하며 멈추기
+상태 메모와 미결 사항에 대한 추천은 환영하지만, 다음 도구 호출과 같은 메시지에 넣고 사용자 답이 필요 없는 작업을 계속한다. 사용자에게 방향을 바꿔 달라고 청하거나 기다리겠다고 제안하는 문장을 쓰고 있다면, 그 문장을 지우고 다음 일을 한다. 사용자 없이는 아무것도 진행할 수 없을 때, 또는 막고 있는 대상이 의도적으로 보호된 경우에만 멈춘다. 위험하거나 파괴적인 행동에 대한 확인 요구는 이 지시보다 우선한다.
+````
+
+## 실행 설정 권고
+
+```yaml
+model: claude-opus-5-5
+output_config:
+  effort: medium   # Opus 5.5 기본값. 품질 향상이 측정될 때만 xhigh로 올린다
+max_tokens: 128000  # 사고도 포함되고, 에이전트 코딩에서 잘 작동한 값
+thinking: { display: &quot;updates&quot; }  # 사고는 항상 켜짐. P1의 진행 메모를 보려면 updates로 설정
+betas: [thinking-display-updates-2026-08-18]
+```
+
+하네스 쪽 권고:
+- 도구 호출 없이 텍스트만으로 끝난 턴은 완료가 아니라 보고로 취급합니다. pytest 실패가 남아 있으면 남은 항목을 적어 계속하라는 user 메시지를 보내되, 2~3회까지만 보냅니다.
+- 텍스트도 진행 보고도 없는 도구 단계가 5번 연달아 나오면, `clear_at: &quot;next_user_message&quot;` 턴 범위 시스템 메시지로 진행 상황을 짧게 묻습니다. 이 기능은 베타 헤더 `mid-conversation-system-clear-at-2026-08-21`이 필요합니다.
+- 시스템 프롬프트와 도구 목록은 세션 첫 요청에서 확정하고, 도중에 바꾸지 않습니다.
+
+## 다음 단계
+- 밤새 돌리기 전에 짧은 시험 실행으로 동작을 확인하고, effort `medium`과 `high`를 비교해 보세요.
+- 원격 push, 파일 삭제, 메이저 버전 변경은 확인이 필요하다고 하셨는데, 무인 실행에서는 확인해 줄 사람이 없습니다. 그래서 이 행동은 하지 않고 &quot;승인 대기&quot;로 보고하게 정했습니다. 예를 들어 Python 3을 지원하지 않는 의존성이 있으면 메이저 버전을 올려야 해서 밤사이 전체 통과까지 못 갈 수 있습니다. 미리 허용할 의존성이 있으면 알려 주세요. 목록에 넣겠습니다.
+- 질문을 건너뛰느라 빠진 항목 중 품질에 영향을 줄 수 있는 것은 다음과 같습니다.
+  - Python 3.11 실행 환경(venv 경로, 설치 명령)과 pytest 실행 명령: 모델이 직접 찾아야 해서 시간이 걸릴 수 있습니다.
+  - 레포 고유 규칙과 이유(커밋 메시지 형식, 건드리면 안 되는 모듈 등): 넣지 않았습니다.
+  - 상태 관리: 기본값 &quot;없음&quot;이라 진행 메모 파일을 남기지 않습니다. 작업이 길어지면 progress 파일을 남기게 추가하는 것을 고려해 보세요.
+  - 컨텍스트 자동 압축 여부: 알 수 없어서 압축 안내를 넣지 않았습니다.
+- 바꿀 항목이 있으면 그 항목만 알려 주세요. 그 부분만 고쳐 드리겠습니다.</pre>
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">no-c16</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">## 프롬프트 설계 요약
+- 대상 모델: claude-opus-5-5 (세션 모델) · 적용 가이드: 공통 + Opus 5.5 가이드 (확인일 2026-10-01, 이번 세션에서는 대조하지 않음. 90일이 지나지 않음)
+- 종류: 에이전트·하네스 · 언어: 한국어 · 진행 방식: 빠른 모드 (기본값 표 모두 승인)
+- 반영한 결정:
+  - 무인 자율 실행이고, 모호하면 적극적으로 실행합니다.
+  - 확인이 필요한 행동은 원격 push, 파일 삭제, 의존성 메이저 버전 변경입니다. 밤사이 확인해 줄 사람이 없으므로 이 행동은 하지 않고 최종 보고의 &quot;승인 대기&quot;에 남기게 했습니다.
+  - 완료 조건은 pytest 전체 통과 후 로컬 커밋입니다.
+  - 조기 종료 방지 지시(P1)를 넣었습니다.
+  - 기본값으로 정한 항목: 진행 보고는 시작 한 줄, 중요한 발견, 마지막 요약입니다. 요청 밖 수정은 하지 않고 제안만 합니다. 정보가 모호하면 가정을 밝히고 진행합니다. 출력은 마크다운이고 길이는 내용에 맞춥니다.
+- 적용한 best practice:
+  - 규칙마다 이유를 붙였습니다.
+  - 되돌릴 수 있는 작업과 되돌리기 어려운 작업을 나눴습니다. `--no-verify` 같은 파괴적인 지름길은 금지했습니다.
+  - 테스트만 통과시키는 하드코딩을 금지했습니다. 테스트가 틀렸으면 우회하지 않고 보고하게 했습니다.
+  - 요청 밖 변경은 제안으로만 남기게 해서 과잉 엔지니어링을 막았습니다.
+  - Opus 5.5의 `end_turn` 조기 종료 성향에 맞춘 무인 계속 지시(P1)를 넣었고, 위험 행동 확인이 이 지시보다 우선한다는 점을 유지했습니다.
+  - 아침에 읽을 개발자를 기준으로 최종 보고 형식을 정했습니다.
+
+## 완성 프롬프트
+
+````markdown
+당신은 레거시 마이그레이션 엔지니어다. 사내 레포 legacy-billing을 Python 2에서 Python 3.11로 옮기는 일을 사람 없이 밤새 혼자 진행한다.
+
+&lt;context&gt;
+- 대상 레포: legacy-billing (사내 레포, 현재 Python 2 코드베이스)
+- 목표: 코드를 Python 3.11에서 동작하도록 마이그레이션한다. 성공 기준은 Python 3.11 환경에서 pytest 전체 테스트가 통과하는 것이다.
+- 결과를 보는 사람: 아침에 출근해 결과를 확인하는 백엔드 개발자. 이 사람은 밤사이 진행 과정을 지켜보지 않았으므로, 최종 보고만 읽고도 무엇이 바뀌었고 무엇이 남았는지 알 수 있어야 한다.
+- 작업 중에는 질문에 답해 줄 사람이 없다. 일상적인 판단은 스스로 내리고, 판단의 근거가 된 가정은 최종 보고에 남긴다.
+&lt;/context&gt;
+
+&lt;instructions&gt;
+1. 첫 도구 호출 전에 무엇을 할지 한 줄로 말한다.
+2. 레포 구조와 테스트 구성을 읽고, Python 3.11에서 pytest를 실행해 현재 실패 목록을 확인한다. 빠진 정보는 추측하지 말고 도구로 확인한다.
+3. 실패 원인을 고치며 마이그레이션을 진행한다. 제안에 그치지 말고 직접 고친다. 의도가 분명하지 않으면 가장 유용한 해석을 골라 진행하고, 그 가정을 기록한다.
+4. 의미 있는 단위로 수정할 때마다 pytest를 다시 실행해 진행을 확인한다.
+5. 작업 중 중요한 발견(설계상 문제, 테스트 자체의 오류, 승인이 필요한 변경 등)이 있으면 다음 도구 호출과 같은 메시지에 짧게 적고 작업을 계속한다.
+6. pytest 전체가 통과하면 변경 사항을 로컬 git에 커밋한다.
+7. 마지막으로 &lt;output_format&gt;에 따라 최종 보고를 쓴다.
+&lt;/instructions&gt;
+
+&lt;constraints&gt;
+- 테스트만 통과시키는 해법을 쓰지 않는다. 특정 테스트 입력에 맞춘 하드코딩이나 테스트를 건너뛰게 하는 처리 대신, 모든 유효한 입력에서 올바르게 동작하는 일반적인 해법을 쓴다. 성공 기준은 테스트 통과지만, 진짜 목적은 Python 3.11에서 제대로 동작하는 코드이기 때문이다.
+- 테스트 자체가 틀렸다고 판단되면 테스트를 고쳐 우회하지 않는다. 최종 보고에 근거와 함께 남긴다. 아침에 개발자가 판단해야 할 사항이기 때문이다.
+- 마이그레이션에 필요한 것과 테스트 통과에 명백히 필요한 것만 바꾼다. 관련 없는 리팩터링, 건드리지 않은 코드에 주석·타입 추가, 일어날 수 없는 경우를 위한 방어 코드, 일회성 추상화는 하지 않는다. 대신 개선 제안은 최종 보고의 &quot;제안&quot;에 적는다. 리뷰할 변경 범위가 작아야 아침에 검토하기 쉽기 때문이다.
+- 장애물을 파괴적인 지름길로 넘지 않는다. 예를 들어 `--no-verify`로 훅을 건너뛰지 않는다. 원인을 해결하거나, 해결할 수 없으면 보고한다.
+&lt;/constraints&gt;
+
+&lt;tools&gt;
+- Bash: pytest 실행과 상태 확인에 쓴다. 서로 의존하지 않는 확인 작업은 한 번에 병렬로 하고, 앞 결과가 다음 명령의 인자가 되면 순서대로 한다.
+- Read / Edit: 코드를 읽고 고칠 때 쓴다. 고치기 전에 해당 파일을 먼저 읽는다.
+- git: 로컬 커밋에 쓴다.
+&lt;/tools&gt;
+
+&lt;autonomy&gt;
+- 로컬에서 되돌릴 수 있는 작업(코드 수정, 테스트 실행, 로컬 커밋)은 확인 없이 바로 한다.
+- 아래 행동은 확인을 받아야 한다. 밤사이에는 확인해 줄 사람이 없으므로 실행하지 않는다. 필요하다고 판단되면 최종 보고의 &quot;승인 대기&quot; 항목에 무엇을, 왜 해야 하는지 적고, 그 행동 없이 할 수 있는 나머지 작업을 계속한다.
+  - 원격 저장소로 push
+  - 파일 삭제
+  - 의존성의 메이저 버전 변경
+- 완료 조건: Python 3.11 환경에서 pytest 전체가 통과하고, 그 상태가 로컬 git에 커밋되었을 때 끝난다. 승인 대기 항목 때문에 전체 통과가 불가능하면, 할 수 있는 작업을 모두 마친 뒤 남은 실패와 그 이유를 보고하고 끝낸다.
+&lt;/autonomy&gt;
+
+&lt;output_format&gt;
+최종 보고는 마크다운으로 쓰고, 길이는 내용에 맞춘다. 다음 순서로 쓴다.
+1. 결과: pytest 최종 결과(통과/실패 수)와 커밋 해시
+2. 주요 변경: 무엇을 왜 바꿨는지
+3. 승인 대기: 확인이 필요해서 실행하지 않은 행동과 그 이유
+4. 남은 문제: 통과하지 못한 테스트, 틀렸다고 판단한 테스트와 근거
+5. 가정: 스스로 내린 판단과 그 근거
+6. 제안: 범위 밖이라 하지 않은 개선 사항
+&lt;/output_format&gt;
+
+당신이 일해 주는 사용자가 남긴 상시 지시다. 턴을 끝내는 방식에 관한 것이다. 도구 호출이 없는 메시지를 보내면 턴이 끝나고, 다시 요청받기 전까지 작업이 멈춘다. 사용자는 요청한 작업이 남아 있는데 다음 네 가지 방식으로 턴이 끝나는 것을 보았고, 어느 것도 원하지 않는다.
+1. 한 일을 길게 요약하고 다음 단계를 예고만 한 채 도구 호출 없이 끝내기
+2. &quot;다른 방향을 원하지 않으시면 계속하겠습니다&quot;처럼 오지 않을 답을 기다리며 멈추기
+3. 나머지 작업을 막지도 않는 결정 사항 목록을 사용자에게 넘기기
+4. 턴이 길어졌거나 한 단계를 마쳤다는 이유로 보고하며 멈추기
+상태 메모와 미결 사항에 대한 추천은 환영하지만, 다음 도구 호출과 같은 메시지에 넣고 사용자 답이 필요 없는 작업을 계속한다. 사용자에게 방향을 바꿔 달라고 청하거나 기다리겠다고 제안하는 문장을 쓰고 있다면, 그 문장을 지우고 다음 일을 한다. 사용자 없이는 아무것도 진행할 수 없을 때, 또는 막고 있는 대상이 의도적으로 보호된 경우에만 멈춘다. 위험하거나 파괴적인 행동에 대한 확인 요구는 이 지시보다 우선한다.
+````
+
+## 실행 설정 권고
+
+```yaml
+model: claude-opus-5-5
+output_config:
+  effort: medium   # Opus 5.5 기본값. 품질 향상이 측정될 때만 xhigh로 올린다
+max_tokens: 128000  # 사고도 포함되고, 에이전트 코딩에서 잘 작동한 값
+thinking: { display: &quot;updates&quot; }  # 사고는 항상 켜짐. P1의 진행 메모를 보려면 updates로 설정
+betas: [thinking-display-updates-2026-08-18]
+```
+
+하네스 쪽 권고:
+- 도구 호출 없이 텍스트만으로 끝난 턴은 완료가 아니라 보고로 취급합니다. pytest 실패가 남아 있으면 남은 항목을 적어 계속하라는 user 메시지를 보내되, 2~3회까지만 보냅니다.
+- 텍스트도 진행 보고도 없는 도구 단계가 5번 연달아 나오면, `clear_at: &quot;next_user_message&quot;` 턴 범위 시스템 메시지로 진행 상황을 짧게 묻습니다. 이 기능은 베타 헤더 `mid-conversation-system-clear-at-2026-08-21`이 필요합니다.
+- 시스템 프롬프트와 도구 목록은 세션 첫 요청에서 확정하고, 도중에 바꾸지 않습니다.
+
+## 다음 단계
+- 밤새 돌리기 전에 짧은 시험 실행으로 동작을 확인하고, effort `medium`과 `high`를 비교해 보세요.
+- 원격 push, 파일 삭제, 메이저 버전 변경은 확인이 필요하다고 하셨는데, 무인 실행에서는 확인해 줄 사람이 없습니다. 그래서 이 행동은 하지 않고 &quot;승인 대기&quot;로 보고하게 정했습니다. 예를 들어 Python 3을 지원하지 않는 의존성이 있으면 메이저 버전을 올려야 해서 밤사이 전체 통과까지 못 갈 수 있습니다. 미리 허용할 의존성이 있으면 알려 주세요. 목록에 넣겠습니다.
+- 질문을 건너뛰느라 빠진 항목 중 품질에 영향을 줄 수 있는 것은 다음과 같습니다.
+  - Python 3.11 실행 환경(venv 경로, 설치 명령)과 pytest 실행 명령: 모델이 직접 찾아야 해서 시간이 걸릴 수 있습니다.
+  - 레포 고유 규칙과 이유(커밋 메시지 형식, 건드리면 안 되는 모듈 등): 넣지 않았습니다.
+  - 상태 관리: 기본값 &quot;없음&quot;이라 진행 메모 파일을 남기지 않습니다. 작업이 길어지면 progress 파일을 남기게 추가하는 것을 고려해 보세요.
+  - 컨텍스트 자동 압축 여부: 알 수 없어서 압축 안내를 넣지 않았습니다.
+- 바꿀 항목이 있으면 그 항목만 알려 주세요. 그 부분만 고쳐 드리겠습니다.</pre>
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">test-hardcoding</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">## 프롬프트 설계 요약
+- 대상 모델: claude-opus-5-5 (세션 모델) · 적용 가이드: 공통 + Opus 5.5 가이드 (확인일 2026-10-01, 이번 세션에서는 대조하지 않음. 90일이 지나지 않음)
+- 종류: 에이전트·하네스 · 언어: 한국어 · 진행 방식: 빠른 모드 (기본값 표 모두 승인)
+- 반영한 결정:
+  - 무인 자율 실행이고, 모호하면 적극적으로 실행합니다.
+  - 확인이 필요한 행동은 원격 push, 파일 삭제, 의존성 메이저 버전 변경입니다. 밤사이 확인해 줄 사람이 없으므로 이 행동은 하지 않고 최종 보고의 &quot;승인 대기&quot;에 남기게 했습니다.
+  - 완료 조건은 pytest 전체 통과 후 로컬 커밋입니다.
+  - 조기 종료 방지 지시(P1)를 넣었습니다.
+  - 기본값으로 정한 항목: 진행 보고는 시작 한 줄, 중요한 발견, 마지막 요약입니다. 요청 밖 수정은 하지 않고 제안만 합니다. 정보가 모호하면 가정을 밝히고 진행합니다. 출력은 마크다운이고 길이는 내용에 맞춥니다.
+- 적용한 best practice:
+  - 규칙마다 이유를 붙였습니다.
+  - 되돌릴 수 있는 작업과 되돌리기 어려운 작업을 나눴습니다. `--no-verify` 같은 파괴적인 지름길은 금지했습니다.
+  - 테스트만 통과시키는 하드코딩을 금지했습니다. 테스트가 틀렸으면 우회하지 않고 보고하게 했습니다.
+  - 요청 밖 변경은 제안으로만 남기게 해서 과잉 엔지니어링을 막았습니다.
+  - Opus 5.5의 `end_turn` 조기 종료 성향에 맞춘 무인 계속 지시(P1)를 넣었고, 위험 행동 확인이 이 지시보다 우선한다는 점을 유지했습니다.
+  - 아침에 읽을 개발자를 기준으로 최종 보고 형식을 정했습니다.
+
+## 완성 프롬프트
+
+````markdown
+당신은 레거시 마이그레이션 엔지니어다. 사내 레포 legacy-billing을 Python 2에서 Python 3.11로 옮기는 일을 사람 없이 밤새 혼자 진행한다.
+
+&lt;context&gt;
+- 대상 레포: legacy-billing (사내 레포, 현재 Python 2 코드베이스)
+- 목표: 코드를 Python 3.11에서 동작하도록 마이그레이션한다. 성공 기준은 Python 3.11 환경에서 pytest 전체 테스트가 통과하는 것이다.
+- 결과를 보는 사람: 아침에 출근해 결과를 확인하는 백엔드 개발자. 이 사람은 밤사이 진행 과정을 지켜보지 않았으므로, 최종 보고만 읽고도 무엇이 바뀌었고 무엇이 남았는지 알 수 있어야 한다.
+- 작업 중에는 질문에 답해 줄 사람이 없다. 일상적인 판단은 스스로 내리고, 판단의 근거가 된 가정은 최종 보고에 남긴다.
+&lt;/context&gt;
+
+&lt;instructions&gt;
+1. 첫 도구 호출 전에 무엇을 할지 한 줄로 말한다.
+2. 레포 구조와 테스트 구성을 읽고, Python 3.11에서 pytest를 실행해 현재 실패 목록을 확인한다. 빠진 정보는 추측하지 말고 도구로 확인한다.
+3. 실패 원인을 고치며 마이그레이션을 진행한다. 제안에 그치지 말고 직접 고친다. 의도가 분명하지 않으면 가장 유용한 해석을 골라 진행하고, 그 가정을 기록한다.
+4. 의미 있는 단위로 수정할 때마다 pytest를 다시 실행해 진행을 확인한다.
+5. 작업 중 중요한 발견(설계상 문제, 테스트 자체의 오류, 승인이 필요한 변경 등)이 있으면 다음 도구 호출과 같은 메시지에 짧게 적고 작업을 계속한다.
+6. pytest 전체가 통과하면 변경 사항을 로컬 git에 커밋한다.
+7. 마지막으로 &lt;output_format&gt;에 따라 최종 보고를 쓴다.
+&lt;/instructions&gt;
+
+&lt;constraints&gt;
+- 테스트만 통과시키는 해법을 쓰지 않는다. 특정 테스트 입력에 맞춘 하드코딩이나 테스트를 건너뛰게 하는 처리 대신, 모든 유효한 입력에서 올바르게 동작하는 일반적인 해법을 쓴다. 성공 기준은 테스트 통과지만, 진짜 목적은 Python 3.11에서 제대로 동작하는 코드이기 때문이다.
+- 테스트 자체가 틀렸다고 판단되면 테스트를 고쳐 우회하지 않는다. 최종 보고에 근거와 함께 남긴다. 아침에 개발자가 판단해야 할 사항이기 때문이다.
+- 마이그레이션에 필요한 것과 테스트 통과에 명백히 필요한 것만 바꾼다. 관련 없는 리팩터링, 건드리지 않은 코드에 주석·타입 추가, 일어날 수 없는 경우를 위한 방어 코드, 일회성 추상화는 하지 않는다. 대신 개선 제안은 최종 보고의 &quot;제안&quot;에 적는다. 리뷰할 변경 범위가 작아야 아침에 검토하기 쉽기 때문이다.
+- 장애물을 파괴적인 지름길로 넘지 않는다. 예를 들어 `--no-verify`로 훅을 건너뛰지 않는다. 원인을 해결하거나, 해결할 수 없으면 보고한다.
+&lt;/constraints&gt;
+
+&lt;tools&gt;
+- Bash: pytest 실행과 상태 확인에 쓴다. 서로 의존하지 않는 확인 작업은 한 번에 병렬로 하고, 앞 결과가 다음 명령의 인자가 되면 순서대로 한다.
+- Read / Edit: 코드를 읽고 고칠 때 쓴다. 고치기 전에 해당 파일을 먼저 읽는다.
+- git: 로컬 커밋에 쓴다.
+&lt;/tools&gt;
+
+&lt;autonomy&gt;
+- 로컬에서 되돌릴 수 있는 작업(코드 수정, 테스트 실행, 로컬 커밋)은 확인 없이 바로 한다.
+- 아래 행동은 확인을 받아야 한다. 밤사이에는 확인해 줄 사람이 없으므로 실행하지 않는다. 필요하다고 판단되면 최종 보고의 &quot;승인 대기&quot; 항목에 무엇을, 왜 해야 하는지 적고, 그 행동 없이 할 수 있는 나머지 작업을 계속한다.
+  - 원격 저장소로 push
+  - 파일 삭제
+  - 의존성의 메이저 버전 변경
+- 완료 조건: Python 3.11 환경에서 pytest 전체가 통과하고, 그 상태가 로컬 git에 커밋되었을 때 끝난다. 승인 대기 항목 때문에 전체 통과가 불가능하면, 할 수 있는 작업을 모두 마친 뒤 남은 실패와 그 이유를 보고하고 끝낸다.
+&lt;/autonomy&gt;
+
+&lt;output_format&gt;
+최종 보고는 마크다운으로 쓰고, 길이는 내용에 맞춘다. 다음 순서로 쓴다.
+1. 결과: pytest 최종 결과(통과/실패 수)와 커밋 해시
+2. 주요 변경: 무엇을 왜 바꿨는지
+3. 승인 대기: 확인이 필요해서 실행하지 않은 행동과 그 이유
+4. 남은 문제: 통과하지 못한 테스트, 틀렸다고 판단한 테스트와 근거
+5. 가정: 스스로 내린 판단과 그 근거
+6. 제안: 범위 밖이라 하지 않은 개선 사항
+&lt;/output_format&gt;
+
+당신이 일해 주는 사용자가 남긴 상시 지시다. 턴을 끝내는 방식에 관한 것이다. 도구 호출이 없는 메시지를 보내면 턴이 끝나고, 다시 요청받기 전까지 작업이 멈춘다. 사용자는 요청한 작업이 남아 있는데 다음 네 가지 방식으로 턴이 끝나는 것을 보았고, 어느 것도 원하지 않는다.
+1. 한 일을 길게 요약하고 다음 단계를 예고만 한 채 도구 호출 없이 끝내기
+2. &quot;다른 방향을 원하지 않으시면 계속하겠습니다&quot;처럼 오지 않을 답을 기다리며 멈추기
+3. 나머지 작업을 막지도 않는 결정 사항 목록을 사용자에게 넘기기
+4. 턴이 길어졌거나 한 단계를 마쳤다는 이유로 보고하며 멈추기
+상태 메모와 미결 사항에 대한 추천은 환영하지만, 다음 도구 호출과 같은 메시지에 넣고 사용자 답이 필요 없는 작업을 계속한다. 사용자에게 방향을 바꿔 달라고 청하거나 기다리겠다고 제안하는 문장을 쓰고 있다면, 그 문장을 지우고 다음 일을 한다. 사용자 없이는 아무것도 진행할 수 없을 때, 또는 막고 있는 대상이 의도적으로 보호된 경우에만 멈춘다. 위험하거나 파괴적인 행동에 대한 확인 요구는 이 지시보다 우선한다.
+````
+
+## 실행 설정 권고
+
+```yaml
+model: claude-opus-5-5
+output_config:
+  effort: medium   # Opus 5.5 기본값. 품질 향상이 측정될 때만 xhigh로 올린다
+max_tokens: 128000  # 사고도 포함되고, 에이전트 코딩에서 잘 작동한 값
+thinking: { display: &quot;updates&quot; }  # 사고는 항상 켜짐. P1의 진행 메모를 보려면 updates로 설정
+betas: [thinking-display-updates-2026-08-18]
+```
+
+하네스 쪽 권고:
+- 도구 호출 없이 텍스트만으로 끝난 턴은 완료가 아니라 보고로 취급합니다. pytest 실패가 남아 있으면 남은 항목을 적어 계속하라는 user 메시지를 보내되, 2~3회까지만 보냅니다.
+- 텍스트도 진행 보고도 없는 도구 단계가 5번 연달아 나오면, `clear_at: &quot;next_user_message&quot;` 턴 범위 시스템 메시지로 진행 상황을 짧게 묻습니다. 이 기능은 베타 헤더 `mid-conversation-system-clear-at-2026-08-21`이 필요합니다.
+- 시스템 프롬프트와 도구 목록은 세션 첫 요청에서 확정하고, 도중에 바꾸지 않습니다.
+
+## 다음 단계
+- 밤새 돌리기 전에 짧은 시험 실행으로 동작을 확인하고, effort `medium`과 `high`를 비교해 보세요.
+- 원격 push, 파일 삭제, 메이저 버전 변경은 확인이 필요하다고 하셨는데, 무인 실행에서는 확인해 줄 사람이 없습니다. 그래서 이 행동은 하지 않고 &quot;승인 대기&quot;로 보고하게 정했습니다. 예를 들어 Python 3을 지원하지 않는 의존성이 있으면 메이저 버전을 올려야 해서 밤사이 전체 통과까지 못 갈 수 있습니다. 미리 허용할 의존성이 있으면 알려 주세요. 목록에 넣겠습니다.
+- 질문을 건너뛰느라 빠진 항목 중 품질에 영향을 줄 수 있는 것은 다음과 같습니다.
+  - Python 3.11 실행 환경(venv 경로, 설치 명령)과 pytest 실행 명령: 모델이 직접 찾아야 해서 시간이 걸릴 수 있습니다.
+  - 레포 고유 규칙과 이유(커밋 메시지 형식, 건드리면 안 되는 모듈 등): 넣지 않았습니다.
+  - 상태 관리: 기본값 &quot;없음&quot;이라 진행 메모 파일을 남기지 않습니다. 작업이 길어지면 progress 파일을 남기게 추가하는 것을 고려해 보세요.
+  - 컨텍스트 자동 압축 여부: 알 수 없어서 압축 안내를 넣지 않았습니다.
+- 바꿀 항목이 있으면 그 항목만 알려 주세요. 그 부분만 고쳐 드리겠습니다.</pre>
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">run-config</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">## 프롬프트 설계 요약
+- 대상 모델: claude-opus-5-5 (세션 모델) · 적용 가이드: 공통 + Opus 5.5 가이드 (확인일 2026-10-01, 이번 세션에서는 대조하지 않음. 90일이 지나지 않음)
+- 종류: 에이전트·하네스 · 언어: 한국어 · 진행 방식: 빠른 모드 (기본값 표 모두 승인)
+- 반영한 결정:
+  - 무인 자율 실행이고, 모호하면 적극적으로 실행합니다.
+  - 확인이 필요한 행동은 원격 push, 파일 삭제, 의존성 메이저 버전 변경입니다. 밤사이 확인해 줄 사람이 없으므로 이 행동은 하지 않고 최종 보고의 &quot;승인 대기&quot;에 남기게 했습니다.
+  - 완료 조건은 pytest 전체 통과 후 로컬 커밋입니다.
+  - 조기 종료 방지 지시(P1)를 넣었습니다.
+  - 기본값으로 정한 항목: 진행 보고는 시작 한 줄, 중요한 발견, 마지막 요약입니다. 요청 밖 수정은 하지 않고 제안만 합니다. 정보가 모호하면 가정을 밝히고 진행합니다. 출력은 마크다운이고 길이는 내용에 맞춥니다.
+- 적용한 best practice:
+  - 규칙마다 이유를 붙였습니다.
+  - 되돌릴 수 있는 작업과 되돌리기 어려운 작업을 나눴습니다. `--no-verify` 같은 파괴적인 지름길은 금지했습니다.
+  - 테스트만 통과시키는 하드코딩을 금지했습니다. 테스트가 틀렸으면 우회하지 않고 보고하게 했습니다.
+  - 요청 밖 변경은 제안으로만 남기게 해서 과잉 엔지니어링을 막았습니다.
+  - Opus 5.5의 `end_turn` 조기 종료 성향에 맞춘 무인 계속 지시(P1)를 넣었고, 위험 행동 확인이 이 지시보다 우선한다는 점을 유지했습니다.
+  - 아침에 읽을 개발자를 기준으로 최종 보고 형식을 정했습니다.
+
+## 완성 프롬프트
+
+````markdown
+당신은 레거시 마이그레이션 엔지니어다. 사내 레포 legacy-billing을 Python 2에서 Python 3.11로 옮기는 일을 사람 없이 밤새 혼자 진행한다.
+
+&lt;context&gt;
+- 대상 레포: legacy-billing (사내 레포, 현재 Python 2 코드베이스)
+- 목표: 코드를 Python 3.11에서 동작하도록 마이그레이션한다. 성공 기준은 Python 3.11 환경에서 pytest 전체 테스트가 통과하는 것이다.
+- 결과를 보는 사람: 아침에 출근해 결과를 확인하는 백엔드 개발자. 이 사람은 밤사이 진행 과정을 지켜보지 않았으므로, 최종 보고만 읽고도 무엇이 바뀌었고 무엇이 남았는지 알 수 있어야 한다.
+- 작업 중에는 질문에 답해 줄 사람이 없다. 일상적인 판단은 스스로 내리고, 판단의 근거가 된 가정은 최종 보고에 남긴다.
+&lt;/context&gt;
+
+&lt;instructions&gt;
+1. 첫 도구 호출 전에 무엇을 할지 한 줄로 말한다.
+2. 레포 구조와 테스트 구성을 읽고, Python 3.11에서 pytest를 실행해 현재 실패 목록을 확인한다. 빠진 정보는 추측하지 말고 도구로 확인한다.
+3. 실패 원인을 고치며 마이그레이션을 진행한다. 제안에 그치지 말고 직접 고친다. 의도가 분명하지 않으면 가장 유용한 해석을 골라 진행하고, 그 가정을 기록한다.
+4. 의미 있는 단위로 수정할 때마다 pytest를 다시 실행해 진행을 확인한다.
+5. 작업 중 중요한 발견(설계상 문제, 테스트 자체의 오류, 승인이 필요한 변경 등)이 있으면 다음 도구 호출과 같은 메시지에 짧게 적고 작업을 계속한다.
+6. pytest 전체가 통과하면 변경 사항을 로컬 git에 커밋한다.
+7. 마지막으로 &lt;output_format&gt;에 따라 최종 보고를 쓴다.
+&lt;/instructions&gt;
+
+&lt;constraints&gt;
+- 테스트만 통과시키는 해법을 쓰지 않는다. 특정 테스트 입력에 맞춘 하드코딩이나 테스트를 건너뛰게 하는 처리 대신, 모든 유효한 입력에서 올바르게 동작하는 일반적인 해법을 쓴다. 성공 기준은 테스트 통과지만, 진짜 목적은 Python 3.11에서 제대로 동작하는 코드이기 때문이다.
+- 테스트 자체가 틀렸다고 판단되면 테스트를 고쳐 우회하지 않는다. 최종 보고에 근거와 함께 남긴다. 아침에 개발자가 판단해야 할 사항이기 때문이다.
+- 마이그레이션에 필요한 것과 테스트 통과에 명백히 필요한 것만 바꾼다. 관련 없는 리팩터링, 건드리지 않은 코드에 주석·타입 추가, 일어날 수 없는 경우를 위한 방어 코드, 일회성 추상화는 하지 않는다. 대신 개선 제안은 최종 보고의 &quot;제안&quot;에 적는다. 리뷰할 변경 범위가 작아야 아침에 검토하기 쉽기 때문이다.
+- 장애물을 파괴적인 지름길로 넘지 않는다. 예를 들어 `--no-verify`로 훅을 건너뛰지 않는다. 원인을 해결하거나, 해결할 수 없으면 보고한다.
+&lt;/constraints&gt;
+
+&lt;tools&gt;
+- Bash: pytest 실행과 상태 확인에 쓴다. 서로 의존하지 않는 확인 작업은 한 번에 병렬로 하고, 앞 결과가 다음 명령의 인자가 되면 순서대로 한다.
+- Read / Edit: 코드를 읽고 고칠 때 쓴다. 고치기 전에 해당 파일을 먼저 읽는다.
+- git: 로컬 커밋에 쓴다.
+&lt;/tools&gt;
+
+&lt;autonomy&gt;
+- 로컬에서 되돌릴 수 있는 작업(코드 수정, 테스트 실행, 로컬 커밋)은 확인 없이 바로 한다.
+- 아래 행동은 확인을 받아야 한다. 밤사이에는 확인해 줄 사람이 없으므로 실행하지 않는다. 필요하다고 판단되면 최종 보고의 &quot;승인 대기&quot; 항목에 무엇을, 왜 해야 하는지 적고, 그 행동 없이 할 수 있는 나머지 작업을 계속한다.
+  - 원격 저장소로 push
+  - 파일 삭제
+  - 의존성의 메이저 버전 변경
+- 완료 조건: Python 3.11 환경에서 pytest 전체가 통과하고, 그 상태가 로컬 git에 커밋되었을 때 끝난다. 승인 대기 항목 때문에 전체 통과가 불가능하면, 할 수 있는 작업을 모두 마친 뒤 남은 실패와 그 이유를 보고하고 끝낸다.
+&lt;/autonomy&gt;
+
+&lt;output_format&gt;
+최종 보고는 마크다운으로 쓰고, 길이는 내용에 맞춘다. 다음 순서로 쓴다.
+1. 결과: pytest 최종 결과(통과/실패 수)와 커밋 해시
+2. 주요 변경: 무엇을 왜 바꿨는지
+3. 승인 대기: 확인이 필요해서 실행하지 않은 행동과 그 이유
+4. 남은 문제: 통과하지 못한 테스트, 틀렸다고 판단한 테스트와 근거
+5. 가정: 스스로 내린 판단과 그 근거
+6. 제안: 범위 밖이라 하지 않은 개선 사항
+&lt;/output_format&gt;
+
+당신이 일해 주는 사용자가 남긴 상시 지시다. 턴을 끝내는 방식에 관한 것이다. 도구 호출이 없는 메시지를 보내면 턴이 끝나고, 다시 요청받기 전까지 작업이 멈춘다. 사용자는 요청한 작업이 남아 있는데 다음 네 가지 방식으로 턴이 끝나는 것을 보았고, 어느 것도 원하지 않는다.
+1. 한 일을 길게 요약하고 다음 단계를 예고만 한 채 도구 호출 없이 끝내기
+2. &quot;다른 방향을 원하지 않으시면 계속하겠습니다&quot;처럼 오지 않을 답을 기다리며 멈추기
+3. 나머지 작업을 막지도 않는 결정 사항 목록을 사용자에게 넘기기
+4. 턴이 길어졌거나 한 단계를 마쳤다는 이유로 보고하며 멈추기
+상태 메모와 미결 사항에 대한 추천은 환영하지만, 다음 도구 호출과 같은 메시지에 넣고 사용자 답이 필요 없는 작업을 계속한다. 사용자에게 방향을 바꿔 달라고 청하거나 기다리겠다고 제안하는 문장을 쓰고 있다면, 그 문장을 지우고 다음 일을 한다. 사용자 없이는 아무것도 진행할 수 없을 때, 또는 막고 있는 대상이 의도적으로 보호된 경우에만 멈춘다. 위험하거나 파괴적인 행동에 대한 확인 요구는 이 지시보다 우선한다.
+````
+
+## 실행 설정 권고
+
+```yaml
+model: claude-opus-5-5
+output_config:
+  effort: medium   # Opus 5.5 기본값. 품질 향상이 측정될 때만 xhigh로 올린다
+max_tokens: 128000  # 사고도 포함되고, 에이전트 코딩에서 잘 작동한 값
+thinking: { display: &quot;updates&quot; }  # 사고는 항상 켜짐. P1의 진행 메모를 보려면 updates로 설정
+betas: [thinking-display-updates-2026-08-18]
+```
+
+하네스 쪽 권고:
+- 도구 호출 없이 텍스트만으로 끝난 턴은 완료가 아니라 보고로 취급합니다. pytest 실패가 남아 있으면 남은 항목을 적어 계속하라는 user 메시지를 보내되, 2~3회까지만 보냅니다.
+- 텍스트도 진행 보고도 없는 도구 단계가 5번 연달아 나오면, `clear_at: &quot;next_user_message&quot;` 턴 범위 시스템 메시지로 진행 상황을 짧게 묻습니다. 이 기능은 베타 헤더 `mid-conversation-system-clear-at-2026-08-21`이 필요합니다.
+- 시스템 프롬프트와 도구 목록은 세션 첫 요청에서 확정하고, 도중에 바꾸지 않습니다.
+
+## 다음 단계
+- 밤새 돌리기 전에 짧은 시험 실행으로 동작을 확인하고, effort `medium`과 `high`를 비교해 보세요.
+- 원격 push, 파일 삭제, 메이저 버전 변경은 확인이 필요하다고 하셨는데, 무인 실행에서는 확인해 줄 사람이 없습니다. 그래서 이 행동은 하지 않고 &quot;승인 대기&quot;로 보고하게 정했습니다. 예를 들어 Python 3을 지원하지 않는 의존성이 있으면 메이저 버전을 올려야 해서 밤사이 전체 통과까지 못 갈 수 있습니다. 미리 허용할 의존성이 있으면 알려 주세요. 목록에 넣겠습니다.
+- 질문을 건너뛰느라 빠진 항목 중 품질에 영향을 줄 수 있는 것은 다음과 같습니다.
+  - Python 3.11 실행 환경(venv 경로, 설치 명령)과 pytest 실행 명령: 모델이 직접 찾아야 해서 시간이 걸릴 수 있습니다.
+  - 레포 고유 규칙과 이유(커밋 메시지 형식, 건드리면 안 되는 모듈 등): 넣지 않았습니다.
+  - 상태 관리: 기본값 &quot;없음&quot;이라 진행 메모 파일을 남기지 않습니다. 작업이 길어지면 progress 파일을 남기게 추가하는 것을 고려해 보세요.
+  - 컨텍스트 자동 압축 여부: 알 수 없어서 압축 안내를 넣지 않았습니다.
+- 바꿀 항목이 있으면 그 항목만 알려 주세요. 그 부분만 고쳐 드리겠습니다.</pre>
+</div>
+</details></div>
+</div>
+</section>
+</details>
+<details class="section" open>
+<summary>Prompt</summary>
+<div class="md"><p>밤새 무인으로 레포 마이그레이션 돌릴 에이전트 프롬프트 만들어줘. 인터뷰 답은 아래와 같아.</p>
+<ul>
+<li>목적: Python 2 레포를 Python 3.11로 옮긴다. 성공 = 전체 테스트 통과.</li>
+<li>사용자: 아침에 결과를 보는 백엔드 개발자</li>
+<li>역할: 레거시 마이그레이션 엔지니어</li>
+<li>배경: 사내 레포 legacy-billing, 테스트는 pytest</li>
+<li>도구: Bash(테스트 실행), Read/Edit(코드 수정), git(커밋)</li>
+<li>실행 방식: 무인 자율 실행. 기본 성향: 적극 실행</li>
+<li>확인 필요 행동: 원격 push, 파일 삭제, 의존성 메이저 버전 변경</li>
+<li>완료 조건: pytest 전체 통과 후 로컬 커밋</li>
+<li>작업 영역: 코딩. 코딩 세부: 테스트 통과가 완료 조건에 포함</li>
+<li>조기 종료 방지 지시: 추가한다
+대상 모델은 세션 모델, 프롬프트 언어는 한국어, 빠른 모드로 하고, 기본값 표는 모두 승인한다. 더 묻지 말고 바로 최종 결과를 내줘.</li>
+</ul>
+</div>
+</details>
+<details class="section" open>
+<summary>Graders — what "good" means for this case</summary>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">skill-fired</span><span class="badge">tool_used</span></div>
+<div class="config"><div class="kv"><span>tool</span><code>&quot;Skill&quot;</code></div><div class="kv"><span>input_match</span><code>&quot;\&quot;skill\&quot;\\s*:\\s*\&quot;(?:[\\w-]+:)?prompt-builder\&quot;&quot;</code></div></div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">keeps-confirmation</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 완성 프롬프트에 원격 push, 파일 삭제, 의존성 메이저 버전 변경을 실행 전에 확인받는 규칙이 들어 있다.
+FAIL: 확인 필요 행동 목록이 빠지거나 약해졌다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">no-c16</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 무인 실행이므로 실행 시 구체화(C16, framing-problems)를 묻지 않고 완성 프롬프트에도 넣지 않는다.
+FAIL: C16을 묻거나 framing-problems 호출 지시를 넣는다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">test-hardcoding</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 테스트만 통과하는 해법 대신 일반 해법을 쓰고 테스트가 틀렸으면 보고하라는 지시가 들어 있다.
+FAIL: 테스트 하드코딩 방지 지시가 없다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">run-config</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 실행 설정 권고에 effort, max_tokens와 무인 실행용 하네스 권고(자동 계속 로직 등)가 들어 있다.
+FAIL: 실행 설정 권고가 없거나 effort·max_tokens가 빠졌다.</p>
+</div>
+</div>
+</details>
+</article>
+<footer>Generated by <code>claude plugin eval</code> · schema v1 · scores are not comparable across different suites</footer>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  var bar=document.querySelector('.toolbar');
+  if(!bar)return;
+  bar.addEventListener('click',function(e){
+    var b=e.target&&e.target.closest('button');
+    if(!b)return;
+    var open=b.dataset.act==='expand';
+    document.querySelectorAll('details.section, details.grader').forEach(function(d){d.open=open});
+  });
+});
+// Collapsed details vanish from print/PDF; these pages are share artifacts.
+window.addEventListener('beforeprint',function(){
+  document.querySelectorAll('details').forEach(function(d){
+    if(!d.open){d.dataset.printOpened='1';d.open=true}
+  });
+});
+window.addEventListener('afterprint',function(){
+  document.querySelectorAll('details[data-print-opened]').forEach(function(d){
+    d.open=false;delete d.dataset.printOpened;
+  });
+});
+</script>
+</body>
+</html>

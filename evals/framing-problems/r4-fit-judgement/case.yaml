@@ -1,0 +1,33 @@
+schema_version: "1.1"
+name: r4-fit-judgement
+description: 웹 검색이 있을 때 외부 근거마다 적합성과 근거 칸을 판정하는지
+tags: [r4]
+execution:
+  prompt: |
+    framing-problems로 구체화하던 중이야. R1~R3은 아래처럼 확정했으니 R4부터 진행해.
+
+    | 항목 | 내용 | 출처 | 근거 |
+    |---|---|---|---|
+    | R1 의도 | 사내 API 비밀번호 저장을 안전하게 바꾸고 싶다 | 사용자 | - |
+    | R2 이상 | 유출돼도 평문 복원이 현실적으로 불가능 | 사용자 | R1 의도 |
+    | R2 현재 | SHA-256 단일 해시, 솔트 없음 | 사용자 | - |
+    | R2 원인 | 빠른 해시라 무차별 대입에 약함 (확인됨) | 사용자 | R2 현재 |
+    | R3 제약 | Python 3.8, 로그인 응답 500ms 이내, 외부 의존성 추가는 보안팀 승인 필요 | 사용자 | - |
+    | R3 자원 | 표준 라이브러리 hashlib | 사용자 | - |
+  max_turns: 15
+  allowed_tools: [Skill, WebSearch, WebFetch]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?framing-problems"'
+  - name: per-item-fit
+    type: llm
+    criteria: |
+      PASS: 외부 근거(예: Argon2id, scrypt, bcrypt, PBKDF2, OWASP 권고)를 항목마다 "맞음 / 조건부 / 맞지 않음"으로 판정하고, 판정의 근거가 된 기록 칸(예: R3 제약의 외부 의존성 승인, Python 3.8)을 적는다. 출처 URL을 붙인다.
+      FAIL: 많이 쓰인다는 이유만으로 채택하거나, 적합성 판정이나 근거 칸 없이 나열한다.
+  - name: stops-before-r5-pick
+    type: llm
+    criteria: |
+      PASS: R4 판정이나 질문에서 응답을 마치고, R5 해법 선택은 사용자 답을 받은 뒤로 남겨 둔다.
+      FAIL: 사용자 답 없이 특정 해법을 채택하거나 확정한다(예: "PBKDF2로 정한다").

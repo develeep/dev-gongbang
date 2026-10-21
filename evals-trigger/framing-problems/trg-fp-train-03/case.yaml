@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: trg-fp-train-03
+description: "트리거해야 함 / train"
+tags: [trigger, train, positive]
+execution:
+  prompt: "결제 실패 알림이 고객센터에 늦게 간다는 민원이 계속 와. 큐 워커 늘리자는 얘기가 나왔는데 그게 맞는 방향인지 모르겠어. 바로 손대진 말고 같이 따져보자"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?framing-problems"'

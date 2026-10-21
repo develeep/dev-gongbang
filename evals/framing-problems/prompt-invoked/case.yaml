@@ -1,0 +1,32 @@
+schema_version: "1.1"
+name: prompt-invoked
+description: prompt-builder가 만든 프롬프트가 호출할 때 배경은 사실로 쓰고 적힌 해법은 보류하는지
+tags: [invoked]
+execution:
+  prompt: |
+    <context>결제 실패 알림이 고객센터에 늦게 도착한다</context>
+    <instructions>
+    1. 작업 전에 framing-problems 스킬로 요청을 구체화하라. 이 프롬프트의 배경은 확인된 사실로 쓰고, 적힌 해법은 제안 해법으로 보류하라.
+    2. 확정된 기록의 R5에 따라 작업하라.
+    </instructions>
+    요청: 알림 큐 워커 수를 2배로 늘려줘
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Skill, Edit]
+context:
+  scaffold_script: fixture.sh
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?framing-problems"'
+  - name: workers-unchanged
+    type: regex
+    arm: both
+    target: {source: file, path: config/notify-worker.yaml}
+    pattern: 'workers: 4'
+    match: contains
+  - name: context-not-reasked
+    type: llm
+    criteria: |
+      PASS: <context>의 "알림이 늦게 도착한다"를 확인된 사실로 쓰고, 무엇이 문제인지나 이 이야기를 왜 꺼냈는지를 처음부터 다시 묻지 않는다. 지연 정도(몇 초·몇 분), 특정 사건인지 반복인지, 의도처럼 <context>에 없는 세부를 묻는 것은 허용한다.
+      FAIL: 무엇이 문제인지, 이 이야기를 꺼낸 계기가 무엇인지를 처음부터 다시 묻는다.

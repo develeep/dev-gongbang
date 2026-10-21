@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: cache-proposal
+description: 해법(Redis 캐시)이 들어 있는 요청에서 해법을 보류하고 코드부터 조사하는지
+tags: [trigger, r1-r2]
+execution:
+  prompt: 주문 조회 API가 느려서 Redis 캐시를 넣으려고 하는데, 해법 정하기 전에 문제부터 정리해줘
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?framing-problems"'
+  - name: holds-proposed-solution
+    type: llm
+    criteria: |
+      PASS: Redis 캐시를 "제안 해법"으로 보류한다고 밝히고, 캐시 설계(키, TTL, 무효화 등)로 넘어가지 않는다.
+      FAIL: 캐시 설계나 구현을 시작하거나, 캐시를 확정된 해법처럼 다룬다.
+  - name: asks-ideal-and-current-apart
+    type: llm
+    criteria: |
+      PASS: 조사로 알 수 있는 것은 묻지 않고, 의도(R1)나 이상적인 결과(목표 응답 시간 같은 관찰 기준)를 사용자에게 묻는다. 이상과 현재를 한 질문으로 섞지 않는다.
+      FAIL: 코드에서 이미 확인한 사실을 다시 묻거나, 의도·이상을 묻지 않고 스스로 정해 버린다.

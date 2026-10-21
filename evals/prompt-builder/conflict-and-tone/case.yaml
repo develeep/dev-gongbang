@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: conflict-and-tone
+description: "'무인 실행'과 '모든 변경 전 확인' 충돌, '톤은 알아서'를 처리하는지"
+tags: [answers]
+execution:
+  prompt: |
+    /prompt-builder 사람 없이 돌아가는 배포 자동화 에이전트 프롬프트 만들어줘. 모든 변경은 실행 전에 꼭 확인받게 하고, 톤은 알아서 해줘
+  max_turns: 20
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: surfaces-conflict
+    type: llm
+    criteria: |
+      PASS: '사람 없이 돌아감(무인)'과 '모든 변경 전 확인'이 충돌한다고 보여 주고 어느 쪽을 우선할지 묻는다.
+      FAIL: 충돌을 짚지 않거나 한쪽을 조용히 고른다.
+  - name: tone-candidates
+    type: llm
+    criteria: |
+      PASS: '톤은 알아서'에 대해 후보 2~3개를 보여 주고 고르게 하거나, 톤 라운드에서 그렇게 하겠다고 밝힌다. 톤을 조용히 정하지 않는다.
+      FAIL: 톤을 사용자 확인 없이 정해 버린다.

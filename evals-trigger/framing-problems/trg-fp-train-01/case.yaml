@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: trg-fp-train-01
+description: "트리거해야 함 / train"
+tags: [trigger, train, positive]
+execution:
+  prompt: "해법 정하기 전에 정리해줘. 신규 가입자 7일 이탈률이 40%라서 온보딩 튜토리얼을 넣으려고 해"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?framing-problems"'

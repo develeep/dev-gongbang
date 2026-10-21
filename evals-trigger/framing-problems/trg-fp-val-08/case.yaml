@@ -1,0 +1,15 @@
+schema_version: "1.1"
+name: trg-fp-val-08
+description: "트리거하면 안 됨 (near-miss) / val"
+tags: [trigger, val, negative]
+execution:
+  prompt: "회의록 요약해서 결정 사항만 뽑아줘: 1) 배포는 목요일로 2) QA는 민수 담당"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?framing-problems"'
+    min: 0
+    max: 0

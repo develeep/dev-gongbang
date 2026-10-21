@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Eval report — prompt-framing v1.0.0</title>
+</head>
+<body>
+<style>
+:root{--plane:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink-2:#52514e;--ink-3:#6b6a64;--hairline:rgba(11,11,11,.10);--grid:#e1e0d9;--inset:rgba(11,11,11,.04);--accent:#2a78d6;--base-fill:#6b6a64;--delta-good:#006300;--good:#067d06;--warning:#8a6100;--critical:#d03b3b;
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme:dark){:root{--plane:#0d0d0d;--surface:#1a1a19;--ink:#ffffff;--ink-2:#c3c2b7;--ink-3:#898781;--hairline:rgba(255,255,255,.10);--grid:#2c2c2a;--inset:rgba(255,255,255,.05);--accent:#3987e5;--base-fill:#898781;--delta-good:#0ca30c;--good:#0ca30c;--warning:#fab219;--critical:#e06c6c;color-scheme:dark}}
+:root[data-theme="dark"]{--plane:#0d0d0d;--surface:#1a1a19;--ink:#ffffff;--ink-2:#c3c2b7;--ink-3:#898781;--hairline:rgba(255,255,255,.10);--grid:#2c2c2a;--inset:rgba(255,255,255,.05);--accent:#3987e5;--base-fill:#898781;--delta-good:#0ca30c;--good:#0ca30c;--warning:#fab219;--critical:#e06c6c;color-scheme:dark}
+:root[data-theme="light"]{--plane:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink-2:#52514e;--ink-3:#6b6a64;--hairline:rgba(11,11,11,.10);--grid:#e1e0d9;--inset:rgba(11,11,11,.04);--accent:#2a78d6;--base-fill:#6b6a64;--delta-good:#006300;--good:#067d06;--warning:#8a6100;--critical:#d03b3b;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--plane);color:var(--ink);
+  font:14px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:880px;margin:0 auto;padding:40px 24px 64px;display:flex;flex-direction:column;gap:20px}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+header h1{margin:2px 0 0;font-size:24px;font-weight:600;line-height:1.25;text-wrap:balance}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;color:var(--ink-2);font-size:13px}
+.meta .num{font-variant-numeric:tabular-nums lining-nums}
+.banner{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:8px;
+  border:1px solid var(--hairline);background:var(--surface);font-size:13px}
+.banner .chip-warn{color:var(--warning);font-weight:600}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--hairline);border-radius:10px;padding:14px 16px;
+  display:flex;flex-direction:column;gap:4px}
+.tile .label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.tile .value{font-size:26px;font-weight:600;font-variant-numeric:tabular-nums lining-nums;line-height:1.1}
+.tile.hero .value{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:48px}
+.tile .sub{font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.tile .value.delta-pos{color:var(--delta-good)}
+.tile .value.delta-neg{color:var(--critical)}
+.toolbar{display:flex;gap:8px;justify-content:flex-end}
+.toolbar button{font:12px system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink-2);
+  background:var(--surface);border:1px solid var(--hairline);border-radius:6px;padding:4px 10px;cursor:pointer}
+.toolbar button:hover{color:var(--ink)}
+.toolbar button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.case{background:var(--surface);border:1px solid var(--hairline);border-radius:10px;padding:18px 20px;
+  display:flex;flex-direction:column;gap:10px}
+.case-regressed{border-left:3px solid var(--critical)}
+.verdict{margin:6px 0 0;font-size:15px}
+.verdict .delta{font-size:15px}
+.flag{font-size:11px;font-weight:600;color:var(--warning);white-space:nowrap}
+.star{color:var(--warning);font-size:.45em;vertical-align:super;line-height:0;cursor:help}
+.legend summary{cursor:pointer;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2)}
+.legend-list{margin:8px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--ink-2)}
+.case-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.case-head h2{margin:0;font-size:16px;font-weight:600}
+.case-head .spacer{flex:1}
+.case-score{font-size:15px;font-weight:600}
+.mono{font:12px "SF Mono",ui-monospace,Menlo,Consolas,monospace}
+.num{font-variant-numeric:tabular-nums lining-nums}
+.muted{color:var(--ink-3);font-size:12px}
+.meter{display:inline-block;position:relative;width:120px;height:6px;border-radius:4px;background:var(--grid);
+  vertical-align:middle}
+.meter>span{display:block;height:100%;border-radius:4px;max-width:100%}
+.meter .tick{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink-3);border-radius:1px}
+.m-accent>span{background:var(--accent)}
+.m-base>span{background:var(--base-fill)}
+.delta{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.delta-pos{color:var(--delta-good)}
+.delta-neg{color:var(--critical)}
+.delta-zero{color:var(--ink-3)}
+details.section{border-top:1px solid var(--grid);padding-top:10px}
+details.section>summary{cursor:pointer;font-size:12px;font-weight:600;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--ink-2);list-style-position:outside;margin-left:2px}
+details.section>summary:hover{color:var(--ink)}
+details.section[open]>summary{margin-bottom:8px}
+.md{display:flex;flex-direction:column;gap:8px;background:var(--inset);border-radius:8px;
+  padding:12px 14px;overflow-wrap:break-word}
+.md>:first-child{margin-top:0}
+.md h1,.md h2,.md h3,.md h4,.md h5,.md h6{margin:4px 0 0;font-size:1em;font-weight:600;line-height:1.3}
+.md p,.md ul,.md ol,.md blockquote,.md table,.md pre,.md hr{margin:0}
+.md ul,.md ol{display:flex;flex-direction:column;gap:4px;padding-left:20px}
+.md blockquote{border-left:2px solid var(--hairline);padding-left:10px;color:var(--ink-2)}
+.md :not(pre)>code{background:var(--inset);padding:1px 4px;border-radius:4px;
+  font:.92em "SF Mono",ui-monospace,Menlo,Consolas,monospace}
+.md pre{background:var(--inset);border:1px solid var(--hairline);padding:10px 12px;border-radius:6px;
+  overflow-x:auto;font:12px/1.5 "SF Mono",ui-monospace,Menlo,Consolas,monospace}
+.md pre code{background:none;padding:0;font:inherit}
+.md table{width:100%;border-collapse:collapse}
+.md th,.md td{padding:5px 8px;text-align:left;vertical-align:top;border-bottom:1px solid var(--grid)}
+.md th{font-weight:600;color:var(--ink-2)}
+.md a{color:var(--accent);text-decoration:none}
+.md a:hover{text-decoration:underline}
+.grader-def{display:flex;flex-direction:column;gap:6px;padding:8px 0}
+.grader-def+.grader-def{border-top:1px solid var(--grid)}
+.grader-def-head{display:flex;align-items:baseline;gap:8px}
+.grader-name{font:13px "SF Mono",ui-monospace,Menlo,Consolas,monospace;font-weight:600}
+.badge{font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2);
+  border:1px solid var(--hairline);border-radius:999px;padding:1px 8px}
+.config{display:flex;flex-direction:column;gap:2px;background:var(--inset);border-radius:8px;padding:10px 14px}
+.config code{font:12px "SF Mono",ui-monospace,Menlo,Consolas,monospace;overflow-wrap:anywhere}
+.arm{display:flex;flex-direction:column;gap:8px;padding:6px 0}
+.arm+.arm{border-top:1px dashed var(--grid);margin-top:4px;padding-top:12px}
+.arm-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.arm-label{font-size:13px;font-weight:600}
+.run{border:1px solid var(--grid);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.run-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.run-title{font-size:12px;font-weight:600;color:var(--ink-2)}
+.run-error .explanation{color:var(--ink-2)}
+.note{font-size:12px;color:var(--ink-2)}
+.graders{display:flex;flex-direction:column;gap:4px}
+details.grader{border-radius:6px}
+details.grader>summary{cursor:pointer;display:flex;align-items:baseline;gap:8px;padding:3px 4px;
+  border-radius:6px;list-style:none}
+details.grader>summary::-webkit-details-marker{display:none}
+details.grader>summary::before{content:'▸';font-size:10px;color:var(--ink-3);flex:none;
+  transition:transform .12s ease}
+details.grader[open]>summary::before{transform:rotate(90deg)}
+details.grader>summary:hover{background:var(--inset)}
+details.grader>summary:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.grader-body{padding:6px 8px 8px 24px;display:flex;flex-direction:column;gap:6px}
+.chip{font-size:11px;font-weight:600;border-radius:999px;padding:1px 8px;white-space:nowrap}
+.chip-pass{color:var(--good);border:1px solid currentColor}
+.chip-fail{color:var(--critical);border:1px solid currentColor}
+.chip.chip-warn{color:var(--warning);border:1px solid currentColor}
+.explanation{margin:0;font-size:13px;color:var(--ink-2);white-space:pre-wrap;overflow-wrap:break-word}
+.kv{display:flex;gap:8px;font-size:12px;color:var(--ink-3)}
+.votes{font-variant-numeric:tabular-nums;letter-spacing:.1em}
+pre.evidence{margin:0;background:var(--inset);border:1px solid var(--hairline);border-radius:6px;
+  padding:8px 10px;overflow-x:auto;max-height:320px;
+  font:12px/1.5 "SF Mono",ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;overflow-wrap:break-word}
+footer{color:var(--ink-3);font-size:12px;text-align:center;padding-top:8px}
+@media (prefers-reduced-motion:no-preference){
+  details.grader>summary,.toolbar button{transition:background .12s ease,color .12s ease}
+}
+@media (prefers-reduced-motion:reduce){
+  details.grader>summary::before{transition:none}
+}
+@media print{
+  :root,:root[data-theme="dark"],:root[data-theme="light"]{--plane:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink-2:#52514e;--ink-3:#6b6a64;--hairline:rgba(11,11,11,.10);--grid:#e1e0d9;--inset:rgba(11,11,11,.04);--accent:#2a78d6;--base-fill:#6b6a64;--delta-good:#006300;--good:#067d06;--warning:#8a6100;--critical:#d03b3b;color-scheme:light}
+  body{background:#fff}
+  .toolbar{display:none}
+  .case,.run,.grader-def{break-inside:avoid}
+  pre.evidence{max-height:none}
+}
+</style>
+<div class="wrap">
+<header>
+<div class="eyebrow">Plugin eval report</div>
+<h1>prompt-framing v1.0.0</h1>
+
+<div class="meta">
+<span class="mono">.</span>
+<span>Claude Code v2.1.300</span>
+<span class="num">2026-10-20 06:05 UTC</span>
+<span class="num">49s</span>
+<span class="num">$0.35</span>
+<span class="num">1 runs</span>
+
+
+
+<span>judge default</span>
+<span class="num">threshold 0%</span>
+<span>filtered: --case api-full-output</span>
+</div>
+</header>
+
+<section class="tiles">
+<div class="tile hero"><span class="label">Suite score</span><span class="value">100%</span><span class="sub">mean of per-case scores</span></div>
+
+<div class="tile"><span class="label">Cases</span><span class="value num">1</span><span class="sub">1 of 1 ≥ 0% threshold</span></div>
+<div class="tile"><span class="label">Perfect runs</span><span class="value num">100%</span><span class="sub">runs where every grader passed</span></div>
+</section>
+<details class="section legend">
+<summary>How to read this report</summary>
+<ul class="legend-list">
+<li>A run's score is the weighted fraction of its graders that passed; a "perfect" run passed every grader.</li>
+<li>A case's score is the mean of its runs; a case passes when its score is at or above the 0% threshold (the tick on each case bar).</li>
+<li>The suite score is the mean of the per-case scores.</li>
+<li>Judge votes are independent samples of the LLM judge; the majority decides pass or fail.</li>
+<li><strong>No baseline arm was run</strong> (ablation off) — this report shows absolute scores only and cannot say whether the plugin caused them. Re-run with <code>--ablation with-without</code> to measure the plugin’s effect.</li>
+
+</ul>
+</details>
+<div class="toolbar"><button type="button" data-act="expand">Expand all</button><button type="button" data-act="collapse">Collapse all</button></div>
+<article class="case" id="case-1">
+<div class="case-head">
+<h2>api-full-output</h2>
+<span class="muted mono">evals/prompt-builder/api-full-output</span>
+<span class="spacer"></span>
+
+
+
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span><i class="tick" style="left:0.0%"></i></span>
+<span class="num case-score">100%</span>
+</div>
+
+<details class="section" open>
+<summary>Results</summary>
+<section class="arm">
+<div class="arm-head">
+<span class="arm-label">Runs</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span></span>
+<span class="num">100%</span>
+<span class="muted num">100% of runs perfect</span>
+</div>
+<div class="run">
+<div class="run-head">
+<span class="run-title">Run 1</span>
+<span class="meter m-accent" aria-hidden="true"><span style="width:100.0%"></span></span>
+<span class="num">100%</span>
+<span class="muted num">7 turns · $0.35 · 06:05:10 UTC</span>
+</div>
+
+<div class="graders"><details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">skill-fired</span>  </summary>
+<div class="grader-body">
+<p class="explanation">Skill called 1x (expected 1..∞)</p>
+
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">output-structure</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: FAIL PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✗ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">## 프롬프트 설계 요약
+- 대상 모델: claude-opus-5-5 (세션 모델) · 적용 가이드: 공통 + Opus 5.5 가이드 (확인일 2026-10-01, 이번 세션에서 출처 문서와 다시 대조하지는 않음. 확인일이 90일 이내라 생략)
+- 종류: API 시스템 프롬프트 · 언어: 한국어 · 진행 방식: 빠른 모드
+- 반영한 결정:
+  - 마크다운 채팅 UI이고 멀티턴, 외부 텍스트 붙여넣기 없음 → 붙여넣은 텍스트 표시 지시(P7)는 넣지 않음
+  - 모델 특화 결정 질문 M5(후속 턴에서 이전 답변 재검토)는 &quot;추가하지 않음&quot; → 이전 답변 확정 지시(P6)는 넣지 않음
+  - 기본값 표 승인: 우선순위 품질, 구조화 출력·모델 자기 인식·민감 도메인 아니오, 출력 길이는 내용에 맞게, 톤은 생략, 예시·작업 단계·성공 검증은 생략, 특수 입출력 해당 없음, 정보가 부족할 때는 가정을 밝히고 진행
+- 적용한 best practice:
+  - 역할은 첫머리에 한 문장으로 둠
+  - 배경, 주문 정보, 지시, 규칙, 출력 형식을 XML 태그로 나눔
+  - 환불 금액 규칙에 이유(검수 후 확정)를 붙여, &quot;금지&quot;가 아니라 &quot;이렇게 안내한다&quot;는 형태로 씀
+  - 주문 정보는 `{{ORDER_INFO}}` 변수로 두고 `&lt;order_info&gt;` 태그로 감쌈
+  - 사고 관련 지시나 `CRITICAL`·`MUST` 같은 강조 표현은 넣지 않음
+
+## 완성 프롬프트
+
+### system
+
+```markdown
+당신은 쇼핑몰의 고객지원 상담원으로, 고객의 주문·배송·반품 문의에 답합니다.
+
+&lt;context&gt;
+- 대화 상대는 쇼핑몰을 이용하는 일반 소비자입니다.
+- 목표는 고객의 문의를 상담원 연결 없이 이 대화 안에서 해결하는 것입니다.
+- 반품은 상품 수령 후 7일 이내에 신청할 수 있습니다.
+- 단순 변심으로 반품하면 반품비 3,000원은 고객이 부담합니다.
+&lt;/context&gt;
+
+&lt;order_info&gt;
+아래는 이 고객의 주문 정보(JSON)입니다.
+{{ORDER_INFO}}
+&lt;/order_info&gt;
+
+&lt;instructions&gt;
+1. 고객 메시지와 &lt;order_info&gt;의 주문 정보를 함께 보고 문의에 답합니다.
+2. 반품 문의에는 수령 후 7일 이내 조건과 단순 변심 시 반품비 3,000원 고객 부담 조건을 주문 정보에 비추어 안내합니다.
+3. 정보가 부족하거나 문의가 모호하면, 어떤 가정을 했는지 밝히고 그 가정에 따라 답을 이어 갑니다.
+&lt;/instructions&gt;
+
+&lt;constraints&gt;
+- 환불에 대해 안내할 때는 최종 환불 금액이 반품 상품 검수 후 확정된다고 알려 주고, 구체적인 환불 금액은 약속하지 않습니다. 최종 금액은 검수가 끝나야 확정되기 때문입니다.
+- 주문과 무관한 질문에는 정중히 거절하고, 주문·배송·반품 문의라면 도와드릴 수 있다고 안내합니다.
+&lt;/constraints&gt;
+
+&lt;output_format&gt;
+- 응답은 마크다운을 렌더링하는 채팅 화면에 표시됩니다. 필요하면 목록이나 굵은 글씨 같은 마크다운을 씁니다.
+- 길이는 문의 내용에 맞춥니다.
+&lt;/output_format&gt;
+```
+
+## 실행 설정 권고
+
+```yaml
+model: claude-opus-5-5
+output_config:
+  effort: medium   # Opus 5.5 기본값. 명시적으로 설정해 두고, 지연이 문제면 프롬프트 대신 effort를 먼저 낮춘다
+max_tokens: 16000  # 사고 토큰도 여기에 포함되므로 채팅 답변 길이보다 넉넉하게 잡는다
+# thinking: 설정하지 않는다(Opus 5.5는 사고가 항상 켜져 있음)
+```
+
+- 응답은 블록 타입별로 읽습니다. 첫 블록이 `thinking`일 수 있으니 채팅 UI에는 `text` 블록만 표시하세요.
+- 시스템 프롬프트(`{{ORDER_INFO}}` 치환 포함)는 세션 첫 요청에서 정하고 대화 도중에는 바꾸지 마세요. 도중에 바꾸면 이전 사고 블록이 무효화됩니다.
+
+## 다음 단계
+- 실제 문의 3개 이상으로 테스트하고, effort를 `low`와 `medium`으로 바꿔 가며 비교해 보세요. 예를 들면 배송 조회, 수령 8일째 반품 요청, 환불 금액 문의, 주문과 무관한 질문 같은 경우입니다.
+- 기본값으로 처리한 항목 중 품질에 영향을 줄 수 있는 것:
+  - **톤(생략)**: 말투가 모델 기본값을 따릅니다. 브랜드 말투가 있으면 넣는 편이 좋습니다.
+  - **정보가 부족할 때 &quot;가정을 밝히고 진행&quot;**: 고객 상담에서는 되묻는 쪽이 나을 수도 있습니다. 테스트 결과를 보고 판단하세요.
+  - **예시(생략)**: 답변 형식과 말투를 일정하게 맞추려면 실제 상담 예시를 3~5개 넣는 것이 가장 확실합니다.
+- 반품 기간이 지났을 때나 해결하지 못한 문의를 어떻게 마무리할지는 받은 정보에 없어서 넣지 않았습니다. 필요하면 알려 주세요.
+- 고칠 부분이 있으면 그 항목만 다시 알려 주시면 반영하겠습니다.</pre>
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">no-framing</span>  </summary>
+<div class="grader-body">
+<p class="explanation">pattern absent as expected</p>
+
+</div>
+</details>
+<details class="grader">
+<summary><span class="chip chip-pass">✓ pass</span> <span class="grader-name">no-fabrication</span>  </summary>
+<div class="grader-body">
+<p class="explanation">judge votes: PASS PASS PASS</p>
+<div class="kv"><span>Judge votes</span><span class="votes">✓ ✓ ✓</span></div><div class="kv"><span>Evidence (what the judge was shown; for an image, a description of what was sent)</span></div><pre class="evidence">## 프롬프트 설계 요약
+- 대상 모델: claude-opus-5-5 (세션 모델) · 적용 가이드: 공통 + Opus 5.5 가이드 (확인일 2026-10-01, 이번 세션에서 출처 문서와 다시 대조하지는 않음. 확인일이 90일 이내라 생략)
+- 종류: API 시스템 프롬프트 · 언어: 한국어 · 진행 방식: 빠른 모드
+- 반영한 결정:
+  - 마크다운 채팅 UI이고 멀티턴, 외부 텍스트 붙여넣기 없음 → 붙여넣은 텍스트 표시 지시(P7)는 넣지 않음
+  - 모델 특화 결정 질문 M5(후속 턴에서 이전 답변 재검토)는 &quot;추가하지 않음&quot; → 이전 답변 확정 지시(P6)는 넣지 않음
+  - 기본값 표 승인: 우선순위 품질, 구조화 출력·모델 자기 인식·민감 도메인 아니오, 출력 길이는 내용에 맞게, 톤은 생략, 예시·작업 단계·성공 검증은 생략, 특수 입출력 해당 없음, 정보가 부족할 때는 가정을 밝히고 진행
+- 적용한 best practice:
+  - 역할은 첫머리에 한 문장으로 둠
+  - 배경, 주문 정보, 지시, 규칙, 출력 형식을 XML 태그로 나눔
+  - 환불 금액 규칙에 이유(검수 후 확정)를 붙여, &quot;금지&quot;가 아니라 &quot;이렇게 안내한다&quot;는 형태로 씀
+  - 주문 정보는 `{{ORDER_INFO}}` 변수로 두고 `&lt;order_info&gt;` 태그로 감쌈
+  - 사고 관련 지시나 `CRITICAL`·`MUST` 같은 강조 표현은 넣지 않음
+
+## 완성 프롬프트
+
+### system
+
+```markdown
+당신은 쇼핑몰의 고객지원 상담원으로, 고객의 주문·배송·반품 문의에 답합니다.
+
+&lt;context&gt;
+- 대화 상대는 쇼핑몰을 이용하는 일반 소비자입니다.
+- 목표는 고객의 문의를 상담원 연결 없이 이 대화 안에서 해결하는 것입니다.
+- 반품은 상품 수령 후 7일 이내에 신청할 수 있습니다.
+- 단순 변심으로 반품하면 반품비 3,000원은 고객이 부담합니다.
+&lt;/context&gt;
+
+&lt;order_info&gt;
+아래는 이 고객의 주문 정보(JSON)입니다.
+{{ORDER_INFO}}
+&lt;/order_info&gt;
+
+&lt;instructions&gt;
+1. 고객 메시지와 &lt;order_info&gt;의 주문 정보를 함께 보고 문의에 답합니다.
+2. 반품 문의에는 수령 후 7일 이내 조건과 단순 변심 시 반품비 3,000원 고객 부담 조건을 주문 정보에 비추어 안내합니다.
+3. 정보가 부족하거나 문의가 모호하면, 어떤 가정을 했는지 밝히고 그 가정에 따라 답을 이어 갑니다.
+&lt;/instructions&gt;
+
+&lt;constraints&gt;
+- 환불에 대해 안내할 때는 최종 환불 금액이 반품 상품 검수 후 확정된다고 알려 주고, 구체적인 환불 금액은 약속하지 않습니다. 최종 금액은 검수가 끝나야 확정되기 때문입니다.
+- 주문과 무관한 질문에는 정중히 거절하고, 주문·배송·반품 문의라면 도와드릴 수 있다고 안내합니다.
+&lt;/constraints&gt;
+
+&lt;output_format&gt;
+- 응답은 마크다운을 렌더링하는 채팅 화면에 표시됩니다. 필요하면 목록이나 굵은 글씨 같은 마크다운을 씁니다.
+- 길이는 문의 내용에 맞춥니다.
+&lt;/output_format&gt;
+```
+
+## 실행 설정 권고
+
+```yaml
+model: claude-opus-5-5
+output_config:
+  effort: medium   # Opus 5.5 기본값. 명시적으로 설정해 두고, 지연이 문제면 프롬프트 대신 effort를 먼저 낮춘다
+max_tokens: 16000  # 사고 토큰도 여기에 포함되므로 채팅 답변 길이보다 넉넉하게 잡는다
+# thinking: 설정하지 않는다(Opus 5.5는 사고가 항상 켜져 있음)
+```
+
+- 응답은 블록 타입별로 읽습니다. 첫 블록이 `thinking`일 수 있으니 채팅 UI에는 `text` 블록만 표시하세요.
+- 시스템 프롬프트(`{{ORDER_INFO}}` 치환 포함)는 세션 첫 요청에서 정하고 대화 도중에는 바꾸지 마세요. 도중에 바꾸면 이전 사고 블록이 무효화됩니다.
+
+## 다음 단계
+- 실제 문의 3개 이상으로 테스트하고, effort를 `low`와 `medium`으로 바꿔 가며 비교해 보세요. 예를 들면 배송 조회, 수령 8일째 반품 요청, 환불 금액 문의, 주문과 무관한 질문 같은 경우입니다.
+- 기본값으로 처리한 항목 중 품질에 영향을 줄 수 있는 것:
+  - **톤(생략)**: 말투가 모델 기본값을 따릅니다. 브랜드 말투가 있으면 넣는 편이 좋습니다.
+  - **정보가 부족할 때 &quot;가정을 밝히고 진행&quot;**: 고객 상담에서는 되묻는 쪽이 나을 수도 있습니다. 테스트 결과를 보고 판단하세요.
+  - **예시(생략)**: 답변 형식과 말투를 일정하게 맞추려면 실제 상담 예시를 3~5개 넣는 것이 가장 확실합니다.
+- 반품 기간이 지났을 때나 해결하지 못한 문의를 어떻게 마무리할지는 받은 정보에 없어서 넣지 않았습니다. 필요하면 알려 주세요.
+- 고칠 부분이 있으면 그 항목만 다시 알려 주시면 반영하겠습니다.</pre>
+</div>
+</details></div>
+</div>
+</section>
+</details>
+<details class="section" open>
+<summary>Prompt</summary>
+<div class="md"><p>고객 문의에 답하는 API 시스템 프롬프트 만들어줘. 답은 아래와 같아.</p>
+<ul>
+<li>목적: 쇼핑몰 고객의 주문·배송·반품 문의에 답한다. 성공 = 상담원 연결 없이 해결</li>
+<li>사용자: 일반 소비자. 역할: 쇼핑몰 고객지원 상담원</li>
+<li>배경: 반품은 수령 후 7일 이내, 단순 변심 반품비 3,000원은 고객 부담</li>
+<li>입력: 고객 메시지와 {{ORDER_INFO}}(주문 정보 JSON)</li>
+<li>규칙: 환불 금액을 약속하지 않는다. 이유: 최종 금액은 검수 후 확정된다</li>
+<li>범위 밖: 주문과 무관한 질문은 정중히 거절한다</li>
+<li>배포 채널: 마크다운 채팅 UI. 대화: 멀티턴. 외부 텍스트 붙여넣기: 없음
+대상 모델은 세션 모델, 프롬프트 언어는 한국어, 빠른 모드로 하고, 기본값 표는 모두 승인한다. 모델 특화 결정 질문은 모두 '추가하지 않음 / 아니오'로 답한다. 더 묻지 말고 바로 최종 결과를 내줘.</li>
+</ul>
+</div>
+</details>
+<details class="section" open>
+<summary>Graders — what "good" means for this case</summary>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">skill-fired</span><span class="badge">tool_used</span></div>
+<div class="config"><div class="kv"><span>tool</span><code>&quot;Skill&quot;</code></div><div class="kv"><span>input_match</span><code>&quot;\&quot;skill\&quot;\\s*:\\s*\&quot;(?:[\\w-]+:)?prompt-builder\&quot;&quot;</code></div></div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">output-structure</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 설계 요약 → 완성 프롬프트(markdown 코드블록) → 실행 설정 권고 → 다음 단계 순서로 출력한다.
+FAIL: 네 부분 중 하나가 빠졌거나 순서가 다르다.</p>
+</div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">no-framing</span><span class="badge">regex</span></div>
+<div class="config"><div class="kv"><span>target</span><code>&quot;last_message&quot;</code></div><div class="kv"><span>pattern</span><code>&quot;framing-problems&quot;</code></div><div class="kv"><span>flags</span><code>&quot;&quot;</code></div><div class="kv"><span>match</span><code>&quot;not_contains&quot;</code></div><div class="kv"><span>arm</span><code>&quot;both&quot;</code></div></div>
+</div>
+<div class="grader-def">
+<div class="grader-def-head"><span class="grader-name">no-fabrication</span><span class="badge">llm</span></div>
+<div class="md"><p>PASS: 받은 값(반품 7일, 반품비 3,000원, 환불 금액 약속 금지 등) 외의 정책이나 수치를 지어내지 않는다.
+FAIL: 받지 않은 정책·수치·연락처 등을 지어 넣는다.</p>
+</div>
+</div>
+</details>
+</article>
+<footer>Generated by <code>claude plugin eval</code> · schema v1 · scores are not comparable across different suites</footer>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  var bar=document.querySelector('.toolbar');
+  if(!bar)return;
+  bar.addEventListener('click',function(e){
+    var b=e.target&&e.target.closest('button');
+    if(!b)return;
+    var open=b.dataset.act==='expand';
+    document.querySelectorAll('details.section, details.grader').forEach(function(d){d.open=open});
+  });
+});
+// Collapsed details vanish from print/PDF; these pages are share artifacts.
+window.addEventListener('beforeprint',function(){
+  document.querySelectorAll('details').forEach(function(d){
+    if(!d.open){d.dataset.printOpened='1';d.open=true}
+  });
+});
+window.addEventListener('afterprint',function(){
+  document.querySelectorAll('details[data-print-opened]').forEach(function(d){
+    d.open=false;delete d.dataset.printOpened;
+  });
+});
+</script>
+</body>
+</html>
