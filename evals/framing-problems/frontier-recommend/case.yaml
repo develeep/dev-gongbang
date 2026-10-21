@@ -1,0 +1,30 @@
+schema_version: "1.1"
+name: frontier-recommend
+description: 첫 메시지에 코드에서 찾은 원인을 보여 주고, 여러 단계의 질문을 모아 모두 추천 답을 다는지
+tags: [frontier, recommend]
+execution:
+  prompt: 주문 조회 API가 느려서 Redis 캐시를 넣으려고 해. 구체화해줘
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?framing-problems"'
+  - name: code-cause-first
+    type: llm
+    criteria: |
+      PASS: 첫 응답에서 코드로 찾은 원인 후보(주문마다 상품을 따로 조회하는 N+1, order_items.order_id 인덱스 없음)를 파일 경로와 함께 보여 준다.
+      FAIL: 원인 후보를 보여 주지 않거나, 뒤 단계에서 보여 주겠다며 미룬다.
+  - name: frontier-questions
+    type: llm
+    criteria: |
+      PASS: 한 메시지에서 둘 이상의 단계(예: R1 의도와 R2 이상, R3 제약)에 걸친 질문을 함께 묻는다.
+      FAIL: R1 의도·배경 질문만 묻는다.
+  - name: every-question-recommended
+    type: llm
+    criteria: |
+      PASS: 모든 질문에 추천 답(➡️ 줄)이 있고, 의도·계기처럼 사용자만 아는 사실에 대한 추천에는 "추정"과 그렇게 본 이유가 붙어 있다.
+      FAIL: 추천 답이 없는 질문이 있거나, 사용자만 아는 사실을 추정 표시 없이 확인된 사실처럼 추천한다.
