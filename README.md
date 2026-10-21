@@ -5,7 +5,7 @@
 ## 설치
 
 ```bash
-claude plugin marketplace add /path/to/ClaudeMe
+claude plugin marketplace add develeep/dev-gongbang
 claude plugin install gongbang@dev-gongbang
 ```
 
