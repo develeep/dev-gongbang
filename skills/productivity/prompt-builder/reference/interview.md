@@ -22,7 +22,7 @@ B1 선택지에는 "(권장)"을 붙이지 않는다. 대상 모델은 best prac
 
 ## 구성 요소 카탈로그
 
-형식: 선택 = AskUserQuestion, 서술 = 번호 텍스트 질문. 필수 여부: ● 필수, ○ 선택(상세 인터뷰에서는 묻고, 빠른 모드에서는 "빠른 모드 기본값"을 표로 승인받는다), - 해당 없음. CLAUDE.md / SKILL.md 종류는 이 표 대신 [skill-authoring.md](skill-authoring.md)의 K1~K9를 쓴다.
+형식: 선택 = AskUserQuestion, 서술 = 번호 텍스트 질문. 필수 여부: ● 필수, ○ 선택(상세 인터뷰에서는 묻고, 빠른 모드에서는 "빠른 모드 기본값"을 표로 승인받는다), - 해당 없음. CLAUDE.md / SKILL.md 종류는 이 표 대신 [skill-authoring.md](skill-authoring.md)의 K1~K10을 쓴다.
 
 ### 공통
 
@@ -92,7 +92,7 @@ G6 기본값 근거: Opus 5, Opus 5.5, Fable 5.1, Sonnet 5.5 가이드가 모두
 
 ### CLAUDE.md / SKILL.md
 
-[skill-authoring.md](skill-authoring.md)의 인터뷰 항목(K1~K9)을 쓴다.
+[skill-authoring.md](skill-authoring.md)의 인터뷰 항목(K1~K10)을 쓴다.
 
 ## 종류별 라운드 순서 (상세 인터뷰)
 
@@ -124,7 +124,7 @@ G6 기본값 근거: Opus 5, Opus 5.5, Fable 5.1, Sonnet 5.5 가이드가 모두
 5. 모델 특화 결정 질문
 
 **SKILL.md**
-1. 선택: K4, K6 (K1, K7은 0라운드에서 받음)
+1. 선택: K10, K4, K6 (K1, K7은 0라운드에서 받음)
 2. 서술: K2, K3, K5, K9, K6 상세(K6=필요할 때)
 3. 서술: K8
 4. 모델 가이드의 제거 검토와 검수 항목 적용

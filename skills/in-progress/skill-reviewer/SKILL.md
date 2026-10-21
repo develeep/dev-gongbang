@@ -34,7 +34,7 @@ python3 ${CLAUDE_SKILL_DIR}/scripts/validate.py $ARGUMENTS
 
 - 저장소 루트에서 실행한다. `.claude-plugin/plugin.json`과 `skills/`가 있는 저장소를 찾으면 저장소 규칙(E10~E13, W7, W8)도 검사하고, 못 찾으면 일반 규칙만 검사한다.
 - 출력은 JSON이다. `skills[].errors`, `skills[].warnings`, `repo_findings`, `not_found`를 읽는다. 종료 코드 1은 오류가 있다는 뜻이고 실행 실패가 아니다.
-- `fatal`이 있으면 그 메시지대로 조치하고 다시 실행한다. PyYAML이 없으면 설치해도 되는지 사용자에게 묻는다.
+- 종료 코드 2는 실행 실패다. stderr 메시지대로 조치하고 다시 실행한다. PyYAML이 없으면 설치해도 되는지 사용자에게 묻는다.
 - `not_found`에 이름이 있으면 그 스킬을 찾지 못했다고 알리고 나머지만 계속한다.
 - 스크립트 판정은 그대로 보고한다. 오탐이 의심되면 판정을 바꾸지 말고 보고서에 "오탐 의심"과 이유를 붙인다.
 

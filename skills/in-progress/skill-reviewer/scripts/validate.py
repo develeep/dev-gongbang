@@ -3,7 +3,7 @@
 
 Usage: validate.py [SKILL_NAME_OR_PATH ...]
   No arguments: every skill under <repo>/skills/.
-  Output: JSON on stdout. Exit code 1 if any error, 0 otherwise. Needs PyYAML.
+  Output: JSON on stdout. Exit code 1 if any error, 2 if it could not run (message on stderr), 0 otherwise. Needs PyYAML.
 """
 import argparse, json, re, subprocess, sys
 from pathlib import Path
@@ -11,7 +11,7 @@ from pathlib import Path
 try:
     import yaml
 except ImportError:
-    print(json.dumps({"fatal": "PyYAML이 없다. `pip install pyyaml` 후 다시 실행한다."}, ensure_ascii=False))
+    print("PyYAML이 없다. `pip install pyyaml` 후 다시 실행한다.", file=sys.stderr)
     sys.exit(2)
 
 # Claude Code가 인식하는 frontmatter 키. 그 밖의 키는 CC가 경고 없이 무시하므로 오타로 본다.
@@ -296,7 +296,7 @@ def main():
             (dirs if d else missing).append(d or t)
     else:
         if not repo:
-            print(json.dumps({"fatal": "인자가 없고 skills/와 .claude-plugin/plugin.json이 있는 저장소도 찾지 못했다. 스킬 경로를 넘긴다."}, ensure_ascii=False))
+            print("인자가 없고 skills/와 .claude-plugin/plugin.json이 있는 저장소도 찾지 못했다. 스킬 경로를 넘긴다.", file=sys.stderr)
             sys.exit(2)
         dirs, missing = sorted(p.parent for p in (repo / "skills").glob("**/SKILL.md")), []
 
