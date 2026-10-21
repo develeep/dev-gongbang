@@ -14,7 +14,7 @@ argument-hint: "[스킬 이름 또는 경로 ...]"
 ## 알아 둘 함정
 
 - Claude Code는 frontmatter YAML이 깨져도 스킬을 로드하고 모든 필드를 버린다. 모르는 키(`disable-model-invokation` 같은 오타)도 경고 없이 무시한다. 그래서 스킬이 "동작하는 것처럼 보여도" 스크립트의 E1·E2·E6 결과를 그대로 믿는다.
-- `claude plugin validate`와 `scripts/check.py`는 SKILL.md frontmatter 값을 검사하지 않는다. 그 결과로 이 검사를 대신하지 않는다.
+- `claude plugin validate`는 SKILL.md frontmatter 값을 검사하지 않는다. 그 결과로 이 검사를 대신하지 않는다.
 - 기준은 Claude Code다. `argument-hint`, `disable-model-invocation` 같은 CC 전용 키는 정상이다. claude.ai나 API로 배포할 스킬은 스펙 키 6개(`name`, `description`, `license`, `compatibility`, `metadata`, `allowed-tools`)만 쓸 수 있다고 수정 계획에 한 줄 덧붙인다.
 
 ## 단계

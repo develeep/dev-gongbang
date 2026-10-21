@@ -24,7 +24,6 @@ NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 LINK_RE = re.compile(r"\]\(([^)\s]+)\)")
 PROMOTED = ("engineering", "productivity")
 TOC_LINES = 100  # 플랫폼 best practices 기준. skill-creator는 300을 쓴다.
-CAPS_LIMIT = 3
 
 
 def find_repo(start):
@@ -141,23 +140,19 @@ def check_skill(skill_dir, repo):
 
     for m in re.finditer(r"!`([^`]+)`", text):
         if "|| true" not in m.group(1):
-            W("W10", f, line_of(text, m.group(0)), "동적 주입 명령이 실패하면 스킬 호출 전체가 중단된다. `|| true`를 붙일지 검토한다")
+            W("W10", f, text.count("\n", 0, m.start()) + 1,"동적 주입 명령이 실패하면 스킬 호출 전체가 중단된다. `|| true`를 붙일지 검토한다")
 
     direct = {(md.parent / m.group(1).split("#")[0]).resolve() for m in LINK_RE.finditer(prose(text))}
     # 링크, 참조 깊이, 목차, 경로·시간 표현은 스킬 안의 모든 .md에 적용한다
     for p in sorted(skill_dir.rglob("*.md")):
         t = prose(p.read_text(encoding="utf-8"))
         pf = rel(p)
-        seen = set()
         for m in LINK_RE.finditer(t):
             target = m.group(1).split("#")[0]
             if not target or re.match(r"[a-z]+:", target):
                 continue
             dest = (p.parent / target).resolve()
-            ln = line_of(t, m.group(0))
-            if (ln, target) in seen:
-                continue
-            seen.add((ln, target))
+            ln = t.count("\n", 0, m.start()) + 1
             if not dest.is_relative_to(skill_dir.resolve()):
                 E("E9", pf, ln, f"스킬 폴더 밖을 가리키는 링크 `{target}`. 다른 스킬은 'Skill 도구로 `<이름>`을 호출한다'고 쓴다")
             elif not dest.exists():
@@ -175,7 +170,7 @@ def check_skill(skill_dir, repo):
             if not old and re.search(r"20\d\d\s*년?\s*(\d+\s*월\s*)?(이후|이전|부터|까지)|(before|after|until)\s+(\w+\s+)?20\d\d", l, re.I):
                 W("W6", pf, i, "시간에 따라 틀려질 표현이다. 'Old patterns' 절로 옮기거나 지운다")
         caps = re.findall(r"\b(MUST|ALWAYS|NEVER|CRITICAL)\b", t)
-        if len(caps) > CAPS_LIMIT:
+        if len(caps) > 3:
             W("W12", pf, 1, f"대문자 강조어가 {len(caps)}개다. 강조 대신 이유를 쓴다")
 
     return {"name": skill_dir.name, "path": str(rel(skill_dir)), "errors": errs, "warnings": warns}, fm
@@ -307,7 +302,7 @@ def main():
         if fm:
             fms[r["name"]] = fm
     repo_level = repo_checks(repo, results, fms) if repo else []
-    out = {"repo": str(repo) if repo else None, "repo_rules": bool(repo), "skills": results,
+    out = {"repo": str(repo) if repo else None, "skills": results,
            "repo_findings": repo_level, "not_found": [str(m) for m in missing]}
     print(json.dumps(out, ensure_ascii=False, indent=1))
     has_err = missing or any(r["errors"] for r in results) or any(x["id"].startswith("E") for x in repo_level)
