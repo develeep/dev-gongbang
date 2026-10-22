@@ -3,7 +3,7 @@
 출처: https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5-5
 사고 설정 출처: https://platform.claude.com/docs/en/build-with-claude/thinking-troubleshooting
 확인일: 2026-10-01 (출처 문서와 대조)
-아래 스니펫은 원문과 같은 의도를 한국어로 다시 쓴 것이다. B2=영어이면 원문 스니펫을 쓴다. Sonnet 5용 프롬프트도 대체로 잘 작동하므로, [sonnet-5.md](sonnet-5.md)의 패턴은 출발점으로만 참고한다.
+각 스니펫 아래에 공식 문서의 영어 원문을 둔다. B2=영어이면 원문을 바탕으로 쓰고, 그 외 언어이면 한국어 스니펫을 바탕으로 쓴다. Sonnet 5용 프롬프트도 대체로 잘 작동하므로, [sonnet-5.md](sonnet-5.md)의 패턴은 출발점으로만 참고한다.
 
 ## 목차
 - 특성 요약
@@ -53,21 +53,39 @@ M1=범위 제한만이면 둘째 문단만 넣는다. 요청하지 않은 테스
 
 요청한 일을 마치고 확인까지 끝나면 멈추고 보고한다. 요청하지 않은 기능, 테스트, 파일, 문서, 리팩터링은 추가하지 않는다. 도움이 될 것 같으면 하지 말고 끝에 제안한다.
 ```
+원문:
+```text
+Keep working until everything the user asked for is done, and only stop to ask when you can't go on without the user or before a risky step.
+
+When the work the user asked for is done and checked, stop and report. Don't add features, tests, files, docs or refactors that weren't asked for. If you think one would help, mention it at the end instead of doing it.
+```
 G8=금지하고 제안만이면 원칙 G의 과잉 엔지니어링 방지 문구 대신 이 둘째 문단을 쓴다.
 
 **P2. 자체 리뷰 라운드 억제** (M2=예) 시스템 프롬프트에 넣는다. 일상 작업은 이런 라운드가 드문 `high` 이하로 돌리는 편이 먼저라고 알린다. 공식 테스트(`max` effort 코딩)에서 리뷰 서브에이전트 실행이 멈추고 세션 비용이 약 3분의 1 줄었으며 품질 변화는 없었다. 메인 에이전트가 스스로 시작하는 리뷰는 줄지만 완전히 없어지지는 않는다.
 ```
 요청한 일을 마치고 검사가 통과하면 멈추고 보고한다. 스스로 추가 리뷰나 보강 라운드를 시작하지 않고, 사용자가 리뷰를 요청하지 않았다면 리뷰용 서브에이전트를 띄우지 않는다. 더 깊은 리뷰가 필요하다고 보면 끝에 그렇게 말한다.
 ```
+원문:
+```text
+When the work the user asked for is done and its checks pass, stop and report. Don't start extra rounds of review or hardening on your own, and don't launch reviewer sub-agents unless the user asked for a review. If you think a deeper review is worth doing, say so at the end.
+```
 
 **P3. 아이디어·계획 요청** (M3=예) 시스템 프롬프트 대신 요청 자체에 "아이디어부터"라고 적는 방법도 있다. 단발 작업 프롬프트라면 그쪽을 쓴다.
 ```
 사용자가 아이디어, 선택지, 계획을 요청하면 그것만 주고 멈춘다. 진행하라고 할 때까지 아무것도 만들거나 바꾸지 않는다.
 ```
+원문:
+```text
+When the user asks for ideas, options or a plan, give them that and stop. Don't start building or changing anything until they say to go ahead.
+```
 
 **P4. JSON 추론 작업에서 먼저 생각하기** (M5=structured outputs) 적응형 사고에서 시스템 프롬프트 끝에 넣는다. `between_tools`에서는 효과가 없으므로 이 요청에는 적응형 사고를 쓰라고 실행 설정에 적는다.
 ```
 답하기 전에 문제를 끝까지 생각한다.
+```
+원문:
+```text
+Think the problem through before you answer.
 ```
 효과: `high`에서는 출력 토큰이 조금 늘고 정확도가 `xhigh`에 가까워진다. `low`와 `medium`에서도 정확도가 오르지만 `high` 수준에는 못 미치고, 출력 토큰은 더 많이 는다. 스니펫 대신 `xhigh`로 돌리면 정확도가 가장 높지만 출력 토큰이 `high`보다 많다. 이 트레이드오프를 보여 주고 고르게 한다.
 M5=프롬프트로 JSON 요청이면 스니펫 대신 하네스 권고를 적는다(실행 설정 권고 참고). 이 경우 모델은 응답 본문에서 문제를 풀고 끝에 JSON을 쓰는 경우가 많다. 적응형 사고에서 `xhigh`로 올리면 풀이가 사고로 옮겨 가 JSON만 돌려주는 경우가 많고, 총 출력 토큰은 `high`와 비슷하다.
@@ -76,16 +94,25 @@ M5=프롬프트로 JSON 요청이면 스니펫 대신 하네스 권고를 적는
 ```
 첫 도구 호출 전에 무엇을 할지 한 줄로 말한다. 작업을 마치면 무엇을 찾았고 무엇을 했으며 다음은 무엇인지 짧게 정리한다.
 ```
+원문: 없음 (문서 설명을 바탕으로 작성). B2=영어이면 위 스니펫을 영어로 옮긴다.
 M6=그대로 보여 줄 콘텐츠 있음이면, 사용자 메시지 전송 도구를 그런 콘텐츠에만 쓰라는 문장을 넣고 그 도구를 세션 첫 요청부터 `tools`에 선언하라고 실행 설정에 적는다.
 
 **P6. 검색 트리거** (M7=예) 먼저 "꼭 필요할 때만 도구를 써라", "도구 호출을 최소화하라" 같은 문구를 제거한다(제거 검토).
 ```
 학습 이후 바뀌었을 수 있는 세부, 예를 들어 무엇이 허용되고 요구되며 얼마가 부과되는지는 확신이 있어도 검색 도구로 확인한다. 보고서나 비교처럼 조사가 필요한 작업은 학습 지식으로 쓰지 말고 최신 출처를 모은다.
 ```
+원문:
+```text
+Use the search tool to check specifics that may have changed since your training, such as what is allowed, required or charged, even when you feel confident. For researched work such as a report or a comparison, gather current sources rather than writing from your training knowledge.
+```
 
 **P7. 코딩 변경 검증** (M9=예) 시스템 프롬프트에 넣는다.
 ```
 실행, 빌드, 타입 검사가 가능한 코드를 바꿨으면 완료라고 보고하기 전에 그 변경을 실제로 실행해 보는 검사를 한다. 프로젝트의 테스트, 타입 검사기, 빌드, 또는 바꾼 명령 자체가 해당한다. 문법만 보는 검사나 시작조차 못 한 검사 명령은 검사로 치지 않는다. 빠진 것이 프로젝트에 선언된 의존성뿐이면, 하지 말라는 지시가 없는 한 프로젝트 자체의 패키지 관리자와 잠금 파일로 설치한다(예: npm install, pip install -r requirements.txt). sudo나 시스템 패키지 관리자는 쓰지 않는다. 실제 검사를 돌릴 수 없을 때만, 완료라고 보고하는 대신 어떤 검사를 왜 돌리지 못했는지 말한다.
+```
+원문:
+```text
+When you change code that can be run, built, or type-checked, run a real check that exercises the change before reporting it done: the project's tests, type-checker, or build, or the changed command itself. A syntax-only check, or a check command that failed to start, does not count; if all that is missing is the project's declared dependencies, install them with its own package manager and lockfile (e.g. npm install, pip install -r requirements.txt), never via sudo or the system package manager, unless told not to. Only if no real check can run here, say which one you did not run and why instead of reporting the change as done.
 ```
 
 M4와 M8은 프롬프트 문구가 아니라 실행 설정 권고로 반영한다.

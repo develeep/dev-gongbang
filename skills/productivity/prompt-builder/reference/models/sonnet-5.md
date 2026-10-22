@@ -2,7 +2,7 @@
 
 출처: https://platform.claude.com/docs/ko/build-with-claude/prompt-engineering/prompting-claude-sonnet-5
 확인일: 2026-10-01 (출처 문서와 대조)
-아래 스니펫은 원문과 같은 의도를 한국어로 다시 쓴 것이다. B2=영어이면 원문 스니펫을 쓴다. Sonnet 5.5는 이 파일이 아니라 [sonnet-5-5.md](sonnet-5-5.md)를 쓴다.
+각 스니펫 아래에 공식 문서의 영어 원문을 둔다. B2=영어이면 원문을 바탕으로 쓰고, 그 외 언어이면 한국어 스니펫을 바탕으로 쓴다. Sonnet 5.5는 이 파일이 아니라 [sonnet-5-5.md](sonnet-5-5.md)를 쓴다.
 
 ## 목차
 - 특성 요약
@@ -47,17 +47,29 @@
 ```
 간결하고 초점이 분명하게 응답한다. 꼭 필요하지 않은 맥락은 빼고 예시는 최소한으로 쓴다.
 ```
+원문:
+```text
+Provide concise, focused responses. Skip non-essential context, and keep examples minimal.
+```
 사용자가 좋은 응답 예시를 주면 `<examples>`에 넣는다. 긍정 예시가 금지 지시보다 효과적이다.
 
 **P3. low effort에서의 추론 유도** (M3=low 유지 + 다단계)
 ```
 이 작업은 여러 단계의 추론이 필요하다. 응답하기 전에 문제를 신중히 생각한다.
 ```
+원문:
+```text
+This task involves multistep reasoning. Think carefully through the problem before responding.
+```
 low를 유지할 필요가 없으면 프롬프트 대신 effort를 `high`나 `xhigh`로 올리라고 권고한다.
 
 **P4. 사고 과다 억제** (M9=예)
 ```
 사고는 지연 시간을 늘리므로 답의 품질을 의미 있게 높일 때만 한다. 보통은 여러 단계의 추론이 필요한 문제에 해당한다. 애매하면 바로 답한다.
+```
+원문:
+```text
+Thinking adds latency and should only be used when it will meaningfully improve answer quality, typically for problems that require multistep reasoning. When in doubt, respond directly.
 ```
 
 **P5. 도구 사용 유도** (M4=예) 도구마다 왜, 언제 써야 하는지 사용자에게 받아 명시한다. 예: "최신 정보가 필요한 질문에는 답하기 전에 <검색 도구>로 확인한다. 학습 데이터 이후에 바뀌었을 수 있기 때문이다."
@@ -68,13 +80,21 @@ low를 유지할 필요가 없으면 프롬프트 대신 effort를 `high`나 `xh
 - 사양 제공: 사용자가 준 팔레트(hex), 서체, 레이아웃, radius, 모션 수치를 그대로 명시한다. "그 색은 쓰지 마"나 "깔끔하게" 같은 일반 지시는 다른 고정 팔레트로 옮겨 갈 뿐이다.
 - 방향 제안:
 ```
-만들기 전에 이 요청에 맞는 서로 다른 시각적 방향 4가지를 제안한다(각각 배경 hex, 강조색 hex, 서체, 한 줄 근거). 사용자가 하나를 고르면 그 방향만 구현한다.
+만들기 전에 이 요청에 맞는 서로 다른 시각적 방향 4가지를 제안한다(각각 배경 hex, 강조색 hex, 서체, 한 줄 근거). 사용자에게 하나를 고르게 하고, 고른 방향만 구현한다.
+```
+원문:
+```text
+Before building, propose 4 distinct visual directions tailored to this brief (each as: bg hex / accent hex / typeface, plus a one-line rationale). Ask the user to pick one, then implement only that direction.
 ```
 - 공통으로 흔한 AI 기본 미감을 피하는 지시를 넣는다: Inter/Roboto/Arial/시스템 폰트, 흰 배경이나 어두운 배경의 보라 그라디언트, 예측 가능한 레이아웃. 맥락에 맞는 고유한 서체, 일관된 색 테마, 마이크로 인터랙션을 쓰게 한다.
 
 **P8. 코드 리뷰 커버리지** (M7=예)
 ```
 확신이 없거나 심각도가 낮은 것까지 발견한 문제를 모두 보고한다. 이 단계에서는 중요도나 확신도로 거르지 않는다. 걸러내는 일은 별도의 검증 단계가 한다. 이 단계의 목표는 커버리지다. 실제 버그를 조용히 빠뜨리는 것보다 나중에 걸러질 발견을 보고하는 편이 낫다. 발견마다 확신도와 예상 심각도를 적는다.
+```
+원문:
+```text
+Report every issue you find, including ones you are uncertain about or consider low-severity. Do not filter for importance or confidence at this stage - a separate verification step will do that. Your goal here is coverage: it is better to surface a finding that later gets filtered out than to silently drop a real bug. For each finding, include your confidence level and an estimated severity so a downstream filter can rank them.
 ```
 M7=아니오면 구체적인 기준을 사용자에게 받는다. 예: "잘못된 동작, 테스트 실패, 오해를 부르는 결과를 낼 수 있는 버그는 모두 보고하고, 순수한 스타일이나 이름 취향만 뺀다."
 
