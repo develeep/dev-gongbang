@@ -1,0 +1,23 @@
+schema_version: "1.1"
+name: oneshot-no-framing
+description: "한 번 쓰는 단발 작업에서 C16을 묻지 않는지"
+tags: [quick, oneshot, framing]
+execution:
+  prompt: |
+    /prompt-builder 단발 작업 프롬프트 만들어줘. 답은 아래와 같아.
+    - 목적: 결제 모듈의 지난 분기 장애 리포트 12건을 읽고 반복 원인을 찾는다. 성공 = 원인별 건수와 대표 사례가 정리됨
+    - 독자: 결제팀 리드
+    - 배경: 리포트는 사내 템플릿(증상, 영향, 조치)을 따른다
+    - 자료: 장애 리포트 12건, 건당 1~2쪽
+    - 재사용: 한 번 쓰고 끝
+    - 산출물: 분석·리서치
+    - 출력 형식: 마크다운, 길이: 내용에 맞게
+    대상 모델은 세션 모델, 프롬프트 언어는 한국어, 빠른 모드로 하고, 기본값 표는 모두 승인한다.
+  max_turns: 20
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: no-c16
+    type: llm
+    criteria: |
+      PASS: 한 번 쓰는 단발 작업이므로 실행 시 구체화(C16, framing-problems)를 묻지 않고, 완성 프롬프트를 냈다면 framing-problems 호출 지시도 넣지 않는다.
+      FAIL: C16이나 실행 시 구체화 여부를 묻거나, 완성 프롬프트에 framing-problems 호출 지시를 넣는다.
