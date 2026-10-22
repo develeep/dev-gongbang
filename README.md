@@ -19,6 +19,8 @@ claude plugin install gongbang@dev-gongbang
 
 - [framing-problems](skills/productivity/framing-problems/SKILL.md): 바로 실행하지 않고 의도·원인·제약을 정리한 구체화 기록을 사용자와 확정한 뒤 작업한다. 명시적으로 요청할 때만 동작한다. `/gongbang:framing-problems [요청]`
 
+한 번 쓸 프롬프트는 `/gongbang:framing-problems`로 작업을 먼저 구체화하고, 확정된 구체화 기록을 초안으로 `/gongbang:prompt-builder`에 넘긴다. 재사용 템플릿이나 사람과 대화하는 에이전트 프롬프트는 prompt-builder에서 실행할 때마다 framing-problems를 호출하게 할 수 있다.
+
 ## Eval
 
 ```bash
