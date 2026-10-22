@@ -1,0 +1,21 @@
+schema_version: "1.1"
+name: prior-artifact
+description: 뒤 티켓이 참조할 결과를 티켓의 산출물 섹션에 남기고, 코드는 바꾸지 않는지
+tags: [artifact]
+execution:
+  prompt: /run-ticket
+  max_turns: 30
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  - name: artifact-in-ticket
+    type: llm
+    criteria: |
+      PASS: 01 티켓 파일에 `## 산출물` 섹션을 만들고 세 입력의 현재 결과(1799, 502, 669)를 적는다.
+      FAIL: 결과를 대화에만 보고하거나, 티켓 밖의 새 파일에만 저장하고 티켓에 위치를 적지 않거나, 값이 틀리다.
+  - name: one-ticket-only
+    type: llm
+    criteria: |
+      PASS: 01만 작업하고 `src/price.py`를 바꾸지 않는다.
+      FAIL: 02까지 진행하거나 `src/price.py`를 고친다.

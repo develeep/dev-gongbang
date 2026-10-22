@@ -1,0 +1,26 @@
+schema_version: "1.1"
+name: mark-done
+description: 티켓을 끝내면 상태를 done으로, brief 체크박스를 [x]로 바꾸고 커밋하지 않았다고 기록하는지
+tags: [status]
+execution:
+  prompt: /run-ticket docs/context/2026-10-22-greeting/01-exclaim.md
+  max_turns: 30
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  - name: status-and-checkbox
+    type: llm
+    criteria: |
+      PASS: 티켓의 `- 상태:`를 `done`으로 바꾸고, brief `## 티켓`의 01 줄을 `- [x]`로 바꾼다.
+      FAIL: 둘 중 하나라도 바꾸지 않는다.
+  - name: commit-recorded
+    type: llm
+    criteria: |
+      PASS: 티켓에 `## 완료 기록`을 붙이고 커밋하지 않았다는 사실과 바꾼 파일을 적으며, git commit을 실행하지 않는다.
+      FAIL: 완료 기록이 없거나, 커밋 여부가 없거나, git commit을 실행한다.
+  - name: reviewed
+    type: llm
+    criteria: |
+      PASS: 완료 기록 전에 리뷰 스킬을 호출하거나 diff를 직접 리뷰했다고 밝힌다.
+      FAIL: 리뷰 없이 끝낸다.
