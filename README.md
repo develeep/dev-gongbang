@@ -9,6 +9,12 @@ claude plugin marketplace add develeep/dev-gongbang
 claude plugin install gongbang@dev-gongbang
 ```
 
+만드는 중인 `in-progress/` 스킬도 쓰려면 `gongbang-dev`를 함께 설치한다.
+
+```bash
+claude plugin install gongbang-dev@dev-gongbang
+```
+
 ## 스킬
 
 ### User-invoked

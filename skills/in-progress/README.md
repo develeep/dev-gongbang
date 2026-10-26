@@ -12,7 +12,19 @@
 
 ## 설치
 
-플러그인에 들어 있지 않으므로 저장소를 클론한 뒤 직접 연결한다.
+`gongbang` 플러그인에는 들어 있지 않다. 두 방법 중 하나로 설치한다.
+
+### 플러그인으로 설치
+
+```bash
+claude plugin install gongbang-dev@dev-gongbang
+```
+
+`gongbang`과 함께 설치한다. 호출 이름은 `/gongbang:set-brief`처럼 `gongbang:` 접두사가 붙는다. GitHub에서 설치하면 `plugin.json`의 `version`이 바뀔 때만 갱신된다.
+
+### 링크로 설치
+
+저장소를 클론한 뒤 직접 연결한다.
 
 ```bash
 scripts/link-in-progress.sh
