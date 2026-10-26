@@ -27,6 +27,8 @@
 
 6. **문장 경계는 생각을 따른다.** 단서, 이유, 결과를 주장과 떼면 관계가 흐려질 때는 붙여 둔다. 짧은 문장과 조각문은 맥락상 바로 이해되거나 강조가 목적에 맞을 때 쓴다. 배경, 설명, 결론에 서로 다른 무게를 준다. 작은 사실 하나하나가 따로 폭로나 결정타가 되는 반복 리듬을 피한다. 문장 길이를 기계적으로 번갈아 쓰거나, 모든 것을 긴 문장으로 잇거나, 모든 문단을 교훈으로 끝내지 않는다. 진짜로 따로인 항목은 목록으로 쓰고, 항목 사이의 관계가 요점이면 이어진 산문으로 쓴다.
 
+7. **줄이려고 말을 압축하지 않는다.** 간결하게 쓴다는 것은 독자에게 필요 없는 내용을 빼는 것이다. 같은 내용을 더 적은 말에 욱여넣는 것은 간결이 아니다. 명사를 셋 넘게 잇지 않는다. "세션 토큰 만료 갱신 로직"은 "세션 토큰이 만료되면 갱신하는 코드"로 푼다. 주어와 서술어 사이, 또는 명사 앞에 긴 수식어를 넣지 말고 문장을 나눈다. 관계를 드러내는 조사와 연결어를 빼지 않는다. 짧아진 문장을 독자가 다시 풀어 읽어야 하면 압축한 것이다.
+
 ## 지킬 것
 
 사실의 의미와 글쓴이의 목소리를 지킨다. 모호한 글을 구체적으로 만들려고 사건, 동기, 감정, 메커니즘, 수량, 근거를 지어내지 않는다. 생략된 의미는 맥락이 뒷받침할 때만 되살린다. 그렇지 않으면 불확실성을 그대로 두거나, 답에 실질적인 영향이 있으면 초점이 분명한 질문을 한다. 해석을 사실로 바꾸지 않는다. 따뜻함, 개성, 유머, 쓸모 있는 복잡함을 지킨다.
@@ -67,6 +69,12 @@ Direct: "Your friends often ask you for help, but they rarely help when you ask.
 Context: A failed job can be retried independently while other jobs continue.
 Abstract: "Failure isolation preserves continuity. Recovery stays local."
 Concrete: "If one job fails, the other jobs keep running, and you can retry the failed job by itself."
+</example>
+
+<example>
+Context: When a user's session token expires, the code requests a new one.
+Compressed: "Session token expiry refresh logic handles this."
+Clear: "When a user's session token expires, the code requests a new one."
 </example>
 
 <example>
