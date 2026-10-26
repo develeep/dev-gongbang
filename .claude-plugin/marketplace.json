@@ -12,6 +12,15 @@
       "name": "gongbang",
       "source": "./",
       "category": "development"
+    },
+    {
+      "name": "gongbang-dev",
+      "source": "./",
+      "description": "gongbang에 만드는 중인 in-progress 스킬까지 더한 버전. gongbang과 함께 설치한다.",
+      "category": "development",
+      "skills": [
+        "./skills/in-progress/"
+      ]
     }
   ]
 }
