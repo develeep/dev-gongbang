@@ -1,6 +1,14 @@
-# gongbang
+<p align="center">
+  <img src="./assets/gongbang-logo.gif" alt="Gongbang" width="800">
+</p>
 
-개발 과정에서 쓰는 Claude Code 스킬 모음.
+<h1 align="center">
+    dev-gongbang
+</h1>
+
+<p align="center">
+    개발 과정에서 쓰는 Claude Code 스킬 모음.
+</p>
 
 ## 설치
 
