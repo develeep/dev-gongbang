@@ -8,6 +8,7 @@
 - [set-ticket](./set-ticket/SKILL.md): set-brief 이슈나 문서가 클 때 혼자 검증할 수 있는 티켓으로 나눠 sub-issue나 docs 파일로 남기고 brief에 연결한다.
 - [run-ticket](./run-ticket/SKILL.md): set-brief·set-ticket의 brief와 티켓을 새 세션에서 받아 티켓 하나를 구현·리뷰하고 티켓 상태와 brief 체크박스를 갱신한다. 커밋은 하지 않는다.
 - [skill-reviewer](./skill-reviewer/SKILL.md): SKILL.md를 Claude Code 규칙, 공식 best practice, 저장소 운영 규칙으로 검사해 스킬별 보고서와 수정 계획을 낸다.
+- [write-docs](./write-docs/SKILL.md): 분야·독자·목적·톤·자료를 질문으로 정한 뒤 글 초안을 쓰거나, 가져온 초안과 기존 문서를 고친다.
 
 ## 설치
 
