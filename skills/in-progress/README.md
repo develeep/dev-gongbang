@@ -4,6 +4,7 @@
 
 ## User-invoked
 
+- [building-skills](./building-skills/SKILL.md): prompt-builder가 만든 SKILL.md 초안이나 대화 기록·런북·코드 같은 자료로 스킬을 완성하고, 정적 검사·실행 테스트·사람 리뷰·수정 반복까지 진행한다.
 - [set-brief](./set-brief/SKILL.md): 구체화 기록이나 세션 결과를 맥락 없는 작업자도 그대로 이어받을 수 있는 작업 지시서로 정리해 GitHub 이슈나 `docs/context/`에 남긴다.
 - [set-ticket](./set-ticket/SKILL.md): set-brief 이슈나 문서가 클 때 혼자 검증할 수 있는 티켓으로 나눠 sub-issue나 docs 파일로 남기고 brief에 연결한다.
 - [run-ticket](./run-ticket/SKILL.md): set-brief·set-ticket의 brief와 티켓을 새 세션에서 받아 티켓 하나를 구현·리뷰하고 티켓 상태와 brief 체크박스를 갱신한다. 커밋은 하지 않는다.

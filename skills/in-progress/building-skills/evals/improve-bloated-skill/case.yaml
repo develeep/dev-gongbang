@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: improve-bloated-skill
+expected_outcome: |
+  이름을 유지한 채 Claude가 아는 설명을 덜어내고, 라이브러리 기본값을 정하고, 참조 깊이·경로·description 문제를 고친 스킬과 정적 검사 결과.
+context:
+  scaffold_script: place-files.sh

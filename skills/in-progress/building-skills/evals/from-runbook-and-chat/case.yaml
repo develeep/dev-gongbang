@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: from-runbook-and-chat
+expected_outcome: |
+  런북과 대화의 교정 사항을 출처로 삼은 롤백 스킬 폴더. 대화에서 사용자가 바로잡은 사실이 gotcha로 들어가고, 정적 검사를 통과한다.
+context:
+  scaffold_script: place-files.sh
