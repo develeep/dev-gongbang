@@ -1,0 +1,60 @@
+schema_version: "1.1"
+name: save-docs
+description: 확정된 구체화 기록을 docs brief로 저장할 때 파일 이름 규칙과 README 인덱스 형식을 지키고 커밋하지 않는지
+tags: [docs, publish]
+execution:
+  prompt: |
+    /set-brief 주문 상세에 배송 추적 번호 표시
+    아래는 framing-problems로 확정한 구체화 기록이야. 이 기록을 brief로 남겨줘. 저장 위치는 docs 문서로 할게. 초안은 미리 승인할 테니 나한테 다시 묻지 말고 저장까지 끝내줘.
+
+    | 항목 | 내용 | 출처 | 근거 |
+    |---|---|---|---|
+    | R1 의도 | 배송 상태를 묻는 CS 문의를 줄이고 싶다 | 사용자 | - |
+    | R1 계기 | 10월 CS 문의 중 배송 상태 문의가 가장 많았다 | 사용자 | - |
+    | R2 이상 | 고객이 주문 상세 화면에서 택배사와 운송장 번호를 본다 | 사용자 | R1 의도 |
+    | R2 현재 | 주문 상세 API 응답에 배송 정보가 없다 | `src/orders/detail.py` | - |
+    | R2 문제 | 고객은 운송장 번호를 CS에 물어야만 알 수 있다 | - | R2 이상, R2 현재 |
+    | R2 원인 | `shipments` 테이블에 운송장 번호가 있지만 주문 상세 조회가 읽지 않는다 (확인됨) | `src/orders/detail.py` | R2 현재 |
+    | R3 제약 | 주문 상세 API의 기존 필드 이름은 바꿀 수 없다 (앱 구버전 호환) | 사용자 | - |
+    | R3 자원 | `shipments` 테이블의 `carrier`, `tracking_no` 열 | `src/orders/shipments.py` | - |
+    | R4 근거 | 기존 응답에 필드만 추가하면 구버전 앱은 새 필드를 무시한다: 맞음 | 사용자 | R3 제약 |
+    | R5 목표 | 주문 상세 API 응답에 `carrier`, `tracking_no`를 추가하고 화면에 표시한다 | 사용자 | R2 문제 |
+    | R5 해법 | 주문 상세 조회에서 `shipments`를 함께 읽어 응답에 `shipment` 객체로 넣는다 | 사용자 승인 | R5 목표, R3, R4 |
+    | R6 부작용 | 아직 출고되지 않은 주문은 `shipment`가 `null`이다: 감수, 화면은 "배송 준비 중" 표시 | 사용자 | R5 해법 |
+  max_turns: 30
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/in-progress/set-brief/SKILL.md:94
+  - name: saved-path
+    type: llm
+    criteria: |
+      PASS: brief를 `docs/context/YYYY-MM-DD-<slug>.md` 형식의 새 파일로 저장한다. 날짜는 숫자 날짜이고, slug는 영문 소문자와 하이픈으로만 되어 있다.
+      FAIL: 저장하지 않거나, `docs/context/` 밖에 저장하거나, 파일 이름에 날짜가 없거나 slug에 한글·대문자·공백이 있거나, 기존 `2026-09-01-signup-email-verify.md`를 덮어쓴다.
+  # 근거: skills/in-progress/set-brief/SKILL.md:47, :102-142
+  - name: template-literal
+    type: llm
+    criteria: |
+      PASS: 저장한 brief에 `- 작성일: YYYY-MM-DD` 줄이 굵게 하지 않은 그대로 있고, `## 요약`, `## 합의한 작업`, `## 작업 경계`, `## 확인 기준` 같은 템플릿 섹션 이름과 "남은 일"·"바꾸지 않는 범위"·"바꿀 수 없는 조건" 줄 이름이 템플릿과 글자 하나 다르지 않다.
+      FAIL: 작성일 줄이 `**작성일**`처럼 바뀌었거나, 섹션 이름이나 줄 이름을 바꾸거나 굵게 했다.
+  # 근거: skills/in-progress/set-brief/SKILL.md:95
+  - name: index-line-format
+    type: regex
+    target: {source: file, path: docs/context/README.md}
+    pattern: '- \[(?!2026-09-01)(\d{4}-\d{2}-\d{2}) [^\]]+\]\(\./\1-[a-z0-9-]+\.md\): \S'
+    match: contains
+  # 근거: skills/in-progress/set-brief/SKILL.md:95
+  - name: index-line-appended
+    type: regex
+    target: {source: file, path: docs/context/README.md}
+    pattern: '\(\./2026-09-01-signup-email-verify\.md\)'
+    match: contains
+  # 근거: skills/in-progress/set-brief/SKILL.md:96
+  - name: no-commit
+    type: tool_used
+    arm: both
+    tool: Bash
+    input_match: 'git\s+commit'
+    min: 0
+    max: 0

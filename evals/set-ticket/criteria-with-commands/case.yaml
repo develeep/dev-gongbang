@@ -1,0 +1,37 @@
+schema_version: "1.1"
+name: criteria-with-commands
+description: 분할안의 티켓마다 완료 기준을 보여 주고, brief 확인 기준의 명령과 기대 결과를 그대로 옮기며, 만들 것에는 구현 파일 경로를 적지 않는지
+tags: [docs, breakdown, criteria]
+execution:
+  prompt: /set-ticket docs/context/2026-10-26-sales-report-options.md
+  max_turns: 20
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/in-progress/set-ticket/SKILL.md:76
+  - name: criteria-per-ticket
+    type: llm
+    criteria: |
+      PASS: 분할안의 티켓마다 "완료 기준"이 있다.
+      FAIL: 완료 기준이 없는 티켓이 하나라도 있다.
+  # 근거: skills/in-progress/set-ticket/SKILL.md:55
+  # 근거: skills/in-progress/set-ticket/SKILL.md:76
+  - name: commands-carried
+    type: llm
+    criteria: |
+      PASS: JSON 출력을 만드는 티켓의 완료 기준에 brief의 `--format json` 확인 명령과 기대 결과 `4`가, 날짜 필터를 만드는 티켓의 완료 기준에 brief의 `--since 2026-10-15` 확인 명령과 기대 결과 `3`이 함께 있다. 공백이나 기호 같은 사소한 표기 차이는 허용한다.
+      FAIL: 두 항목 중 하나라도 명령만 있고 기대 결과가 없거나, "JSON이 출력된다"처럼 명령 없는 문장으로 바꾸거나, 해당 티켓에 없다.
+  # 근거: skills/in-progress/set-ticket/SKILL.md:16
+  - name: no-impl-path-in-build
+    type: llm
+    criteria: |
+      PASS: 모든 티켓의 "만들 것"이 동작으로 적혀 있고 `src/sales/formatters.py`, `src/sales/__main__.py` 같은 구현 파일 경로나 코드 조각이 없다. `--format json`, `--since` 같은 바뀌는 옵션 이름과, 완료 기준의 명령 안에 들어 있는 경로는 허용한다.
+      FAIL: "만들 것"에 구현할 파일 경로나 코드 조각이 있다.
+  # 근거: skills/in-progress/set-ticket/SKILL.md:84
+  - name: no-write
+    type: tool_used
+    arm: both
+    tool: Write
+    min: 0
+    max: 0

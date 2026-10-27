@@ -1,0 +1,14 @@
+schema_version: "1.1"
+name: trg-ar-train-02
+description: "트리거해야 함 / train"
+tags: [trigger, train, positive]
+execution:
+  prompt: "기획팀이 올린 링크야 https://contoso.sharepoint.com/sites/plan/Shared%20Documents/멤버십-개편.pptx 이거 보고 서비스별로 개발 범위 뽑아줘"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  # 근거: skills/in-progress/analyzing-requirements/SKILL.md:3
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?analyzing-requirements"'

@@ -1,0 +1,14 @@
+schema_version: "1.1"
+name: trg-ar-train-04
+description: "트리거해야 함 (요구사항·기획서 단어 없음) / train"
+tags: [trigger, train, positive]
+execution:
+  prompt: "다음 분기 포인트 적립 개편안 PDF야 docs/point-renewal.pdf. 우리 팀이 개발할 게 뭔지 md로 정리 좀"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  # 근거: skills/in-progress/analyzing-requirements/SKILL.md:3
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?analyzing-requirements"'

@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: skip-split-brief
+description: 인자 없이 실행하면 이미 나눈 brief와 끝난 brief를 건너뛰고, 아직 나누지 않은 brief를 골라 알리는지
+tags: [input]
+execution:
+  prompt: /set-ticket
+  max_turns: 20
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/in-progress/set-ticket/SKILL.md:43
+  # 근거: skills/in-progress/set-ticket/SKILL.md:45
+  - name: picks-unsplit
+    type: llm
+    criteria: |
+      PASS: 2026-10-10 "장바구니 상품 수량을 바꿀 수 있다" brief를 골랐다고 알리고, 분할안이 그 brief의 남은 일(수량 변경, 0이면 삭제, 재고 초과 안내)을 다룬다.
+      FAIL: `## 티켓` 섹션이 이미 있는 2026-10-24 쿠폰 brief나 남은 일이 모두 체크된 2026-10-22 배송비 brief를 고르거나, 어떤 brief를 골랐는지 알리지 않는다.
+  # 근거: skills/in-progress/set-ticket/SKILL.md:84
+  - name: no-write
+    type: tool_used
+    arm: both
+    tool: Write
+    min: 0
+    max: 0

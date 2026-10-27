@@ -1,0 +1,36 @@
+schema_version: "1.1"
+name: no-mixed-select
+description: 첫 메시지에 서술형 질문(R1 의도)과 선택형 질문이 함께 필요할 때 AskUserQuestion 선택창과 텍스트 질문을 섞지 않는지
+tags: [frontier, ask-user-question]
+execution:
+  prompt: 주문 조회 API가 느리다는 얘기가 나왔어. 구체화해줘
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Skill, AskUserQuestion]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/productivity/framing-problems/SKILL.md:3
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?framing-problems"'
+  # 근거: skills/productivity/framing-problems/SKILL.md:37
+  # 근거: skills/productivity/framing-problems/SKILL.md:46
+  - name: asks-intent
+    type: llm
+    criteria: |
+      PASS: 첫 질문 메시지에서 R1 의도·계기(누가 느리다고 했는지, 왜 지금 다루는지 등)를 묻는다. 텍스트 질문이든 선택지 + 기타(자유 입력)든 상관없다.
+      FAIL: R1 의도·계기를 묻지 않고 스스로 정해 버린다.
+  # 근거: skills/productivity/framing-problems/SKILL.md:21
+  # 근거: skills/productivity/framing-problems/SKILL.md:72
+  - name: no-mixed-message
+    type: llm
+    criteria: |
+      PASS: AskUserQuestion을 호출한 응답에는(그 호출과 같은 응답에 쓴 텍스트 포함) 자유 서술로 답해야 하는 ❓ 질문이 없다. 모든 질문을 텍스트로 묻거나, 서술형을 선택지 + 기타(자유 입력)로 바꿔 AskUserQuestion으로 묻는다. AskUserQuestion을 호출하지 않으면 PASS다.
+      FAIL: AskUserQuestion 선택창을 띄운 응답에 서술형 텍스트 질문이 하나라도 함께 있다.
+  # 근거: skills/productivity/framing-problems/SKILL.md:72
+  - name: recommended-first-option
+    type: llm
+    criteria: |
+      PASS: AskUserQuestion을 호출했다면 질문마다 추천 답이 첫 선택지이고 라벨 끝에 "(추천)"이 붙어 있으며, 한 번에 4개 이하만 묻는다. AskUserQuestion을 호출하지 않으면 PASS다.
+      FAIL: 추천이 첫 선택지가 아니거나, "(추천)" 표시가 없거나, 5개 이상을 선택창으로 묻는다.

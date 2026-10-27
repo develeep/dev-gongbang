@@ -1,0 +1,32 @@
+schema_version: "1.1"
+name: polish-sentences-only
+description: 가져온 초안을 수정 범위 "문장만"으로 다듬을 때 섹션 순서와 제목을 바꾸지 않는지
+tags: [polish, tech]
+execution:
+  prompt: |
+    /write-docs docs/draft-onboarding.md 초안 다듬어줘.
+    - 분야: 기술 문서, 유형은 학습
+    - 독자: 신규 입사 프론트엔드 개발자
+    - 목적: 첫날 로컬 개발 환경을 띄우게 한다
+    - 톤: 지금 초안 그대로
+    - 수정 범위: 문장만
+    결과는 채팅으로 보여 줘.
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/in-progress/write-docs/SKILL.md:48
+  # 근거: skills/in-progress/write-docs/SKILL.md:41
+  - name: structure-unchanged
+    type: llm
+    criteria: |
+      PASS: 결과의 섹션이 원본과 같은 순서(문제가 생기면 → 준비물 → 설치하기 → 기타)이고, 제목 문구("로컬 개발 환경 띄우기", "문제가 생기면", "준비물", "설치하기", "기타")가 그대로다. 섹션을 더하거나 빼지 않는다.
+      FAIL: 섹션 순서를 바꾸거나(예: 준비물을 맨 앞으로), 제목을 고치거나(예: "기타" → "실행하기"), 학습 유형의 권장 구조로 다시 짠다.
+  # 근거: skills/in-progress/write-docs/SKILL.md:48
+  # 근거: skills/in-progress/write-docs/SKILL.md:12
+  - name: facts-kept
+    type: llm
+    criteria: |
+      PASS: 원본의 명령, 경로, 버전, 포트(`lsof -i :3000`, Node.js 20, pnpm 9, `pnpm install`, `.env.example` → `.env.local`, `pnpm dev`, http://localhost:3000)를 그대로 두고, 원본에 없는 단계나 수치를 더하지 않는다.
+      FAIL: 명령·경로·버전·포트 중 하나라도 바꾸거나, 원본에 없는 단계·설명·수치를 더한다.

@@ -50,7 +50,7 @@ TIME_RE = re.compile(
 SHOUT_RE = re.compile(r"\b(MUST|CRITICAL|ALWAYS|NEVER|IMPORTANT)\b")
 BACKSLASH_PATH_RE = re.compile(r"(?<![\\\w])[\w.-]+\\[\w.-]+\.(md|py|sh|js|ts|json|yaml|yml|txt)\b")
 MD_LINK_RE = re.compile(r"\[[^\]]*\]\(([^)\s]+)\)")
-CODE_PATH_RE = re.compile(r"`((?:scripts|references|reference|assets|templates|examples|docs)/[^`\s]+)`")
+CODE_PATH_RE = re.compile(r"`((?:scripts|references|reference|assets|templates|examples)/[^`\s]+)`")
 # A link sentence that only says "see X" gives the agent no cue for when to open X.
 GENERIC_POINTER_RE = re.compile(r"참고(하라|한다|하세요|\s*$|\.)|자세한|자세히는|\bsee\b|\bfor (more )?details\b|\bmore info", re.IGNORECASE)
 CONDITION_RE = re.compile(r"\b(when|if|before|after|only|unless|while)\b|면\b|때|경우|전에|후에|단계", re.IGNORECASE)
@@ -209,19 +209,24 @@ def check_frontmatter(fm, folder):
             add("WARN", "frontmatter.unknown", f"unknown frontmatter key '{k}'")
 
 
+def strip_fences(text):
+    # Blank out fences instead of deleting them so line numbers still match the file.
+    return re.sub(r"```.*?```", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.DOTALL)
+
+
 def strip_code(text):
-    return re.sub(r"```.*?```", "", text, flags=re.DOTALL)
+    return re.sub(r"`[^`\n]*`", "", strip_fences(text))
 
 
 def local_links(text):
-    """Relative file links: markdown links + backticked bundle paths. Code fences are ignored for md links."""
+    """Relative file links: markdown links + backticked bundle paths. Code fences are ignored for both."""
     out = []
     for i, line in enumerate(strip_code(text).splitlines(), 1):
         for m in MD_LINK_RE.finditer(line):
             target = m.group(1).split("#")[0]
             if target and not re.match(r"^[a-z]+:", target) and not target.startswith("/"):
                 out.append((target, line, i))
-    for i, line in enumerate(text.splitlines(), 1):
+    for i, line in enumerate(strip_fences(text).splitlines(), 1):
         for m in CODE_PATH_RE.finditer(line):
             target = m.group(1).rstrip(".,:;)")
             if "<" in target or "*" in target:

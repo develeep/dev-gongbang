@@ -1,0 +1,23 @@
+schema_version: "1.1"
+name: gitignored-brief
+description: 인자 없이 실행했을 때 .gitignore에 걸린 폴더에만 있는 brief를 command grep으로 찾아 진행하는지
+tags: [input, find]
+execution:
+  prompt: /set-ticket
+  max_turns: 20
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/in-progress/set-ticket/SKILL.md:43
+  # 근거: skills/in-progress/set-ticket/SKILL.md:45
+  - name: finds-ignored-brief
+    type: llm
+    criteria: |
+      PASS: `.scratch/invoice-pdf/brief.md`의 "청구서를 PDF로 내려받을 수 있다" brief를 골랐다고 알리고, 분할안이 그 brief의 남은 일을 다룬다.
+      FAIL: brief가 없다고 알리고 멈추거나, 어떤 brief를 골랐는지 알리지 않는다.
+  # 근거: skills/in-progress/set-ticket/SKILL.md:43
+  - name: command-grep
+    type: tool_used
+    tool: Bash
+    input_match: 'command\s+grep'

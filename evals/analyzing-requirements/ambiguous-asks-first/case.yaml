@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: ambiguous-asks-first
+description: "두 가지로 읽히는 문장(30만 원 이상 주문: 1회 주문 금액인지 누적인지)을 문서 작성 전에 묻고 답을 기다리는지"
+tags: [ambiguity]
+execution:
+  prompt: /analyzing-requirements docs/plan/vip-grade.md
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Write, Edit, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/in-progress/analyzing-requirements/SKILL.md:18, skills/in-progress/analyzing-requirements/SKILL.md:50
+  - name: asks-ambiguity-first
+    type: llm
+    criteria: |
+      PASS: 요구사항 문서를 쓰기 전에 "30만 원 이상 주문"이 한 번 주문한 금액인지 누적(기간 포함) 주문 금액인지 묻고, 왜 모호한지 적는다. 질문은 번호 목록으로 한 메시지에 모여 있다.
+      FAIL: 묻지 않고 한쪽 해석으로 요구사항을 적거나, 질문을 여러 메시지로 나누거나, 무엇이 왜 모호한지 적지 않는다.
+  # 근거: skills/in-progress/analyzing-requirements/SKILL.md:50, skills/in-progress/analyzing-requirements/SKILL.md:88
+  - name: no-write
+    type: tool_used
+    arm: both
+    tool: Write
+    min: 0
+    max: 0

@@ -35,7 +35,7 @@ set-ticket이 만든 티켓을 새 세션에서 끝까지 실행한다. 이 세�
 
 **brief 목록**
 
-- docs: `grep -rlE --include='*.md' --exclude-dir=.git --exclude-dir=node_modules '^- 작성일: [0-9]{4}-[0-9]{2}-[0-9]{2}' .`로 찾는다. Grep 도구는 `.gitignore`에 걸린 폴더(`.scratch/` 등)를 건너뛸 수 있으므로 Bash로 찾는다.
+- docs: `command grep -rlE --include='*.md' --exclude-dir=.git --exclude-dir=node_modules '^- 작성일: [0-9]{4}-[0-9]{2}-[0-9]{2}' .`로 찾는다. Grep 도구와 셸 함수(ugrep 등)로 바뀐 Bash `grep`은 `.gitignore`에 걸린 폴더(`.scratch/` 등)를 건너뛰므로 `command grep`으로 찾는다.
 - GitHub: `git remote -v`에 github.com이 있고 `gh auth status`가 성공하면 `gh issue list --label context --state open --json number,title,body`도 본다.
 
 **막힘 관계**: docs는 티켓의 `- 막힘 관계:` 줄, GitHub는 `gh api repos/{owner}/{repo}/issues/<번호>/dependencies/blocked_by`와 본문의 "막힘 관계" 섹션이다.
@@ -119,9 +119,9 @@ set-ticket이 만든 티켓을 새 세션에서 끝까지 실행한다. 이 세�
 **GitHub 티켓**
 
 1. 위 기록을 임시 파일에 저장하고 `gh issue comment <번호> --body-file <임시 파일>`로 남긴 뒤 `gh issue close <번호>`로 닫는다.
-2. `gh issue view <brief 번호> --json body --jq .body`로 받은 본문에서 `- [ ] #<번호>`를 `- [x] #<번호>`로 바꾸고 `gh issue edit <brief 번호> --body-file <임시 파일>`로 올린다. 임시 파일을 지운다.
+2. `gh issue view <brief 번호> --json body --jq .body`로 받은 본문에서 `- [ ] #<번호>`를 `- [x] #<번호>`로 바꾸고 `gh issue edit <brief 번호> --body-file <임시 파일>`로 올린다. 임시 파일을 지운다. `## 티켓`이 없는 brief면 "남은 일" 체크박스를 바꾼 본문을 올리고, 기록은 brief 이슈에 코멘트로 남긴다.
 
-**마지막 티켓이면** brief의 "확인 기준"을 실행해 결과를 보고한다. brief는 고치지 않는다.
+**마지막 티켓이면** brief의 "확인 기준"을 실행해 결과를 보고하고, 남은 티켓이 없으므로 brief를 닫는다. GitHub brief는 `gh issue close <brief 번호>`로 닫는다. docs brief는 닫을 상태가 없으므로 체크박스가 모두 체크된 것으로 끝난 것을 나타낸다. 체크박스와 덧붙인 완료 기록 말고 brief 본문은 고치지 않는다.
 
 **보고**: 한 메시지에 다음을 담는다. 끝낸 티켓, 완료 기준 결과, 바꾼 파일, 산출물 위치, 고치지 않은 리뷰 지적, 다음 티켓, 커밋은 사용자가 한다는 안내.
 
