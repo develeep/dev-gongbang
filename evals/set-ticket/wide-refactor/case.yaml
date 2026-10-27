@@ -9,16 +9,20 @@ execution:
 context:
   scaffold_script: fixture.sh
 graders:
+  # 근거: skills/in-progress/set-ticket/SKILL.md:61
+  # 근거: skills/in-progress/set-ticket/SKILL.md:63-65
   - name: expand-migrate-contract
     type: llm
     criteria: |
       PASS: 새 필드를 옛 필드 옆에 추가하는 티켓, 패키지 단위로 호출부를 옮기는 티켓 여러 개, 옛 필드를 지우는 티켓이 이 순서로 있다.
       FAIL: 한 번에 이름을 바꾸는 티켓 하나로 두거나, 옛 필드를 먼저 지운다.
+  # 근거: skills/in-progress/set-ticket/SKILL.md:64-65
   - name: blocking-edges
     type: llm
     criteria: |
       PASS: 패키지별 호출부를 옮기는 티켓마다 "막힘 관계"에 account_id를 추가하는 티켓의 번호가 있고, user_id를 지우는 티켓의 "막힘 관계"에 호출부를 옮기는 티켓 번호가 모두 있다.
       FAIL: 호출부를 옮기는 티켓 중 추가 티켓에 막히지 않는 것이 있거나, 지우는 티켓의 막힘 관계에 빠진 이전 티켓이 있다.
+  # 근거: skills/in-progress/set-ticket/SKILL.md:84
   - name: no-write
     type: tool_used
     arm: both

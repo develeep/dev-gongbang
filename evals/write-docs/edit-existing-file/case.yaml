@@ -1,0 +1,44 @@
+schema_version: "1.1"
+name: edit-existing-file
+description: 기존 문서를 고칠 때 수정본을 채팅에 먼저 보여 주고, 승인 전에는 파일을 바꾸지 않는지
+tags: [edit, approval]
+execution:
+  prompt: |
+    /write-docs docs/api/rate-limit.md 이 문서 고쳐줘. 호출 한도가 분당 60회에서 120회로 바뀌었어.
+    - 분야: 기술 문서, 유형은 참조
+    - 독자: 외부 파트너사 개발자
+    - 목적: 한도를 보고 클라이언트 재시도를 설정하게 한다
+    - 톤: 지금 문서 그대로
+    - 수정 범위: 문장만
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Skill, Edit, Write]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/in-progress/write-docs/SKILL.md:66
+  - name: shows-before-apply
+    type: llm
+    criteria: |
+      PASS: 120회로 고친 수정본을 채팅에 보여 주고, 파일에 반영할지 승인을 요청하거나 승인을 기다린다.
+      FAIL: 수정본을 채팅에 보여 주지 않거나, 승인을 받지 않고 파일에 반영했다고 말한다.
+  # 근거: skills/in-progress/write-docs/SKILL.md:66
+  - name: file-unchanged
+    type: regex
+    arm: both
+    target: {source: file, path: docs/api/rate-limit.md}
+    pattern: '분당 60회'
+    match: contains
+  # 근거: skills/in-progress/write-docs/SKILL.md:66
+  - name: no-edit-before-approval
+    type: tool_used
+    arm: both
+    tool: Edit
+    min: 0
+    max: 0
+  # 근거: skills/in-progress/write-docs/SKILL.md:66
+  - name: no-write-before-approval
+    type: tool_used
+    arm: both
+    tool: Write
+    min: 0
+    max: 0

@@ -1,0 +1,16 @@
+schema_version: "1.1"
+name: trg-ar-train-06
+description: "트리거하면 안 됨 (PRD 레드팀) / train"
+tags: [trigger, train, negative]
+execution:
+  prompt: "docs/prd-membership.md 약점이랑 숨은 가정 레드팀해줘"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  # 근거: skills/in-progress/analyzing-requirements/SKILL.md:3
+  - name: skill-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?analyzing-requirements"'
+    min: 0
+    max: 0

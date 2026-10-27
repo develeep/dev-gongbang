@@ -1,0 +1,14 @@
+schema_version: "1.1"
+name: trg-ar-train-01
+description: "트리거해야 함 / train"
+tags: [trigger, train, positive]
+execution:
+  prompt: "docs/plan/정산-개편-기획서.pdf 읽고 요구사항 정리해줘"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  # 근거: skills/in-progress/analyzing-requirements/SKILL.md:3
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?analyzing-requirements"'

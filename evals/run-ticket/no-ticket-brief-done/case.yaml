@@ -1,0 +1,41 @@
+schema_version: "1.1"
+name: no-ticket-brief-done
+description: 티켓 섹션이 없는 brief를 티켓 하나로 실행하고, 남은 일 체크박스와 완료 기록만 brief에 반영하며 커밋하지 않는지
+tags: [status, brief]
+execution:
+  prompt: /run-ticket docs/context/2026-10-23-slug-hyphen.md
+  max_turns: 30
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/in-progress/run-ticket/SKILL.md:57
+  # 근거: skills/in-progress/run-ticket/SKILL.md:107
+  - name: remaining-checked
+    type: regex
+    target: {source: file, path: docs/context/2026-10-23-slug-hyphen.md}
+    pattern: '- \[x\] 공백을 하이픈으로 바꾼다'
+    match: contains
+  # 근거: skills/in-progress/run-ticket/SKILL.md:107
+  # 근거: skills/in-progress/run-ticket/SKILL.md:109-113
+  # 근거: skills/in-progress/run-ticket/SKILL.md:16
+  - name: record-appended
+    type: llm
+    criteria: |
+      PASS: brief 파일 끝에 `## 완료 기록`을 붙이고, 완료일, 커밋하지 않았다는 사실, 바꾼 파일(`src/slug.py` 포함)을 적는다.
+      FAIL: 완료 기록이 없거나, brief가 아닌 다른 새 파일에만 적거나, 커밋 여부나 바꾼 파일이 빠졌다.
+  # 근거: skills/in-progress/run-ticket/SKILL.md:107
+  # 근거: skills/in-progress/run-ticket/SKILL.md:124
+  - name: brief-body-unchanged
+    type: llm
+    criteria: |
+      PASS: brief에서 바뀐 것이 체크박스(`- [ ]` → `- [x]`)와 끝에 붙인 완료 기록뿐이다. "남은 일"과 "확인 기준" 중 어느 쪽 체크박스를 바꿨는지는 따지지 않는다.
+      FAIL: 제목, 요약, 합의한 작업의 문구, 작업 경계, 확인 기준의 명령, 미확인·위험 중 하나라도 고치거나 지우거나, `## 티켓` 섹션을 새로 만든다.
+  # 근거: skills/in-progress/run-ticket/SKILL.md:16
+  - name: no-commit
+    type: tool_used
+    arm: both
+    tool: Bash
+    input_match: 'git\s+commit'
+    min: 0
+    max: 0
