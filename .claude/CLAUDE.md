@@ -6,7 +6,7 @@
 
 - `engineering/`: 매일 하는 코드 작업
 - `productivity/`: 코드 밖의 일상 작업
-- `in-progress/`: 만드는 중. 플러그인에 넣지 않는다
+- `in-progress/`: 만드는 중. `gongbang`에 넣지 않고, `marketplace.json`의 `gongbang-dev` 항목이 폴더째 담는다
 
 `engineering/`과 `productivity/`가 승격 버킷이다. 플러그인은 승격 버킷의 스킬만 정확히 담는다. 필요해지면 `deprecated/` 같은 버킷을 같은 방식으로 추가한다.
 

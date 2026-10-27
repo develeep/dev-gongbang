@@ -4,14 +4,32 @@
 
 ## User-invoked
 
+- [building-skills](./building-skills/SKILL.md): prompt-builder가 만든 SKILL.md 초안이나 대화 기록·런북·코드 같은 자료로 스킬을 완성하고, 정적 검사·실행 테스트·사람 리뷰·수정 반복까지 진행한다.
 - [set-brief](./set-brief/SKILL.md): 구체화 기록이나 세션 결과를 맥락 없는 작업자도 그대로 이어받을 수 있는 작업 지시서로 정리해 GitHub 이슈나 `docs/context/`에 남긴다.
 - [set-ticket](./set-ticket/SKILL.md): set-brief 이슈나 문서가 클 때 혼자 검증할 수 있는 티켓으로 나눠 sub-issue나 docs 파일로 남기고 brief에 연결한다.
 - [run-ticket](./run-ticket/SKILL.md): set-brief·set-ticket의 brief와 티켓을 새 세션에서 받아 티켓 하나를 구현·리뷰하고 티켓 상태와 brief 체크박스를 갱신한다. 커밋은 하지 않는다.
 - [skill-reviewer](./skill-reviewer/SKILL.md): SKILL.md를 Claude Code 규칙, 공식 best practice, 저장소 운영 규칙으로 검사해 스킬별 보고서와 수정 계획을 낸다.
+- [write-docs](./write-docs/SKILL.md): 분야·독자·목적·톤·자료를 질문으로 정한 뒤 글 초안을 쓰거나, 가져온 초안과 기존 문서를 고친다.
+
+## Model-invoked
+
+- [analyzing-requirements](./analyzing-requirements/SKILL.md): 링크나 PDF·PPT·MD로 받은 기획서를 읽고 요구사항과 서비스·개발 영역별 개발 범위를 마크다운 문서로 정리한다. 기획서에 없는 내용은 채우지 않고 묻는다.
 
 ## 설치
 
-플러그인에 들어 있지 않으므로 저장소를 클론한 뒤 직접 연결한다.
+`gongbang` 플러그인에는 들어 있지 않다. 두 방법 중 하나로 설치한다.
+
+### 플러그인으로 설치
+
+```bash
+claude plugin install gongbang-dev@dev-gongbang
+```
+
+`gongbang`과 함께 설치한다. 호출 이름은 `/gongbang:set-brief`처럼 `gongbang:` 접두사가 붙는다. GitHub에서 설치하면 `plugin.json`의 `version`이 바뀔 때만 갱신된다.
+
+### 링크로 설치
+
+저장소를 클론한 뒤 직접 연결한다.
 
 ```bash
 scripts/link-in-progress.sh
