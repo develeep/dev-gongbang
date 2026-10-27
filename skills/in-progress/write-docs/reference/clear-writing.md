@@ -1,6 +1,6 @@
 # 읽히는 글 원칙
 
-모든 분야에 적용한다. 기술 문서에서 `tech-writing.md`와 부딪치면 `tech-writing.md`를 따른다.
+모든 분야에 적용한다. 기술 문서에서 `tech-writing.md`와 부딪치면 `tech-writing.md`를 따른다. 단, "지킬 것"의 지어내지 않는다는 원칙은 기술 문서에서도 앞선다.
 
 ## 목차
 - 목표
@@ -31,7 +31,7 @@
 
 ## 지킬 것
 
-사실의 의미와 글쓴이의 목소리를 지킨다. 모호한 글을 구체적으로 만들려고 사건, 동기, 감정, 메커니즘, 수량, 근거를 지어내지 않는다. 생략된 의미는 맥락이 뒷받침할 때만 되살린다. 그렇지 않으면 불확실성을 그대로 두거나, 답에 실질적인 영향이 있으면 초점이 분명한 질문을 한다. 해석을 사실로 바꾸지 않는다. 따뜻함, 개성, 유머, 쓸모 있는 복잡함을 지킨다.
+사실의 의미와 글쓴이의 목소리를 지킨다. 모호한 글을 구체적으로 만들려고 사건, 동기, 감정, 메커니즘, 수량, 근거를 지어내지 않는다. 생략된 의미는 맥락이 뒷받침할 때만 되살린다. 그렇지 않으면 `[확인 필요: 무엇]` 표시로 빈 곳을 드러내거나, 답에 실질적인 영향이 있으면 초점이 분명한 질문을 한다. 해석을 사실로 바꾸지 않는다. 따뜻함, 개성, 유머, 쓸모 있는 복잡함을 지킨다.
 
 ## 출력 형식
 
@@ -39,58 +39,58 @@
 
 ## 예시
 
-아래 대비는 원칙을 이해하는 데 쓴다. 사실은 각 예시의 Context가 제공한 것이며, 다른 글에서 비슷한 사실을 지어내도 된다는 뜻이 아니다.
+아래 대비는 원칙을 이해하는 데 쓴다. 사실은 각 예시의 맥락이 제공한 것이며, 다른 글에서 비슷한 사실을 지어내도 된다는 뜻이 아니다.
 
 <example>
-Context: You always initiate contact and arrange meetings with a friend.
-Obscured: "You've become the friendship's maintenance layer."
-Clear: "You're always the one who texts first and arranges to meet."
+맥락: 친구에게 늘 내가 먼저 연락하고 약속을 잡는다.
+흐린 글: "너는 그 우정의 유지보수 담당이 됐어."
+분명한 글: "늘 네가 먼저 연락하고 만날 약속을 잡잖아."
 </example>
 
 <example>
-Context: She canceled three times, so I no longer rely on her plans.
-Fragmented: "Three cancellations. The pattern was clear. Trust shifted."
-Connected: "After she canceled three times, I stopped relying on our plans."
+맥락: 그 친구가 약속을 세 번 취소해서 이제 그 친구와 한 약속을 믿지 않는다.
+끊어 쓴 글: "세 번의 취소. 패턴은 명확했다. 신뢰가 옮겨 갔다."
+이어 쓴 글: "그 친구가 약속을 세 번 취소한 뒤로는 우리 약속을 믿지 않게 됐다."
 </example>
 
 <example>
-Context: Someone keeps suggesting that reconciliation is possible.
-Unanchored image: "That's the door you keep leaving open."
-Direct: "You keep telling him you might get back together."
+맥락: 상대가 다시 만날 수도 있다는 말을 계속 내비친다.
+대상 없는 이미지: "네가 계속 열어 두는 그 문 말이야."
+직접 쓴 글: "너는 그 사람한테 다시 만날 수도 있다고 계속 말하고 있어."
 </example>
 
 <example>
-Context: Friends frequently request your help but rarely help you.
-Image replacing the claim: "You're the bridge everyone crosses but nobody maintains."
-Direct: "Your friends often ask you for help, but they rarely help when you ask."
+맥락: 친구들은 자주 도움을 청하지만 내가 청할 때는 잘 돕지 않는다.
+주장을 대신한 이미지: "너는 모두가 건너지만 아무도 고치지 않는 다리야."
+직접 쓴 글: "친구들은 너한테 자주 도와 달라고 하는데, 네가 부탁하면 잘 안 도와주잖아."
 </example>
 
 <example>
-Context: A failed job can be retried independently while other jobs continue.
-Abstract: "Failure isolation preserves continuity. Recovery stays local."
-Concrete: "If one job fails, the other jobs keep running, and you can retry the failed job by itself."
+맥락: 작업 하나가 실패해도 다른 작업은 계속 돌고, 실패한 작업만 따로 다시 실행할 수 있다.
+추상적인 글: "장애 격리가 연속성을 보장한다. 복구는 국소적으로 이뤄진다."
+구체적인 글: "작업 하나가 실패해도 다른 작업은 계속 실행되고, 실패한 작업만 따로 다시 실행할 수 있다."
 </example>
 
 <example>
-Context: When a user's session token expires, the code requests a new one.
-Compressed: "Session token expiry refresh logic handles this."
-Clear: "When a user's session token expires, the code requests a new one."
+맥락: 사용자의 세션 토큰이 만료되면 코드가 새 토큰을 요청한다.
+압축한 글: "세션 토큰 만료 갱신 로직이 처리한다."
+분명한 글: "사용자의 세션 토큰이 만료되면 코드가 새 토큰을 요청한다."
 </example>
 
 <example>
-Keep natural brevity when the reference is clear: "Did you call her?" "Twice. No answer."
+대상이 분명하면 자연스러운 짧은 말은 그대로 둔다: "그 사람한테 전화해 봤어?" "두 번. 안 받더라."
 </example>
 
 <example>
-Keep an established idiom when it communicates clearly: "I keep explaining, but he never responds. It feels like talking to a wall."
+뜻이 분명히 통하는 관용구는 그대로 둔다: "몇 번을 설명해도 대답이 없어. 벽에 대고 말하는 것 같아."
 </example>
 
 <example>
-Context: The user asks how to make an explanation easier to follow.
-Manufactured correction: "This isn't about shorter sentences. It's about connected meaning."
-Direct: "Keep related thoughts together and explain how each statement follows from the previous one."
+맥락: 사용자가 설명을 따라오기 쉽게 만드는 방법을 묻는다.
+지어낸 바로잡기: "이건 문장을 짧게 쓰는 문제가 아니에요. 의미를 잇는 문제예요."
+직접 쓴 글: "관련된 생각은 붙여 두고, 각 문장이 앞 문장에서 어떻게 이어지는지 설명하세요."
 </example>
 
 <example>
-Keep necessary negation when it answers the actual question: "Does deleting the shortcut uninstall the app?" "No. Deleting the shortcut leaves the app installed."
+실제 질문에 답하는 부정은 남긴다: "바로가기를 지우면 앱도 삭제되나요?" "아니요. 바로가기를 지워도 앱은 그대로 설치돼 있어요."
 </example>
