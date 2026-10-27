@@ -11,7 +11,7 @@
 
 ## 테스트 케이스 형식
 
-스킬 폴더의 `evals/<case-name>/`에 케이스 하나씩 둔다. `claude plugin eval`이 읽는 형식이라, Claude Code 사용자는 나중에 같은 테스트를 CLI나 CI에서 돌릴 수 있다. 형식이 엄격해서 틀리면 CLI가 케이스를 읽지 못한다.
+스킬 폴더의 `evals/<case-name>/`에 케이스 하나씩 둔다. 작업 중인 저장소의 CLAUDE.md가 eval 위치를 정해 두었으면(예: 저장소 루트 `evals/<스킬 이름>/`) 그 위치를 쓴다. `claude plugin eval`이 읽는 형식이라, Claude Code 사용자는 나중에 같은 테스트를 CLI나 CI에서 돌릴 수 있다. 형식이 엄격해서 틀리면 CLI가 케이스를 읽지 못한다.
 
 ```
 evals/<case-name>/

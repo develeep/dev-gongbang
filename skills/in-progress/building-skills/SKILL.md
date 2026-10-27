@@ -1,6 +1,6 @@
 ---
 name: building-skills
-description: Claude 공식 skill best practice와 Agent Skills 명세에 맞춰 스킬을 완성한다. prompt-builder가 만든 SKILL.md 초안을 이어받아 검증·보완하거나, 대화 기록·런북·코드 같은 실제 자료에서 스킬을 새로 만든다. 정적 검사, 실행 테스트, 사람 리뷰, 수정 반복까지 맡는다. 사용자가 /building-skills로 이름을 부르거나 "이 초안으로 스킬 완성해줘"처럼 이 스킬을 명시적으로 요청할 때만 사용한다.
+description: Claude 공식 skill best practice와 Agent Skills 명세에 맞춰 스킬을 완성한다. prompt-builder가 만든 SKILL.md 초안을 이어받아 검증·보완하거나, 대화 기록·런북·코드 같은 실제 자료에서 스킬을 새로 만든다. 정적 검사, 실행 테스트, 사람 리뷰, 수정 반복까지 맡는다.
 argument-hint: "[스킬 폴더 경로, SKILL.md 초안, 또는 만들 스킬 설명]"
 disable-model-invocation: true
 ---
@@ -23,7 +23,7 @@ disable-model-invocation: true
 - **`disable-model-invocation`은 실행 테스트와 무관하다.** 실행 서브에이전트는 SKILL.md를 직접 읽는다. 호출 방식은 description 검증에서만 의미가 있다.
 - **timing은 완료 알림에서만 얻는다.** 서브에이전트 완료 알림의 `total_tokens`, `duration_ms`는 다른 곳에 남지 않으므로 알림이 올 때마다 바로 `timing.json`에 쓴다.
 - **prompt-builder의 "다음 단계" 경고를 버리지 않는다.** 승인받지 못한 보완 제안, 생략·기본값 항목, 통과하지 못한 검수 항목은 실패 원인 후보 1순위다.
-- **저장 경로에 따라 frontmatter가 잘린다.** claude.ai/Cowork의 `propose_skills` 저장 카드는 `name`, `description`과 본문만 남기고 `disable-model-invocation` 같은 다른 키를 버리며, 번들 파일도 담지 못한다. User-invoked 스킬은 description에도 "명시적으로 요청할 때만 사용한다"를 넣어 두고, 번들 파일이나 추가 frontmatter가 있으면 `.skill` 패키지로 전달한다.
+- **저장 경로에 따라 frontmatter가 잘린다.** claude.ai/Cowork의 `propose_skills` 저장 카드는 `name`, `description`과 본문만 남기고 `disable-model-invocation` 같은 다른 키를 버리며, 번들 파일도 담지 못한다. User-invoked 스킬은 저장소 규칙이 막지 않으면 description에도 "명시적으로 요청할 때만 사용한다"를 넣어 두고, 번들 파일이나 추가 frontmatter가 있으면 `.skill` 패키지로 전달한다.
 
 ## 워크플로
 

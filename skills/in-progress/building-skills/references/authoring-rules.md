@@ -66,7 +66,7 @@ K10=Model-invoked:
 
 K10=User-invoked:
 - `disable-model-invocation: true`를 넣는다
-- description은 사람이 목록에서 읽는 요약으로 쓴다. 다만 frontmatter가 잘리는 저장 경로에 대비해 "사용자가 이름으로 부르거나 명시적으로 요청할 때만 사용한다"를 한 문장 넣는다
+- description은 사람이 목록에서 읽는 요약으로 쓴다. 다만 frontmatter가 잘리는 저장 경로에 대비해 "사용자가 이름으로 부르거나 명시적으로 요청할 때만 사용한다"를 한 문장 넣는다. 저장소 규칙이 User-invoked description 형식을 따로 정해 두었으면(예: 트리거 문구 금지) 그 규칙을 따른다
 
 ## 4. 본문: 무엇을 넣고 뺄까
 
