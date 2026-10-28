@@ -1,5 +1,5 @@
 ---
-# 근거: skills/in-progress/building-skills/references/authoring-rules.md:74
+# 근거: skills/productivity/building-skills/references/authoring-rules.md:74
 type: llm
 focus: trace
 weight: 1

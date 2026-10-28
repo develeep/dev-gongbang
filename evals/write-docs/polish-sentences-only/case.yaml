@@ -16,15 +16,15 @@ execution:
 context:
   scaffold_script: fixture.sh
 graders:
-  # 근거: skills/in-progress/write-docs/SKILL.md:48
-  # 근거: skills/in-progress/write-docs/SKILL.md:41
+  # 근거: skills/productivity/write-docs/SKILL.md:48
+  # 근거: skills/productivity/write-docs/SKILL.md:41
   - name: structure-unchanged
     type: llm
     criteria: |
       PASS: 결과의 섹션이 원본과 같은 순서(문제가 생기면 → 준비물 → 설치하기 → 기타)이고, 제목 문구("로컬 개발 환경 띄우기", "문제가 생기면", "준비물", "설치하기", "기타")가 그대로다. 섹션을 더하거나 빼지 않는다.
       FAIL: 섹션 순서를 바꾸거나(예: 준비물을 맨 앞으로), 제목을 고치거나(예: "기타" → "실행하기"), 학습 유형의 권장 구조로 다시 짠다.
-  # 근거: skills/in-progress/write-docs/SKILL.md:48
-  # 근거: skills/in-progress/write-docs/SKILL.md:12
+  # 근거: skills/productivity/write-docs/SKILL.md:48
+  # 근거: skills/productivity/write-docs/SKILL.md:12
   - name: facts-kept
     type: llm
     criteria: |

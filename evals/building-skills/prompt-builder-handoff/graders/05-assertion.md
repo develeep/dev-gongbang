@@ -1,5 +1,5 @@
 ---
-# 근거: skills/in-progress/building-skills/SKILL.md:14, skills/in-progress/building-skills/SKILL.md:123
+# 근거: skills/productivity/building-skills/SKILL.md:14, skills/productivity/building-skills/SKILL.md:123
 type: llm
 focus: trace
 weight: 1
