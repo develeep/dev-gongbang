@@ -105,6 +105,8 @@ claude plugin update gongbang@dev-gongbang
 
 ## 기여
 
+이슈, PR, 커밋 규칙은 [기여 가이드](CONTRIBUTING.md)를 보세요. 이 프로젝트에 참여하는 모든 사람은 [행동 강령](CODE_OF_CONDUCT.md)을 따르고, 보안 문제는 [보안 정책](SECURITY.md)에 따라 비공개로 알려 주세요.
+
 스킬을 추가하거나 옮길 때 지킬 규칙은 [.claude/CLAUDE.md](.claude/CLAUDE.md)에 있습니다. 변경한 뒤 `scripts/check.py`를 실행해 통과시키세요. PyYAML이 필요합니다.
 
 스킬 eval은 다음 명령으로 실행합니다.
