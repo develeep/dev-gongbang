@@ -10,7 +10,12 @@ SCRIPT = Path(__file__).with_name("validate.py")
 
 FILES = {
     ".claude-plugin/plugin.json": '{"name": "t", "skills": ["./skills/engineering/good"]}',
-    "README.md": "## User-invoked\n- [good](skills/engineering/good/SKILL.md)\n",
+    "README.md": "## User-invoked\n- [good](docs/skills/good.md) [SKILL.md](skills/engineering/good/SKILL.md)\n",
+    "README.en.md": "- [good](docs/en/skills/good.md)\n",
+    "docs/README.md": "- [good](skills/good.md)\n",
+    "docs/en/README.md": "- [good](skills/good.md)\n",
+    "docs/skills/good.md": "# good\n",
+    "docs/en/skills/good.md": "# good\n",
     "skills/engineering/README.md": "## User-invoked\n- [good](./good/SKILL.md)\n- [bad](./bad/SKILL.md)\n",
     "skills/engineering/good/SKILL.md": "---\nname: good\ndescription: 좋은 스킬을 요약한다.\ndisable-model-invocation: true\n---\n\n본문. [ref](ref.md)\n",
     "skills/engineering/good/ref.md": "참조.\n",
@@ -44,7 +49,7 @@ with tempfile.TemporaryDirectory() as d:
     assert run.returncode == 1
     assert ids(out, "good") == set(), ids(out, "good")
     bad = ids(out, "bad")
-    for rule in ("E3", "E4", "E5", "E6", "E7", "E8", "E9", "E12", "E13", "W3", "W4", "W5", "W6", "W7", "W11", "W12"):
+    for rule in ("E3", "E4", "E5", "E6", "E7", "E8", "E9", "E12", "E13", "E14", "W3", "W4", "W5", "W6", "W7", "W11", "W12"):
         assert rule in bad, (rule, bad)
     assert ids(out, "broken") == {"E2"}, ids(out, "broken")
     assert "E1" in ids(out, "nofm")

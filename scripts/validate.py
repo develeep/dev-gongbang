@@ -237,6 +237,16 @@ def repo_checks(repo, results, fms):
                         if section != expect:
                             add("E12", "README.md", line_of(top_readme, link), f"최상위 README의 '{section}' 절에 있지만 {expect}다")
                         break
+        # 사용 문서는 버킷과 상관없이 모든 스킬에 한국어·영어 페이지와 목록·README 링크를 둔다
+        if (repo / "docs").is_dir():
+            for lang, readme in (("", "README.md"), ("en/", "README.en.md")):
+                page = f"docs/{lang}skills/{s.name}.md"
+                if not (repo / page).is_file():
+                    add("E14", page, 0, "사용 문서가 없다")
+                for f, needle in ((f"docs/{lang}README.md", f"skills/{s.name}.md"), (readme, page)):
+                    t = (repo / f).read_text(encoding="utf-8") if (repo / f).is_file() else ""
+                    if needle not in t:
+                        add("E14", f, 1, f"`{needle}` 링크가 없다")
         if not (repo / "evals" / s.name).is_dir():
             add("W7", f"evals/{s.name}", 0, "동작 eval 폴더가 없다", "warnings")
         if not user_invoked[s.name] and not (repo / "evals-trigger" / s.name).is_dir():
