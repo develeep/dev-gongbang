@@ -1,0 +1,14 @@
+schema_version: "1.1"
+name: trg-cg-train-02
+description: "트리거해야 함 / train"
+tags: [trigger, train, positive]
+execution:
+  prompt: "이 브랜치에서 바꾼 코드 중에 .claude/rules 규칙 어긴 거 있어?"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  # 근거: skills/in-progress/check-guidelines/SKILL.md:3
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?check-guidelines"'

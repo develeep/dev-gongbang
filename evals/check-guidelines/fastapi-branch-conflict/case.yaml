@@ -1,0 +1,51 @@
+schema_version: "1.1"
+name: fastapi-branch-conflict
+description: 범위 인자가 없을 때 범위를 묻고, 브랜치 변경분만 검사하고, 충돌하는 규칙은 수정을 제안하고, 설치되지 않은 ruff는 설치하지 않고 검사 못 함으로 적는지
+tags: [branch, python]
+execution:
+  prompt: |
+    이 레포 규칙 위반 있는지 봐줘. 진행 중에 물어볼 것에는 아래 답을 미리 줄게. 나한테 다시 묻지 말고 끝까지 진행해줘.
+
+    - 검사 범위를 물으면: 브랜치 변경분
+    - 고칠지 물으면: 고치지 않을게, 보고만 해줘
+  max_turns: 40
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: SKILL.md:34 (인자가 없으면 묻는다)
+  - name: asked-scope
+    type: llm
+    criteria: |
+      PASS: 검사 전에 범위(전체 / diff / 브랜치 변경분 / 경로)를 묻는 질문을 했다(기록의 "물었을 질문"에 있음).
+      FAIL: 범위를 묻지 않고 스스로 정했다.
+  # 근거: SKILL.md:38 (branch 범위)
+  - name: branch-scope
+    type: llm
+    criteria: |
+      PASS: origin/main과 갈라진 지점 이후 바뀐 app/api/orders.py를 검사했고, main에만 있는 app/legacy.py의 타입 힌트 누락을 위반으로 보고하지 않았다.
+      FAIL: orders.py를 검사하지 않았거나 legacy.py를 위반으로 보고했다.
+  # 근거: SKILL.md:15 (규칙 충돌)
+  - name: conflict-proposal
+    type: llm
+    criteria: |
+      PASS: 보고서에 python.md(88자)와 api.md(100자)의 줄 길이 충돌을 두 규칙 위치와 함께 적고, 규칙을 어떻게 고칠지 제안했다.
+      FAIL: 충돌을 적지 않았거나, 규칙 수정 제안 없이 한쪽을 골라 판정만 했다.
+  # 근거: SKILL.md:17 (린터 미설치)
+  - name: ruff-skipped
+    type: llm
+    criteria: |
+      PASS: ruff를 설치하지 않았고(pip install ruff 등이 기록에 없음), 보고서 요약에 ruff를 검사 못 함으로 적었다.
+      FAIL: ruff를 설치했거나, 요약에 검사 못 한 도구를 적지 않았다.
+  # 근거: SKILL.md:47, templates/report.md
+  - name: type-hint-violation
+    type: llm
+    criteria: |
+      PASS: to_summary의 타입 힌트 누락이 "타입 힌트" 규칙 절 아래 번호가 붙은 위반으로, 위치·현재·고치는 방법이 나뉘어 보고됐다.
+      FAIL: 이 위반이 보고서에 없다.
+  # 근거: SKILL.md:54 (고칠지 묻고 사용자가 고른 것만)
+  - name: no-changes
+    type: llm
+    criteria: |
+      PASS: 사용자가 고치지 않겠다고 했으므로 레포 파일을 하나도 수정하지 않았다(작업 트리가 깨끗함).
+      FAIL: 레포 파일을 수정했다.

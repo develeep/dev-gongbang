@@ -1,0 +1,57 @@
+schema_version: "1.1"
+name: nextjs-diff-mixed
+description: Next.js 레포의 커밋하지 않은 변경만 검사하고, paths가 맞는 규칙만 적용하고, ESLint를 실행하고, 애매한 것을 위반으로 세지 않고, 고른 위반만 고친 뒤 다시 검사하는지
+tags: [diff, typescript]
+execution:
+  prompt: |
+    커밋하기 전에 지금 변경분이 레포 규칙 지키는지 검사해줘. 진행 중에 물어볼 것에는 아래 답을 미리 줄게. 나한테 다시 묻지 말고 끝까지 진행해줘.
+
+    - 검사 범위를 물으면: diff
+    - 고칠지 물으면: `any` 타입 위반만 고쳐줘
+  max_turns: 40
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: SKILL.md:37 (diff 범위)
+  - name: scope-diff
+    type: llm
+    criteria: |
+      PASS: 새 파일 lib/price.ts와 수정한 app/page.tsx를 검사했고, 커밋된 lib/legacy.ts의 any를 위반으로 보고하지 않았다.
+      FAIL: lib/price.ts(untracked)를 검사하지 않았거나, lib/legacy.ts를 위반으로 보고했다.
+  # 근거: SKILL.md:14 (paths 적용)
+  - name: paths-applied
+    type: llm
+    criteria: |
+      PASS: app/page.tsx의 인라인 색상 '#e11d48'을 styles.md(paths: **/*.css)의 "색상 값은 CSS 변수로" 위반으로 보고하지 않았다.
+      FAIL: 그 색상을 위반으로 보고했다.
+  # 근거: SKILL.md:48 (린터 실행)
+  - name: eslint-run
+    type: llm
+    criteria: |
+      PASS: ESLint를 실제로 실행했고(기록에 실행 명령과 결과가 있음), lib/price.ts의 `==`(eqeqeq) 위반이 보고서에 있다.
+      FAIL: ESLint를 실행하지 않았거나 eqeqeq 위반이 보고서에 없다.
+  # 근거: SKILL.md:16 (애매함)
+  - name: ambiguous-not-violation
+    type: llm
+    criteria: |
+      PASS: loadPriceLabel을 "함수 하나는 한 가지 일만 한다" 위반 목록에 넣지 않았다. 애매함으로 따로 적었거나 언급하지 않았다.
+      FAIL: loadPriceLabel을 번호가 붙은 위반으로 보고했다.
+  # 근거: templates/report.md, SKILL.md:54
+  - name: report-format
+    type: llm
+    criteria: |
+      PASS: 보고서가 결과를 말하는 두 문장 안의 개요와 범위·적용한 규칙 표로 시작하고, 위반이 규칙별 절로 묶여 있고, 위반마다 위치·현재·고치는 방법이 따로 적혀 있고, 번호가 보고서 전체에서 이어지고, 고칠 번호를 묻는 줄로 끝난다.
+      FAIL: 개요나 표가 없거나, 규칙별로 묶이지 않았거나, 위치·현재·고치는 방법이 한 줄에 섞였거나, 절마다 번호가 1부터 다시 시작한다.
+  # 근거: SKILL.md:54, :58
+  - name: fix-selected-only
+    type: llm
+    criteria: |
+      PASS: 최종 lib/price.ts에 `any`가 없고, `value == null`과 app/page.tsx의 productBadge는 그대로다.
+      FAIL: any가 남았거나, 고르지 않은 위반(== 또는 productBadge)까지 고쳤다.
+  # 근거: SKILL.md:58
+  - name: recheck
+    type: llm
+    criteria: |
+      PASS: 고친 뒤 고친 파일을 같은 규칙으로 다시 검사했고(ESLint 재실행이나 규칙 재확인이 기록에 있음), 재검사 결과를 사용자에게 알렸다.
+      FAIL: 고친 뒤 다시 검사하지 않았다.

@@ -1,0 +1,16 @@
+schema_version: "1.1"
+name: trg-cg-val-03
+description: "트리거하면 안 됨 (린터 설정 수정) / val"
+tags: [trigger, val, negative]
+execution:
+  prompt: "eslint 설정에 eqeqeq 규칙 켜줘"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  # 근거: skills/in-progress/check-guidelines/SKILL.md:3
+  - name: skill-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?check-guidelines"'
+    min: 0
+    max: 0

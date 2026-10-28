@@ -1,0 +1,34 @@
+schema_version: "1.1"
+name: large-repo-all
+description: 대상 파일이 100개를 넘는 레포 전체 검사에서 경고하고, 최상위 디렉터리별 구역을 보여 승인받은 뒤 구역별 서브에이전트로 검사하고 결과를 합치는지
+tags: [all, python, large]
+execution:
+  prompt: |
+    레포 전체가 규칙 지키는지 검사해줘. 진행 중에 물어볼 것에는 아래 답을 미리 줄게. 나한테 다시 묻지 말고 끝까지 진행해줘.
+
+    - 검사 범위를 물으면: 레포 전체
+    - 나눠서 검사할지 물으면: 승인
+    - 고칠지 물으면: 고치지 않을게, 보고만 해줘
+  max_turns: 40
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill, Agent]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: SKILL.md:50
+  - name: warn-and-approve
+    type: llm
+    criteria: |
+      PASS: 검사 전에 대상 파일이 100개를 넘는다고 경고하면서 파일 수(132개)와 최상위 디렉터리별 구역(billing, catalog, shipping)을 보여 주고 승인을 받았다.
+      FAIL: 경고 없이 검사했거나, 파일 수나 구역을 보여 주지 않았거나, 승인 없이 나눴다.
+  # 근거: SKILL.md:50
+  - name: subagents-per-area
+    type: llm
+    criteria: |
+      PASS: 구역마다 서브에이전트를 하나씩 띄워 검사했다(기록에 Agent 호출이 구역별로 있음).
+      FAIL: 서브에이전트 없이 혼자 검사했거나 구역과 다르게 나눴다.
+  # 근거: SKILL.md:50 (결과를 합친다), templates/report.md
+  - name: all-found-merged
+    type: llm
+    criteria: |
+      PASS: billing/mod_7.py, catalog/mod_21.py, shipping/mod_35.py의 타입 힌트 누락 3개가 하나의 보고서에 모두 있고, 번호가 1부터 3까지 이어진다.
+      FAIL: 하나라도 빠졌거나 구역별 보고서가 따로 있거나 번호가 이어지지 않는다.
