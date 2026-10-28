@@ -35,7 +35,7 @@ claude plugin install gongbang-dev@dev-gongbang
 
 ### Updating
 
-The plugin updates only when `version` in `plugin.json` changes. Update the marketplace, update the plugin, then restart Claude Code.
+The plugin updates only when `version` in `plugin.json` changes. See [Releases](https://github.com/develeep/dev-gongbang/releases) for what changed in each version. Update the marketplace, update the plugin, then restart Claude Code.
 
 ```bash
 claude plugin marketplace update dev-gongbang
