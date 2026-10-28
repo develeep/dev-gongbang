@@ -1,0 +1,14 @@
+schema_version: "1.1"
+name: trg-cg-val-02
+description: "트리거해야 함 / val"
+tags: [trigger, val, positive]
+execution:
+  prompt: "PR 올리기 전에 린트랑 우리 규칙 위반 검사해줘"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  # 근거: skills/in-progress/check-guidelines/SKILL.md:3
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?check-guidelines"'

@@ -14,6 +14,7 @@
 ## Model-invoked
 
 - [analyzing-requirements](./analyzing-requirements/SKILL.md): 링크나 PDF·PPT·MD로 받은 기획서를 읽고 요구사항과 서비스·개발 영역별 개발 범위를 마크다운 문서로 정리한다. 기획서에 없는 내용은 채우지 않고 묻는다.
+- [check-guidelines](./check-guidelines/SKILL.md): `.claude/rules/`, CLAUDE.md/AGENTS.md, 린터·포매터 설정을 기준으로 고른 범위의 코드를 검사해 규칙별로 보고하고, 고른 위반을 고친 뒤 다시 검사한다. 컨벤션·팀 규칙 검사나 커밋·PR 전 위반 점검을 요청할 때 동작한다.
 
 ## 설치
 

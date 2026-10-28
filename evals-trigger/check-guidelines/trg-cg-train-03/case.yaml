@@ -1,0 +1,14 @@
+schema_version: "1.1"
+name: trg-cg-train-03
+description: "트리거해야 함 / train"
+tags: [trigger, train, positive]
+execution:
+  prompt: "src/payments 폴더가 CLAUDE.md 규칙대로 짜여 있는지 점검해줘"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  # 근거: skills/in-progress/check-guidelines/SKILL.md:3
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?check-guidelines"'
