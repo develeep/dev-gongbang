@@ -1,5 +1,7 @@
 <p align="right"><a href="../../skills/analyzing-requirements.md">한국어</a> · <b>English</b></p>
 
+[README](../../../README.en.md) › [Docs](../README.md) › analyzing-requirements
+
 # analyzing-requirements
 
 Reads a planning document and organizes the requirements, the development scope per service and development area, and the content of each planning document section into a markdown document. Developers and agents read this document instead of the planning document. So it does not fill in anything the planning document does not say, and it asks about ambiguous parts first.
@@ -12,6 +14,8 @@ Reads a planning document and organizes the requirements, the development scope 
 | Invocation | Model-invoked |
 | Command | `/gongbang:analyzing-requirements [planning document link or file path]` |
 | Source | [SKILL.md](../../../skills/in-progress/analyzing-requirements/SKILL.md) |
+
+**Contents**: [When to use](#when-to-use) · [Prerequisites](#prerequisites) · [How it works](#how-it-works) · [Output](#output) · [Customize](#customize) · [Related skills](#related-skills)
 
 ## When to use
 
@@ -54,3 +58,7 @@ To copy and modify the skill, see the [customization guide](../customization.md)
 ## Related skills
 
 It does not connect to other skills. Use it on its own.
+
+---
+
+← Previous: [run-ticket](run-ticket.md) · [All docs](../README.md)

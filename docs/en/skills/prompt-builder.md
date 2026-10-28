@@ -1,5 +1,7 @@
 <p align="right"><a href="../../skills/prompt-builder.md">한국어</a> · <b>English</b></p>
 
+[README](../../../README.en.md) › [Docs](../README.md) › prompt-builder
+
 # prompt-builder
 
 Assembles a prompt only from values gathered in the interview and proposals you approved. Structure and wording follow Claude's official best practices, adjusted with a guide specific to the target model. If you have a draft, it asks only about empty items. If not, it interviews you from scratch.
@@ -10,6 +12,8 @@ Assembles a prompt only from values gathered in the interview and proposals you 
 | Invocation | User-invoked |
 | Command | `/gongbang:prompt-builder [draft path or description of the prompt to build]` |
 | Source | [SKILL.md](../../../skills/productivity/prompt-builder/SKILL.md) |
+
+**Contents**: [When to use](#when-to-use) · [Prerequisites](#prerequisites) · [How it works](#how-it-works) · [Output](#output) · [Customize](#customize) · [Related skills](#related-skills)
 
 ## When to use
 
@@ -64,3 +68,7 @@ For how to copy and edit a skill, see the [customization guide](../customization
 
 - **framing-problems**: For a one-off prompt, frame the task first with framing-problems and pass the confirmed record as a draft. For an agent prompt or reusable template, if you choose "실행 시 구체화" (frame at run time) in the interview, the finished prompt calls framing-problems every time it runs. That skill must be installed in the runtime environment.
 - **building-skills**: After building a SKILL.md draft, pass the output to building-skills to continue with testing and fixes.
+
+---
+
+[All docs](../README.md) · Next: [building-skills](building-skills.md) →

@@ -1,5 +1,7 @@
 <p align="right"><b>한국어</b> · <a href="../en/skills/check-guidelines.md">English</a></p>
 
+[README](../../README.md) › [문서](../README.md) › check-guidelines
+
 # check-guidelines
 
 레포에 있는 규칙으로 코드를 검사한다. `.claude/rules/` 규칙 파일, CLAUDE.md/AGENTS.md, 린터·포매터 설정에서 규칙을 모아 위반을 규칙별로 보고한다. 고를 위반을 번호로 알려 주면 그것만 고친 뒤 다시 검사해 확인한다.
@@ -10,6 +12,8 @@
 | 호출 방식 | Model-invoked |
 | 호출 | `/gongbang:check-guidelines [all \| diff \| branch \| 경로]` |
 | 원문 | [SKILL.md](../../skills/engineering/check-guidelines/SKILL.md) |
+
+**목차**: [언제 쓰나](#언제-쓰나) · [준비물](#준비물) · [진행 과정](#진행-과정) · [결과물](#결과물) · [커스텀](#커스텀) · [함께 쓰는 스킬](#함께-쓰는-스킬)
 
 ## 언제 쓰나
 
@@ -57,3 +61,7 @@
 ## 함께 쓰는 스킬
 
 - **set-guidelines**: 규칙이 없을 때 먼저 실행해 규칙을 만든다.
+
+---
+
+← 이전: [framing-problems](framing-problems.md) · [문서 목록](../README.md) · 다음: [set-brief](set-brief.md) →

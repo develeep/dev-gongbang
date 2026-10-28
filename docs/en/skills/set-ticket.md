@@ -1,5 +1,7 @@
 <p align="right"><a href="../../skills/set-ticket.md">한국어</a> · <b>English</b></p>
 
+[README](../../../README.en.md) › [Docs](../README.md) › set-ticket
+
 # set-ticket
 
 Splits one brief recorded with set-brief into several tickets. Each ticket is written so that reading it alone is enough to finish its work. It links the ticket list to the original brief.
@@ -12,6 +14,8 @@ Splits one brief recorded with set-brief into several tickets. Each ticket is wr
 | Invocation | User-invoked |
 | Command | `/gongbang:set-ticket [brief issue number/URL or docs path]` |
 | Source | [SKILL.md](../../../skills/in-progress/set-ticket/SKILL.md) |
+
+**Contents**: [When to use](#when-to-use) · [Prerequisites](#prerequisites) · [How it works](#how-it-works) · [Output](#output) · [Customize](#customize) · [Related skills](#related-skills)
 
 ## When to use
 
@@ -55,3 +59,7 @@ If you change section names in the ticket templates or the `- 상태:` (status) 
 
 - **set-brief**: creates the brief to split.
 - **run-ticket**: runs the published tickets one at a time in a new session. It is User-invoked, so set-ticket does not call it directly and tells you how to run it.
+
+---
+
+← Previous: [set-brief](set-brief.md) · [All docs](../README.md) · Next: [run-ticket](run-ticket.md) →

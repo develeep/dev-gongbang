@@ -1,5 +1,7 @@
 <p align="right"><a href="../../skills/building-skills.md">한국어</a> · <b>English</b></p>
 
+[README](../../../README.en.md) › [Docs](../README.md) › building-skills
+
 # building-skills
 
 Brings a skill in line with the spec and refines it until, when actually run, it does better than working without the skill. It repeats static checks, test runs, human review, and fixes, based on Claude's official skill best practices and the Agent Skills spec.
@@ -10,6 +12,8 @@ Brings a skill in line with the spec and refines it until, when actually run, it
 | Invocation | User-invoked |
 | Command | `/gongbang:building-skills [skill folder path, SKILL.md draft, or description of the skill to build]` |
 | Source | [SKILL.md](../../../skills/productivity/building-skills/SKILL.md) |
+
+**Contents**: [When to use](#when-to-use) · [Prerequisites](#prerequisites) · [How it works](#how-it-works) · [Output](#output) · [Customize](#customize) · [Related skills](#related-skills)
 
 ## When to use
 
@@ -69,3 +73,7 @@ For how to copy and edit a skill, see the [customization guide](../customization
 
 - **prompt-builder**: Build a SKILL.md draft with prompt-builder and pass its output, and building-skills continues in mode A. It does not ask again about values prompt-builder already confirmed.
 - After editing a skill in this repository, you can test it in mode B. See the [customization guide](../customization.md#test-a-modified-skill).
+
+---
+
+← Previous: [prompt-builder](prompt-builder.md) · [All docs](../README.md) · Next: [write-docs](write-docs.md) →

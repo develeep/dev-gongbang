@@ -1,5 +1,7 @@
 <p align="right"><b>한국어</b> · <a href="../en/skills/set-brief.md">English</a></p>
 
+[README](../../README.md) › [문서](../README.md) › set-brief
+
 # set-brief
 
 대화에서 확정한 내용을 작업 지시서(brief) 하나로 남긴다. 이 brief를 읽는 사람은 대화를 보지 못한 작업자나 다른 에이전트다. brief만 읽고 작업해도 대화 맥락을 가진 에이전트와 같은 결과가 나오게 쓴다.
@@ -12,6 +14,8 @@
 | 호출 방식 | User-invoked |
 | 호출 | `/gongbang:set-brief [남길 작업 요약]` |
 | 원문 | [SKILL.md](../../skills/in-progress/set-brief/SKILL.md) |
+
+**목차**: [언제 쓰나](#언제-쓰나) · [준비물](#준비물) · [진행 과정](#진행-과정) · [결과물](#결과물) · [커스텀](#커스텀) · [함께 쓰는 스킬](#함께-쓰는-스킬)
 
 ## 언제 쓰나
 
@@ -56,3 +60,7 @@ brief에는 요약, 배경·의도, 최종 목적, 확인된 사실, 합의한 �
 - **run-ticket**: 한 창으로 끝날 크기면 새 세션에서 바로 실행한다.
 
 set-ticket과 run-ticket은 User-invoked라 set-brief가 직접 부르지 않는다. 게시를 마치면 어느 쪽을 실행할지 안내한다.
+
+---
+
+← 이전: [check-guidelines](check-guidelines.md) · [문서 목록](../README.md) · 다음: [set-ticket](set-ticket.md) →

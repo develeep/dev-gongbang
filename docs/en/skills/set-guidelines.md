@@ -1,5 +1,7 @@
 <p align="right"><a href="../../skills/set-guidelines.md">한국어</a> · <b>English</b></p>
 
+[README](../../../README.en.md) › [Docs](../README.md) › set-guidelines
+
 # set-guidelines
 
 Picks coding guides that fit the repo's languages and frameworks from the [awesome-guidelines](https://github.com/Kristories/awesome-guidelines) list and extracts rules from the source text. From those rules it creates what you choose: `.claude/rules/` rule files, CLAUDE.md/AGENTS.md, and linter and formatter configs. It writes files only after final approval.
@@ -10,6 +12,8 @@ Picks coding guides that fit the repo's languages and frameworks from the [aweso
 | Invocation | User-invoked |
 | Command | `/gongbang:set-guidelines` |
 | Source | [SKILL.md](../../../skills/engineering/set-guidelines/SKILL.md) |
+
+**Contents**: [When to use](#when-to-use) · [Prerequisites](#prerequisites) · [How it works](#how-it-works) · [Output](#output) · [Customize](#customize) · [Related skills](#related-skills)
 
 ## When to use
 
@@ -56,3 +60,7 @@ To add an in-house guide to the recommendation candidates, add its link to the s
 ## Related skills
 
 - **check-guidelines**: checks code against the rules you created.
+
+---
+
+← Previous: [write-docs](write-docs.md) · [All docs](../README.md) · Next: [framing-problems](framing-problems.md) →

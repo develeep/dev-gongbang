@@ -1,5 +1,7 @@
 <p align="right"><a href="../../skills/check-guidelines.md">한국어</a> · <b>English</b></p>
 
+[README](../../../README.en.md) › [Docs](../README.md) › check-guidelines
+
 # check-guidelines
 
 Checks code against the rules in the repo. It collects rules from `.claude/rules/` rule files, CLAUDE.md/AGENTS.md, and linter and formatter configs, and reports violations by rule. Tell it the numbers of the violations you choose, and it fixes only those, then checks again to confirm.
@@ -10,6 +12,8 @@ Checks code against the rules in the repo. It collects rules from `.claude/rules
 | Invocation | Model-invoked |
 | Command | `/gongbang:check-guidelines [all \| diff \| branch \| path]` |
 | Source | [SKILL.md](../../../skills/engineering/check-guidelines/SKILL.md) |
+
+**Contents**: [When to use](#when-to-use) · [Prerequisites](#prerequisites) · [How it works](#how-it-works) · [Output](#output) · [Customize](#customize) · [Related skills](#related-skills)
 
 ## When to use
 
@@ -57,3 +61,7 @@ The check criteria themselves come from the repo's rule files, CLAUDE.md/AGENTS.
 ## Related skills
 
 - **set-guidelines**: run it first to create rules when there are none.
+
+---
+
+← Previous: [framing-problems](framing-problems.md) · [All docs](../README.md) · Next: [set-brief](set-brief.md) →

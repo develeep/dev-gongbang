@@ -1,5 +1,7 @@
 <p align="right"><b>한국어</b> · <a href="../en/skills/building-skills.md">English</a></p>
 
+[README](../../README.md) › [문서](../README.md) › building-skills
+
 # building-skills
 
 스킬을 명세에 맞추고, 실제로 돌려 봤을 때 스킬 없이 할 때보다 나은 상태까지 다듬는다. Claude 공식 skill best practice와 Agent Skills 명세를 기준으로 정적 검사, 실행 테스트, 사람 리뷰, 수정을 반복한다.
@@ -10,6 +12,8 @@
 | 호출 방식 | User-invoked |
 | 호출 | `/gongbang:building-skills [스킬 폴더 경로, SKILL.md 초안, 또는 만들 스킬 설명]` |
 | 원문 | [SKILL.md](../../skills/productivity/building-skills/SKILL.md) |
+
+**목차**: [언제 쓰나](#언제-쓰나) · [준비물](#준비물) · [진행 과정](#진행-과정) · [결과물](#결과물) · [커스텀](#커스텀) · [함께 쓰는 스킬](#함께-쓰는-스킬)
 
 ## 언제 쓰나
 
@@ -69,3 +73,7 @@
 
 - **prompt-builder**: SKILL.md 초안을 prompt-builder로 만들고 그 출력을 넘기면 모드 A로 이어받는다. prompt-builder가 이미 확인받은 값은 다시 묻지 않는다.
 - 이 저장소의 스킬을 고친 뒤 모드 B로 시험할 수 있다. 방법은 [커스텀 가이드](../customization.md#고친-스킬-시험하기)에 있다.
+
+---
+
+← 이전: [prompt-builder](prompt-builder.md) · [문서 목록](../README.md) · 다음: [write-docs](write-docs.md) →

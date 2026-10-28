@@ -1,5 +1,7 @@
 <p align="right"><b>한국어</b> · <a href="../en/skills/framing-problems.md">English</a></p>
 
+[README](../../README.md) › [문서](../README.md) › framing-problems
+
 # framing-problems
 
 요청을 바로 실행하지 않고, 해법을 고를 근거를 모아 "구체화 기록"으로 정리한 뒤 사용자와 함께 확정한다. 사실은 코드·문서·로그로 조사하고, 의도와 선택은 사용자에게 묻는다. 기록이 확정되면 그 기록에 따라 작업을 이어 간다.
@@ -10,6 +12,8 @@
 | 호출 방식 | Model-invoked (명시적으로 요청할 때만) |
 | 호출 | `/gongbang:framing-problems [구체화할 요청]` |
 | 원문 | [SKILL.md](../../skills/productivity/framing-problems/SKILL.md) |
+
+**목차**: [언제 쓰나](#언제-쓰나) · [준비물](#준비물) · [진행 과정](#진행-과정) · [결과물](#결과물) · [커스텀](#커스텀) · [함께 쓰는 스킬](#함께-쓰는-스킬)
 
 ## 언제 쓰나
 
@@ -62,3 +66,7 @@ Model-invoked라 description이 실행 조건을 정한다. description을 고�
 
 - **prompt-builder**: 확정한 구체화 기록을 초안으로 넘겨 프롬프트를 만든다. prompt-builder 인터뷰에서 "실행 시 구체화"를 고르면 완성 프롬프트가 실행될 때마다 이 스킬을 호출한다.
 - **set-brief**: 확정한 구체화 기록을 다른 세션이나 작업자가 이어받을 작업 지시서로 남긴다.
+
+---
+
+← 이전: [set-guidelines](set-guidelines.md) · [문서 목록](../README.md) · 다음: [check-guidelines](check-guidelines.md) →

@@ -14,6 +14,8 @@
 
 These Claude Code skills help you frame requests, build prompts and skills, write docs, and set and check code rules. You install them as one plugin, and you can copy a skill and edit it to fit your situation. The skill files are written in Korean.
 
+**Contents**: [Installation](#installation) · [Skills](#skills) · [In-progress skills](#in-progress-skills) · [Choosing a skill](#choosing-a-skill) · [Customize](#customize) · [Contributing](#contributing) · [All docs](docs/en/README.md)
+
 ## Installation
 
 Add the marketplace and install the `gongbang` plugin.
@@ -47,7 +49,7 @@ Skills fall into two groups by invocation type.
 - **User-invoked**: Runs only when you type `/gongbang:<skill-name>`.
 - **Model-invoked**: You can type the name, and Claude can also pick and run the skill on its own when a request matches the skill description.
 
-Click a skill name to open its usage page. Click `SKILL.md` to open the skill source.
+Click a skill name to open its usage page. Click `SKILL.md` to open the skill source. Every page is listed in [All docs](docs/en/README.md).
 
 ### User-invoked
 

@@ -1,5 +1,7 @@
 <p align="right"><b>한국어</b> · <a href="../en/skills/analyzing-requirements.md">English</a></p>
 
+[README](../../README.md) › [문서](../README.md) › analyzing-requirements
+
 # analyzing-requirements
 
 기획서를 읽고 요구사항, 서비스·개발 영역별 개발 범위, 기획서 섹션별 내용을 마크다운 문서로 정리한다. 이 문서는 개발자나 에이전트가 기획서 대신 읽는다. 그래서 기획서에 없는 내용은 채우지 않고, 모호한 부분은 먼저 묻는다.
@@ -12,6 +14,8 @@
 | 호출 방식 | Model-invoked |
 | 호출 | `/gongbang:analyzing-requirements [기획서 링크 또는 파일 경로]` |
 | 원문 | [SKILL.md](../../skills/in-progress/analyzing-requirements/SKILL.md) |
+
+**목차**: [언제 쓰나](#언제-쓰나) · [준비물](#준비물) · [진행 과정](#진행-과정) · [결과물](#결과물) · [커스텀](#커스텀) · [함께 쓰는 스킬](#함께-쓰는-스킬)
 
 ## 언제 쓰나
 
@@ -54,3 +58,7 @@
 ## 함께 쓰는 스킬
 
 다른 스킬과 이어지는 흐름은 없다. 혼자 쓴다.
+
+---
+
+← 이전: [run-ticket](run-ticket.md) · [문서 목록](../README.md)

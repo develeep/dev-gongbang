@@ -1,5 +1,7 @@
 <p align="right"><b>한국어</b> · <a href="../en/skills/run-ticket.md">English</a></p>
 
+[README](../../README.md) › [문서](../README.md) › run-ticket
+
 # run-ticket
 
 set-ticket이 만든 티켓 하나를 새 세션에서 구현하고 리뷰한 뒤, 티켓 상태와 brief 체크박스를 갱신한다. brief를 만든 대화 없이 brief, 티켓, 앞 티켓의 완료 기록만 근거로 삼는다. 커밋은 하지 않는다.
@@ -12,6 +14,8 @@ set-ticket이 만든 티켓 하나를 새 세션에서 구현하고 리뷰한 �
 | 호출 방식 | User-invoked |
 | 호출 | `/gongbang:run-ticket [티켓·brief 경로, 이슈 번호·URL] [여러 티켓이면 범위]` |
 | 원문 | [SKILL.md](../../skills/in-progress/run-ticket/SKILL.md) |
+
+**목차**: [언제 쓰나](#언제-쓰나) · [준비물](#준비물) · [진행 과정](#진행-과정) · [결과물](#결과물) · [커스텀](#커스텀) · [함께 쓰는 스킬](#함께-쓰는-스킬)
 
 ## 언제 쓰나
 
@@ -60,3 +64,7 @@ set-ticket이 만든 티켓 하나를 새 세션에서 구현하고 리뷰한 �
 
 - **set-brief**, **set-ticket**: 실행할 brief와 티켓을 만든다.
 - **code-review** 스킬이 설치돼 있으면 5단계 리뷰에 쓴다.
+
+---
+
+← 이전: [set-ticket](set-ticket.md) · [문서 목록](../README.md) · 다음: [analyzing-requirements](analyzing-requirements.md) →

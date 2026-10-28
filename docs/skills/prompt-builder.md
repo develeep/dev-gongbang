@@ -1,5 +1,7 @@
 <p align="right"><b>한국어</b> · <a href="../en/skills/prompt-builder.md">English</a></p>
 
+[README](../../README.md) › [문서](../README.md) › prompt-builder
+
 # prompt-builder
 
 인터뷰로 받은 값과 승인한 제안만으로 프롬프트를 조립한다. 구조와 문구는 Claude 공식 best practice를 따르고, 대상 모델 전용 가이드로 조정한다. 초안이 있으면 빈 항목만 묻고, 없으면 처음부터 인터뷰한다.
@@ -10,6 +12,8 @@
 | 호출 방식 | User-invoked |
 | 호출 | `/gongbang:prompt-builder [초안 경로 또는 만들 프롬프트 설명]` |
 | 원문 | [SKILL.md](../../skills/productivity/prompt-builder/SKILL.md) |
+
+**목차**: [언제 쓰나](#언제-쓰나) · [준비물](#준비물) · [진행 과정](#진행-과정) · [결과물](#결과물) · [커스텀](#커스텀) · [함께 쓰는 스킬](#함께-쓰는-스킬)
 
 ## 언제 쓰나
 
@@ -64,3 +68,7 @@
 
 - **framing-problems**: 한 번 쓸 프롬프트는 framing-problems로 작업을 먼저 구체화하고, 확정된 기록을 초안으로 넘긴다. 에이전트 프롬프트나 재사용 템플릿은 인터뷰에서 "실행 시 구체화"를 고르면, 완성 프롬프트가 실행될 때마다 framing-problems를 호출한다. 실행 환경에 그 스킬이 설치돼 있어야 한다.
 - **building-skills**: SKILL.md 초안을 만든 뒤 그 출력을 building-skills에 넘기면 테스트와 수정을 이어 간다.
+
+---
+
+[문서 목록](../README.md) · 다음: [building-skills](building-skills.md) →

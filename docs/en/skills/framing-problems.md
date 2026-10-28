@@ -1,5 +1,7 @@
 <p align="right"><a href="../../skills/framing-problems.md">한국어</a> · <b>English</b></p>
 
+[README](../../../README.en.md) › [Docs](../README.md) › framing-problems
+
 # framing-problems
 
 Does not run a request right away. It gathers the grounds for choosing a solution into a "구체화 기록" (framing record) and finalizes it with the user. It investigates facts through code, docs, and logs, and asks the user about intent and choices. Once the record is final, it continues the work according to the record.
@@ -10,6 +12,8 @@ Does not run a request right away. It gathers the grounds for choosing a solutio
 | Invocation | Model-invoked (only on explicit request) |
 | Command | `/gongbang:framing-problems [request to frame]` |
 | Source | [SKILL.md](../../../skills/productivity/framing-problems/SKILL.md) |
+
+**Contents**: [When to use](#when-to-use) · [Prerequisites](#prerequisites) · [How it works](#how-it-works) · [Output](#output) · [Customize](#customize) · [Related skills](#related-skills)
 
 ## When to use
 
@@ -62,3 +66,7 @@ It is Model-invoked, so the description sets when it runs. If you change the des
 
 - **prompt-builder**: takes the finalized framing record as a draft and builds a prompt. If you choose "실행 시 구체화" (frame at runtime) in the prompt-builder interview, the finished prompt calls this skill every time it runs.
 - **set-brief**: turns the finalized framing record into a brief that another session or worker can pick up.
+
+---
+
+← Previous: [set-guidelines](set-guidelines.md) · [All docs](../README.md) · Next: [check-guidelines](check-guidelines.md) →

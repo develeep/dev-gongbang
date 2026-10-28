@@ -1,5 +1,7 @@
 <p align="right"><b>한국어</b> · <a href="../en/skills/set-guidelines.md">English</a></p>
 
+[README](../../README.md) › [문서](../README.md) › set-guidelines
+
 # set-guidelines
 
 레포의 언어와 프레임워크에 맞는 코딩 가이드를 [awesome-guidelines](https://github.com/Kristories/awesome-guidelines) 목록에서 골라 원문에서 규칙을 뽑는다. 뽑은 규칙으로 `.claude/rules/` 규칙 파일, CLAUDE.md/AGENTS.md, 린터·포매터 설정 중 고른 것을 만든다. 파일은 최종 승인을 받은 뒤에만 쓴다.
@@ -10,6 +12,8 @@
 | 호출 방식 | User-invoked |
 | 호출 | `/gongbang:set-guidelines` |
 | 원문 | [SKILL.md](../../skills/engineering/set-guidelines/SKILL.md) |
+
+**목차**: [언제 쓰나](#언제-쓰나) · [준비물](#준비물) · [진행 과정](#진행-과정) · [결과물](#결과물) · [커스텀](#커스텀) · [함께 쓰는 스킬](#함께-쓰는-스킬)
 
 ## 언제 쓰나
 
@@ -56,3 +60,7 @@
 ## 함께 쓰는 스킬
 
 - **check-guidelines**: 만든 규칙으로 코드를 검사한다.
+
+---
+
+← 이전: [write-docs](write-docs.md) · [문서 목록](../README.md) · 다음: [framing-problems](framing-problems.md) →

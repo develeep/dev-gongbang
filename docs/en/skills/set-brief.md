@@ -1,5 +1,7 @@
 <p align="right"><a href="../../skills/set-brief.md">한국어</a> · <b>English</b></p>
 
+[README](../../../README.en.md) › [Docs](../README.md) › set-brief
+
 # set-brief
 
 Records what was decided in the conversation as one brief. The readers of this brief are workers or other agents who did not see the conversation. It is written so that working from the brief alone gives the same result as an agent with the conversation context.
@@ -12,6 +14,8 @@ Records what was decided in the conversation as one brief. The readers of this b
 | Invocation | User-invoked |
 | Command | `/gongbang:set-brief [summary of the work to record]` |
 | Source | [SKILL.md](../../../skills/in-progress/set-brief/SKILL.md) |
+
+**Contents**: [When to use](#when-to-use) · [Prerequisites](#prerequisites) · [How it works](#how-it-works) · [Output](#output) · [Customize](#customize) · [Related skills](#related-skills)
 
 ## When to use
 
@@ -56,3 +60,7 @@ If you change section names, line names such as "남은 일" (remaining work), o
 - **run-ticket**: if it fits in one window, runs it right away in a new session.
 
 set-ticket and run-ticket are User-invoked, so set-brief does not call them directly. After publishing, it tells you which one to run.
+
+---
+
+← Previous: [check-guidelines](check-guidelines.md) · [All docs](../README.md) · Next: [set-ticket](set-ticket.md) →

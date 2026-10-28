@@ -1,8 +1,21 @@
 <p align="right"><a href="../customization.md">한국어</a> · <b>English</b></p>
 
+[README](../../README.en.md) › [Docs](README.md) › Customizing skills
+
 # Customizing skills
 
 This page explains how to copy dev-gongbang skills and edit them to fit your team rules, the models you use, and your document formats. After reading it, you will know where to copy a skill, which files to edit, and how to check and test the edited skill.
+
+## Contents
+
+- [Choose where to edit](#choose-where-to-edit)
+- [Copy and edit a skill](#copy-and-edit-a-skill)
+- [Files to edit per skill](#files-to-edit-per-skill)
+- [Change the invocation type](#change-the-invocation-type)
+- [Check a modified skill](#check-a-modified-skill)
+- [Test a modified skill](#test-a-modified-skill)
+- [Use in-progress skills via links](#use-in-progress-skills-via-links)
+- [Contributing](#contributing)
 
 ## Choose where to edit
 
@@ -101,3 +114,7 @@ This creates a link for each skill in `~/.claude/skills/`. To link only some ski
 ## Contributing
 
 To make your edits available to everyone, fork the repository and send a PR. Rules to follow when adding or moving a skill are in [.claude/CLAUDE.md](../../.claude/CLAUDE.md). After making changes, run `scripts/check.py` and make it pass.
+
+---
+
+[All docs](README.md) · [README](../../README.en.md)

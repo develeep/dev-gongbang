@@ -1,5 +1,7 @@
 <p align="right"><b>한국어</b> · <a href="../en/skills/set-ticket.md">English</a></p>
 
+[README](../../README.md) › [문서](../README.md) › set-ticket
+
 # set-ticket
 
 set-brief로 남긴 brief 하나를 티켓 여러 개로 나눈다. 티켓 하나만 읽고 그 티켓의 작업을 끝낼 수 있게 쓰고, 원래 brief에 티켓 목록을 연결한다.
@@ -12,6 +14,8 @@ set-brief로 남긴 brief 하나를 티켓 여러 개로 나눈다. 티켓 하�
 | 호출 방식 | User-invoked |
 | 호출 | `/gongbang:set-ticket [brief 이슈 번호·URL 또는 docs 경로]` |
 | 원문 | [SKILL.md](../../skills/in-progress/set-ticket/SKILL.md) |
+
+**목차**: [언제 쓰나](#언제-쓰나) · [준비물](#준비물) · [진행 과정](#진행-과정) · [결과물](#결과물) · [커스텀](#커스텀) · [함께 쓰는 스킬](#함께-쓰는-스킬)
 
 ## 언제 쓰나
 
@@ -55,3 +59,7 @@ brief는 닫지 않고, "티켓" 섹션을 덧붙이는 것 외에는 고치지 
 
 - **set-brief**: 나눌 brief를 만든다.
 - **run-ticket**: 게시한 티켓을 새 세션에서 하나씩 실행한다. User-invoked라 set-ticket이 직접 부르지 않고 실행 방법을 안내한다.
+
+---
+
+← 이전: [set-brief](set-brief.md) · [문서 목록](../README.md) · 다음: [run-ticket](run-ticket.md) →

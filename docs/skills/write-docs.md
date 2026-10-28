@@ -1,5 +1,7 @@
 <p align="right"><b>한국어</b> · <a href="../en/skills/write-docs.md">English</a></p>
 
+[README](../../README.md) › [문서](../README.md) › write-docs
+
 # write-docs
 
 새 글 초안을 쓰거나, 가져온 초안을 다듬거나, 기존 문서를 고친다. 쓰기 전에 분야, 독자, 목적, 톤, 자료를 정하고, 분야에 맞는 원칙으로 쓴다. 사실, 수치, 경로, 이름, 근거는 지어내지 않고, 빠진 값은 `[확인 필요: 무엇]`으로 표시한다.
@@ -10,6 +12,8 @@
 | 호출 방식 | User-invoked |
 | 호출 | `/gongbang:write-docs [쓰거나 고칠 글에 대한 요청]` |
 | 원문 | [SKILL.md](../../skills/productivity/write-docs/SKILL.md) |
+
+**목차**: [언제 쓰나](#언제-쓰나) · [준비물](#준비물) · [진행 과정](#진행-과정) · [결과물](#결과물) · [커스텀](#커스텀) · [함께 쓰는 스킬](#함께-쓰는-스킬)
 
 ## 언제 쓰나
 
@@ -55,3 +59,7 @@
 ## 함께 쓰는 스킬
 
 다른 스킬과 이어지는 흐름은 없다. 혼자 쓴다.
+
+---
+
+← 이전: [building-skills](building-skills.md) · [문서 목록](../README.md) · 다음: [set-guidelines](set-guidelines.md) →

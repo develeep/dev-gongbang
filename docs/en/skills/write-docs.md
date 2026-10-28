@@ -1,5 +1,7 @@
 <p align="right"><a href="../../skills/write-docs.md">한국어</a> · <b>English</b></p>
 
+[README](../../../README.en.md) › [Docs](../README.md) › write-docs
+
 # write-docs
 
 Writes a new draft, refines a draft you bring, or revises an existing document. Before writing, it sets the field, audience, purpose, tone, and material, then writes with principles that fit the field. It does not invent facts, numbers, paths, names, or evidence, and marks missing values as `[확인 필요: 무엇]` ([needs confirmation: what]).
@@ -10,6 +12,8 @@ Writes a new draft, refines a draft you bring, or revises an existing document. 
 | Invocation | User-invoked |
 | Command | `/gongbang:write-docs [request for the text to write or revise]` |
 | Source | [SKILL.md](../../../skills/productivity/write-docs/SKILL.md) |
+
+**Contents**: [When to use](#when-to-use) · [Prerequisites](#prerequisites) · [How it works](#how-it-works) · [Output](#output) · [Customize](#customize) · [Related skills](#related-skills)
 
 ## When to use
 
@@ -55,3 +59,7 @@ To use your team's style guide, replace `reference/tech-writing.md` with that gu
 ## Related skills
 
 There is no flow that connects to other skills. Use it on its own.
+
+---
+
+← Previous: [building-skills](building-skills.md) · [All docs](../README.md) · Next: [set-guidelines](set-guidelines.md) →
