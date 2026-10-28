@@ -1,5 +1,5 @@
 ---
-# 근거: skills/in-progress/building-skills/references/intake.md:67, evals/building-skills/from-runbook-and-chat/files/rollback-runbook.md:20-22
+# 근거: skills/productivity/building-skills/references/intake.md:67, evals/building-skills/from-runbook-and-chat/files/rollback-runbook.md:20-22
 type: llm
 focus: trace
 weight: 1

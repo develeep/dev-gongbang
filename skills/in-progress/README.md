@@ -4,17 +4,13 @@
 
 ## User-invoked
 
-- [building-skills](./building-skills/SKILL.md): prompt-builder가 만든 SKILL.md 초안이나 대화 기록·런북·코드 같은 자료로 스킬을 완성하고, 정적 검사·실행 테스트·사람 리뷰·수정 반복까지 진행한다.
 - [set-brief](./set-brief/SKILL.md): 구체화 기록이나 세션 결과를 맥락 없는 작업자도 그대로 이어받을 수 있는 작업 지시서로 정리해 GitHub 이슈나 `docs/context/`에 남긴다.
 - [set-ticket](./set-ticket/SKILL.md): set-brief 이슈나 문서가 클 때 혼자 검증할 수 있는 티켓으로 나눠 sub-issue나 docs 파일로 남기고 brief에 연결한다.
 - [run-ticket](./run-ticket/SKILL.md): set-brief·set-ticket의 brief와 티켓을 새 세션에서 받아 티켓 하나를 구현·리뷰하고 티켓 상태와 brief 체크박스를 갱신한다. 커밋은 하지 않는다.
-- [set-guidelines](./set-guidelines/SKILL.md): awesome-guidelines에서 레포에 맞는 가이드와 도구를 골라 `.claude/rules/` 규칙 파일, CLAUDE.md/AGENTS.md, 린터·포매터 설정 중 고른 것을 작성한다.
-- [write-docs](./write-docs/SKILL.md): 분야·독자·목적·톤·자료를 질문으로 정한 뒤 글 초안을 쓰거나, 가져온 초안과 기존 문서를 고친다.
 
 ## Model-invoked
 
 - [analyzing-requirements](./analyzing-requirements/SKILL.md): 링크나 PDF·PPT·MD로 받은 기획서를 읽고 요구사항과 서비스·개발 영역별 개발 범위를 마크다운 문서로 정리한다. 기획서에 없는 내용은 채우지 않고 묻는다.
-- [check-guidelines](./check-guidelines/SKILL.md): `.claude/rules/`, CLAUDE.md/AGENTS.md, 린터·포매터 설정을 기준으로 고른 범위의 코드를 검사해 규칙별로 보고하고, 고른 위반을 고친 뒤 다시 검사한다. 컨벤션·팀 규칙 검사나 커밋·PR 전 위반 점검을 요청할 때 동작한다.
 
 ## 설치
 

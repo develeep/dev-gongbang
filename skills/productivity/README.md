@@ -5,6 +5,8 @@
 ## User-invoked
 
 - [prompt-builder](./prompt-builder/SKILL.md): 모델별 가이드에 맞춰 시스템 프롬프트, CLAUDE.md, SKILL.md를 인터뷰로 설계하거나 초안을 고친다.
+- [building-skills](./building-skills/SKILL.md): prompt-builder가 만든 SKILL.md 초안이나 대화 기록·런북·코드 같은 자료로 스킬을 완성하고, 정적 검사·실행 테스트·사람 리뷰·수정 반복까지 진행한다.
+- [write-docs](./write-docs/SKILL.md): 분야·독자·목적·톤·자료를 질문으로 정한 뒤 글 초안을 쓰거나, 가져온 초안과 기존 문서를 고친다.
 
 ## Model-invoked
 

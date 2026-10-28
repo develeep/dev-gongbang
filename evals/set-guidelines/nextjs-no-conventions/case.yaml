@@ -18,7 +18,7 @@ execution:
 context:
   scaffold_script: fixture.sh
 graders:
-  # 근거: skills/in-progress/set-guidelines/SKILL.md:17, :61, templates/rule.md
+  # 근거: skills/engineering/set-guidelines/SKILL.md:17, :61, templates/rule.md
   - name: rule-files-paths
     type: llm
     criteria: |

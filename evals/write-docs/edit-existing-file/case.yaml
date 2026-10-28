@@ -15,27 +15,27 @@ execution:
 context:
   scaffold_script: fixture.sh
 graders:
-  # 근거: skills/in-progress/write-docs/SKILL.md:66
+  # 근거: skills/productivity/write-docs/SKILL.md:66
   - name: shows-before-apply
     type: llm
     criteria: |
       PASS: 120회로 고친 수정본을 채팅에 보여 주고, 파일에 반영할지 승인을 요청하거나 승인을 기다린다.
       FAIL: 수정본을 채팅에 보여 주지 않거나, 승인을 받지 않고 파일에 반영했다고 말한다.
-  # 근거: skills/in-progress/write-docs/SKILL.md:66
+  # 근거: skills/productivity/write-docs/SKILL.md:66
   - name: file-unchanged
     type: regex
     arm: both
     target: {source: file, path: docs/api/rate-limit.md}
     pattern: '분당 60회'
     match: contains
-  # 근거: skills/in-progress/write-docs/SKILL.md:66
+  # 근거: skills/productivity/write-docs/SKILL.md:66
   - name: no-edit-before-approval
     type: tool_used
     arm: both
     tool: Edit
     min: 0
     max: 0
-  # 근거: skills/in-progress/write-docs/SKILL.md:66
+  # 근거: skills/productivity/write-docs/SKILL.md:66
   - name: no-write-before-approval
     type: tool_used
     arm: both
