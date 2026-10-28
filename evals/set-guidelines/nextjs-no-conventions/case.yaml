@@ -1,0 +1,56 @@
+schema_version: "1.1"
+name: nextjs-no-conventions
+description: 컨벤션이 없는 Next.js 레포에서 분야별 .claude/rules/ 규칙 파일과 CLAUDE.md를 출처 없이 만들고, CLAUDE.md에 린터 규칙을 반복하지 않고, 도구가 없을 때 설치 여부를 묻는지
+tags: [new-repo, typescript]
+execution:
+  prompt: |
+    /set-guidelines
+    이 레포에 코딩 컨벤션을 잡아줘. 진행 중에 물어볼 것에는 아래 답을 미리 줄게. 나한테 다시 묻지 말고 파일 작성까지 끝내줘.
+
+    - 언어·프레임워크: TypeScript + Next.js 맞아
+    - 가이드: Google TypeScript Style Guide
+    - 도구: ESLint
+    - 산출물: 규칙 파일은 .claude/rules/, CLAUDE.md는 레포 루트, ESLint 설정은 레포 루트
+    - 도구가 설치돼 있지 않으면: 설치하지 말고 넘어가
+    - 최종 승인: 보여 준 목록 그대로 승인
+  max_turns: 40
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill, WebFetch]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/in-progress/set-guidelines/SKILL.md:17, :61, templates/rule.md
+  - name: rule-files-paths
+    type: llm
+    criteria: |
+      PASS: .claude/rules/에 분야별 .md 규칙 파일이 있고, 특정 파일에만 해당하는 분야 파일(예: TypeScript·React 파일 규칙)에는 그 파일 패턴을 적은 `paths` frontmatter가 있다.
+      FAIL: 규칙 파일이 없거나, 한 파일에 모든 규칙을 몰아넣었거나, 특정 파일에만 해당하는 규칙 파일에 `paths`가 없다.
+  # 근거: SKILL.md:19
+  - name: no-sources
+    type: llm
+    criteria: |
+      PASS: .claude/rules/의 규칙 파일과 CLAUDE.md에 출처 표시("출처:", 가이드 이름 인용), 가이드 링크, 템플릿에 없는 부가 절(가이드와 다르게 한 이유, 적용하지 않은 규칙, 근거 가이드 목록 등)이 없다.
+      FAIL: 이 중 하나라도 있다.
+  # 근거: SKILL.md:16, :62, templates/agent-instructions.md
+  - name: claude-md-template
+    type: llm
+    criteria: |
+      PASS: 레포 루트 CLAUDE.md에 "팀 규칙" 절과 핵심 규칙 절이 있고, 세부 규칙은 .claude/rules/에 있다.
+      FAIL: CLAUDE.md가 없거나, 팀 규칙 절이 없거나, 세부 규칙을 모두 CLAUDE.md에 적었다.
+  # 근거: SKILL.md:16
+  - name: claude-md-no-linter-rules
+    type: llm
+    criteria: |
+      PASS: CLAUDE.md에 만든 ESLint 설정이 강제하는 규칙(예: 세미콜론, 따옴표, 들여쓰기, 설정에 켠 개별 lint 규칙)을 다시 적지 않았다.
+      FAIL: ESLint 설정에 들어간 규칙을 CLAUDE.md에도 적었다.
+  # 근거: SKILL.md:65
+  - name: approval-before-write
+    type: llm
+    criteria: |
+      PASS: 파일을 쓰기 전에 만들거나 바꿀 파일 목록과 내용 요약, 규칙 파일마다 `paths` 패턴을 사용자에게 보여 주었다.
+      FAIL: 목록을 보여 주지 않고 파일을 썼거나, 목록에 규칙 파일의 `paths` 패턴이 없다.
+  # 근거: SKILL.md:69
+  - name: install-ask
+    type: llm
+    criteria: |
+      PASS: ESLint가 설치돼 있지 않음을 확인한 뒤 설치해서 확인할지 사용자에게 물었고, 답에 따라 설치하지 않았으며, 실행 확인을 하지 못했다고 알렸다.
+      FAIL: 묻지 않고 설치했거나(npm install, npx 내려받기 포함), 묻지 않고 확인을 건너뛰었거나, 확인하지 못한 사실을 알리지 않았다.

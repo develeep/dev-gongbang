@@ -1,0 +1,64 @@
+schema_version: "1.1"
+name: python-api-active
+description: 팀 규칙이 있는 운영 중 Python API 레포에서 팀 규칙을 가이드보다 우선하고, 목록 밖 린터를 추천 단계에서만 표시하고, API 설계 규칙을 아키텍처가 아닌 분야 규칙으로 두는지
+tags: [existing-repo, python]
+execution:
+  prompt: |
+    /set-guidelines
+    지금 운영 중인 API 서버 레포야. 컨벤션을 정리해줘. 진행 중에 물어볼 것에는 아래 답을 미리 줄게. 나한테 다시 묻지 말고 파일 작성까지 끝내줘.
+
+    - 언어·프레임워크: Python + FastAPI 맞아
+    - 기존 규칙 처리: 개선·추가
+    - 가이드: PEP 8, Microsoft REST API Guidelines
+    - 도구: 추천한 Python 린터·포매터 중 첫 번째
+    - 가이드끼리 충돌하면: PEP 8 쪽
+    - 산출물: 규칙 파일은 .claude/rules/, AGENTS.md는 레포 루트, 린터 설정은 pyproject.toml
+    - 도구가 설치돼 있지 않으면: 레포 밖 임시 위치에 설치해서 확인해
+    - 최종 승인: 보여 준 목록 그대로 승인
+  max_turns: 40
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill, WebFetch]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: SKILL.md:15, :54
+  - name: team-line-length
+    type: llm
+    criteria: |
+      PASS: .claude/rules/ 규칙 파일이나 린터 설정에 줄 길이가 있으면 100자다(CONTRIBUTING.md의 팀 규칙). PEP 8의 79자를 규칙으로 쓰지 않았다.
+      FAIL: 줄 길이를 79자나 100이 아닌 값으로 정했다.
+  # 근거: SKILL.md:15, :54
+  - name: team-snake-case
+    type: llm
+    criteria: |
+      PASS: 규칙 파일에서 API 응답 필드 이름을 snake_case로 정했다(CONTRIBUTING.md의 팀 규칙).
+      FAIL: Microsoft REST API Guidelines를 따라 응답 필드 이름을 camelCase로 정했다.
+  # 근거: SKILL.md:48, :19
+  - name: out-of-list-label
+    type: llm
+    criteria: |
+      PASS: 사용자에게 Python 린터·포매터를 추천하는 메시지에 "awesome-guidelines 목록 밖"이라는 표시가 있고, 산출물 파일(.claude/rules/, AGENTS.md)에는 이 표시나 출처, 링크가 없다.
+      FAIL: 추천 메시지에 표시가 없거나, 산출물 파일에 출처·링크·"목록 밖" 같은 부가 문구가 있다.
+  # 근거: SKILL.md:55
+  - name: api-not-architecture
+    type: llm
+    criteria: |
+      PASS: Microsoft REST API Guidelines에서 뽑은 규칙이 API 분야 규칙 파일(예: .claude/rules/api.md)에 있고, 아키텍처 규칙 파일은 없다.
+      FAIL: API 설계 규칙을 아키텍처 파일이나 아키텍처 절에 넣었다.
+  # 근거: SKILL.md:16, :62
+  - name: agents-md-template
+    type: llm
+    criteria: |
+      PASS: 레포 루트 AGENTS.md에 "팀 규칙" 절이 있고, 린터가 강제하는 줄 길이 규칙을 다시 적지 않았다.
+      FAIL: AGENTS.md가 없거나, 팀 규칙 절이 없거나, 줄 길이 규칙을 적었다.
+  # 근거: SKILL.md:43
+  - name: existing-rules-kept
+    type: regex
+    target: {source: file, path: CONTRIBUTING.md}
+    pattern: '100자'
+    match: contains
+  # 근거: SKILL.md:69
+  - name: linter-verified
+    type: llm
+    criteria: |
+      PASS: 린터가 없으면 설치해서 확인할지 물었고(답: 임시 설치), 레포 밖에 설치해 실행해서 pyproject.toml 설정이 오류 없이 읽히는 것을 확인했다.
+      FAIL: 린터를 실행하지 않았거나, 레포 안에 설치 파일을 남겼다.

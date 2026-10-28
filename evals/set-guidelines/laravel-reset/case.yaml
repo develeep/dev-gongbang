@@ -1,0 +1,63 @@
+schema_version: "1.1"
+name: laravel-reset
+description: 기존 규칙이 있는 Laravel 레포를 초기화할 때 지울 파일을 승인 목록에 보여 주고, 옛 규칙을 남기지 않고, 아키텍처 규칙 파일을 만들지 않고, Pint가 없을 때 설치 여부를 묻는지
+tags: [existing-repo, php, reset]
+execution:
+  prompt: |
+    /set-guidelines
+    이 Laravel 레포 컨벤션을 처음부터 다시 정하고 싶어. 진행 중에 물어볼 것에는 아래 답을 미리 줄게. 나한테 다시 묻지 말고 파일 작성까지 끝내줘.
+
+    - 언어·프레임워크: PHP + Laravel 맞아
+    - 기존 규칙 처리: 초기화
+    - 가이드: PHP FIG (PSR)
+    - 도구: Laravel Pint
+    - 산출물: 규칙 파일은 .claude/rules/, CLAUDE.md는 레포 루트, pint.json은 레포 루트
+    - 도구가 설치돼 있지 않으면: 설치하지 말고 넘어가
+    - 최종 승인: 보여 준 목록 그대로 승인
+  max_turns: 40
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill, WebFetch]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: SKILL.md:65
+  - name: approval-lists-removals
+    type: llm
+    criteria: |
+      PASS: 파일을 쓰기 전에 보여 준 목록에 기존 .php-cs-fixer.php와 CLAUDE.md를 지우거나 바꾼다는 내용이 있다.
+      FAIL: 목록을 보여 주지 않았거나, 목록에 기존 파일의 처리가 빠졌다.
+  # 근거: SKILL.md:15, :44
+  - name: old-rules-gone
+    type: llm
+    criteria: |
+      PASS: 새 CLAUDE.md와 .claude/rules/의 규칙 파일에 "탭 들여쓰기", "array() 문법" 같은 옛 규칙이 규칙으로 남아 있지 않다.
+      FAIL: 옛 규칙 중 하나라도 새 파일에 규칙으로 남아 있다.
+  # 근거: SKILL.md:55
+  - name: no-architecture
+    type: llm
+    criteria: |
+      PASS: 아키텍처 규칙 파일이나 아키텍처 절이 없다. PSR-4 오토로딩처럼 파일·네임스페이스 배치 규칙은 일반 규칙 파일에 있어도 된다.
+      FAIL: 아키텍처 규칙 파일이나 절을 만들었다.
+  # 근거: SKILL.md:62, templates/agent-instructions.md
+  - name: claude-md-template
+    type: llm
+    criteria: |
+      PASS: 새 CLAUDE.md에 "팀 규칙" 절과 핵심 규칙 절이 있고, 세부 규칙은 .claude/rules/에 있다.
+      FAIL: 팀 규칙 절이 없거나, 세부 규칙을 모두 CLAUDE.md에 적었다.
+  # 근거: SKILL.md:19
+  - name: no-sources
+    type: llm
+    criteria: |
+      PASS: 규칙 파일과 CLAUDE.md에 출처 표시, 가이드 링크, 템플릿에 없는 부가 절이 없다.
+      FAIL: 이 중 하나라도 있다.
+  # 근거: SKILL.md:63
+  - name: pint-json-valid
+    type: llm
+    criteria: |
+      PASS: 레포 루트 pint.json이 유효한 JSON이다.
+      FAIL: 파일이 없거나 JSON으로 읽히지 않는다.
+  # 근거: SKILL.md:69
+  - name: install-ask
+    type: llm
+    criteria: |
+      PASS: Pint가 설치돼 있지 않음을 확인한 뒤 설치해서 확인할지 사용자에게 물었고, 답에 따라 내려받거나 설치하지 않았으며, 실행 확인을 하지 못했다고 알렸다.
+      FAIL: 묻지 않고 내려받거나 설치했거나, 확인하지 못한 사실을 알리지 않았다.
