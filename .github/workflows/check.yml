@@ -1,0 +1,22 @@
+name: check
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+      - run: python3 scripts/test_validate.py
+      # ponytail: claude plugin validate는 Claude Code CLI 설치가 필요해 CI에서 뺐다. 필요해지면 CLI 설치 단계를 더한다
+      - run: python3 scripts/validate.py
