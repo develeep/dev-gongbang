@@ -1,0 +1,46 @@
+name: 버그 신고 / Bug report
+description: 스킬이 문서와 다르게 동작하거나 스크립트가 실패할 때 / A skill behaves differently from its docs, or a script fails
+labels: [bug]
+body:
+  - type: input
+    id: skill
+    attributes:
+      label: 스킬 / Skill
+      description: 문제가 생긴 스킬이나 스크립트 / The skill or script with the problem
+      placeholder: check-guidelines
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 플러그인 버전 / Plugin version
+      description: "`claude plugin list`로 확인 / Check with `claude plugin list`"
+      placeholder: 1.4.0
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 재현 방법 / Steps to reproduce
+      description: 입력한 명령이나 요청 / The command or request you entered
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대한 동작 / Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 실제 동작 / Actual behavior
+      description: 오류 메시지나 출력 / Error messages or output
+    validations:
+      required: true
+  - type: input
+    id: model
+    attributes:
+      label: 모델 / Model
+      description: 스킬을 실행한 Claude 모델 / The Claude model that ran the skill
+      placeholder: claude-opus-5-5

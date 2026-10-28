@@ -1,0 +1,30 @@
+name: 스킬 제안 / Skill proposal
+description: 새 스킬이나 기존 스킬의 새 동작을 제안할 때 / Propose a new skill or a new behavior for an existing skill
+labels: [enhancement]
+body:
+  - type: input
+    id: skill
+    attributes:
+      label: 대상 스킬 / Target skill
+      description: 기존 스킬을 바꾸는 제안이면 그 스킬 이름, 새 스킬이면 "새 스킬" / The existing skill to change, or "new skill"
+    validations:
+      required: true
+  - type: textarea
+    id: situation
+    attributes:
+      label: 상황 / Situation
+      description: 이 스킬이 필요한 작업과 지금 겪는 문제 / The task that needs this skill and the problem you have now
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: 원하는 동작 / Desired behavior
+      description: 스킬이 무엇을 하고 무엇을 결과로 내야 하는지 / What the skill should do and produce
+    validations:
+      required: true
+  - type: textarea
+    id: examples
+    attributes:
+      label: 예시 요청 / Example requests
+      description: 이 스킬을 쓸 때 입력할 요청 예시 / Requests you would type when using the skill

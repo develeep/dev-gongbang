@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 보안 문제 / Security issue
+    url: https://github.com/develeep/dev-gongbang/security/advisories/new
+    about: 보안 문제는 비공개로 알려 주세요 / Report security problems privately
