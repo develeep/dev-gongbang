@@ -17,7 +17,7 @@
 3. 승격 버킷이면 `.claude-plugin/plugin.json`의 `skills` 배열에 넣는다. `in-progress/`는 넣지 않는다.
 4. 최상위 `README.md`와 `README.en.md`에 한 줄 설명, 사용 문서 링크, `SKILL.md` 링크를 넣는다. 승격 버킷은 "스킬" 절에, `in-progress/`는 "만드는 중인 스킬" 절에 두고, 각 절 안에서 호출 방식 제목 아래에 둔다.
 5. 아래 "사용 문서" 규칙대로 스킬 문서와 문서 목록을 고친다.
-6. 사용자에게 배포할 변경이면 `plugin.json`의 `version`을 올린다. 설치된 플러그인은 버전이 바뀔 때만 갱신된다. 버전은 `plugin.json`에만 둔다.
+6. 사용자에게 배포할 변경이면 `plugin.json`의 `version`을 올린다. 설치된 플러그인은 버전이 바뀔 때만 갱신된다. 버전은 `plugin.json`에만 둔다. 버전을 올린 PR이 머지되면 아래 "릴리스" 절대로 태그와 릴리스를 만든다.
 7. `scripts/check.py`를 실행해 통과시킨다.
 8. `in-progress/`에서 승격할 때는 옮기기 전에 `scripts/link-in-progress.sh --remove <스킬 이름>`(project 범위면 `--project --remove <스킬 이름>`)으로 그 스킬의 로컬 링크를 지운다.
 
@@ -30,6 +30,17 @@
 - `docs/customization.md`: 스킬별로 고칠 파일 표가 있다
 
 스킬을 추가하거나 지우면 스킬 페이지, 문서 목록, `docs/customization.md` 표를 함께 고치고, 앞뒤 스킬 페이지의 이전·다음 링크도 고친다. 순서는 최상위 `README.md`의 스킬 순서를 따른다. 승격할 때는 스킬 페이지의 버킷 값과 "만드는 중인 스킬" 안내를 고치고, 문서 목록과 README에서 절을 옮긴다. 스킬의 동작, 인자, 번들 파일이 바뀌면 그 스킬 페이지도 고친다.
+
+## 릴리스
+
+`plugin.json`의 `version`을 올린 PR이 머지되면, 최신 `master`에서 다음을 실행한다. 태그 이름은 `gongbang--v<버전>`이다.
+
+```bash
+claude plugin tag . --push
+gh release create gongbang--v<버전> --generate-notes
+```
+
+`claude plugin tag`는 `plugin.json`과 `marketplace.json`이 어긋나거나 작업 트리에 커밋하지 않은 변경이 있으면 태그를 만들지 않는다. 릴리스 노트는 직전 태그 뒤에 머지된 PR로 만들어진다.
 
 ## 호출 방식
 

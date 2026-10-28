@@ -37,7 +37,7 @@ claude plugin install gongbang-dev@dev-gongbang
 
 ### 업데이트
 
-플러그인은 `plugin.json`의 `version`이 바뀔 때만 갱신됩니다. 마켓플레이스를 갱신한 뒤 플러그인을 업데이트하고 Claude Code를 다시 시작하세요.
+플러그인은 `plugin.json`의 `version`이 바뀔 때만 갱신됩니다. 버전마다 바뀐 내용은 [Releases](https://github.com/develeep/dev-gongbang/releases)에서 볼 수 있습니다. 마켓플레이스를 갱신한 뒤 플러그인을 업데이트하고 Claude Code를 다시 시작하세요.
 
 ```bash
 claude plugin marketplace update dev-gongbang
