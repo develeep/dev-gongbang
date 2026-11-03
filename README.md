@@ -91,6 +91,8 @@ claude plugin install gongbang-mods@dev-gongbang
 
 함께 쓰면 좋은 외부 mod는 [Mod 문서](docs/mods.md#함께-쓰면-좋은-외부-mod)에 정리했습니다. 모델·브랜치·요금제 사용량을 보여 주는 [상태줄 스크립트](docs/mods.md#상태줄)는 따로 설치합니다. [코드](extras/statusline/statusline.py)
 
+다른 컴퓨터에서 같은 환경을 만들려면 `extras/setup.sh`를 실행하세요. [설명](docs/mods.md#다른-컴퓨터에-똑같이-설정하기)
+
 ## 상황별로 고르기
 
 | 상황 | 스킬 |

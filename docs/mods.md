@@ -14,6 +14,7 @@
 - [끄기와 업데이트](#끄기와-업데이트)
 - [함께 쓰면 좋은 외부 mod](#함께-쓰면-좋은-외부-mod)
 - [상태줄](#상태줄)
+- [다른 컴퓨터에 똑같이 설정하기](#다른-컴퓨터에-똑같이-설정하기)
 - [출처](#출처)
 
 ## 설치
@@ -174,6 +175,39 @@ ln -s "$PWD/extras/statusline/statusline.py" ~/.claude/statusline.py
 
 - 브랜치와 사용량 링크는 OSC 8을 지원하는 터미널에서만 눌립니다. 상태줄에 `]8;;https://…` 같은 글자가 보이면 스크립트의 `LINKS = True`를 `False`로 바꾸세요.
 - 상태줄은 Claude Code가 상태를 갱신할 때 다시 그려집니다. 남은 시간은 그때 계산한 값입니다.
+
+## 다른 컴퓨터에 똑같이 설정하기
+
+`extras/setup.sh`는 이 문서의 mod 환경을 한 번에 설정합니다. 저장소를 받은 뒤 실행하고 Claude Code를 다시 시작하세요.
+
+```bash
+git clone https://github.com/develeep/dev-gongbang && cd dev-gongbang
+extras/setup.sh
+```
+
+스크립트가 하는 일은 다음과 같습니다. 이미 끝난 단계는 건너뛰므로 여러 번 실행해도 됩니다.
+
+- marketplace 4개를 추가하고 `gongbang-mods`와 [외부 mod](#함께-쓰면-좋은-외부-mod) 7개를 설치합니다.
+- `next-steps`의 제안 언어를 한국어로 설정합니다.
+- 상태줄 스크립트를 `~/.claude/statusline.py`로 연결합니다.
+- `~/.claude/settings.json`에 `"tui": "fullscreen"`과 `statusLine`을 넣습니다. 바꾸기 전 파일은 `settings.json.bak`으로 남깁니다. 패널은 fullscreen 화면에서만 우측에 붙습니다.
+
+pokemon 설정은 플러그인 안에 저장되어 스크립트로 넣을 수 없습니다. Claude Code를 다시 시작한 뒤 한 번 입력하세요.
+
+```
+/pokemon charmander     스타팅 포켓몬 고르기 (Bulbasaur, Charmander, Squirtle, Pikachu)
+/pokemon pane           우측 패널로 옮기기
+/pokemon size small     Session 아래에 들어가도록 줄이기
+/pokemon images on      이미지를 그리는 터미널에서만 (kitty, Ghostty, WezTerm, Orca)
+```
+
+지금 쓰는 설정을 건드리지 않고 먼저 시험하려면 빈 폴더를 설정 폴더로 지정하세요. 설치 결과는 `CLAUDE_CONFIG_DIR=<폴더> claude plugin list`로 확인합니다.
+
+```bash
+CLAUDE_CONFIG_DIR="$HOME/.cache/claude-test" extras/setup.sh
+```
+
+터미널 앱, 글꼴, Chrome처럼 컴퓨터마다 다른 것은 스크립트가 설정하지 않습니다.
 
 ## 출처
 
