@@ -34,6 +34,10 @@ Install `gongbang-dev` to use these.
 
 - [analyzing-requirements](skills/analyzing-requirements.md): Turns a planning document into a requirements and development scope document.
 
+## Mods
+
+- [gongbang-mods](mods.md): Folded tool calls, card-style messages and Markdown, and a side pane with the session goal and context
+
 ## Guides
 
 - [Customizing skills](customization.md): How to copy, edit, check, and test a skill

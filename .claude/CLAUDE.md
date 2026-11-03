@@ -31,6 +31,18 @@
 
 스킬을 추가하거나 지우면 스킬 페이지, 문서 목록, `docs/customization.md` 표를 함께 고치고, 앞뒤 스킬 페이지의 이전·다음 링크도 고친다. 순서는 최상위 `README.md`의 스킬 순서를 따른다. 승격할 때는 스킬 페이지의 버킷 값과 "만드는 중인 스킬" 안내를 고치고, 문서 목록과 README에서 절을 옮긴다. 스킬의 동작, 인자, 번들 파일이 바뀌면 그 스킬 페이지도 고친다.
 
+## Mod
+
+mod는 `mods/<플러그인 이름>/`에 두고 `marketplace.json`에 따로 등록한다. 지금은 `gongbang-mods` 하나에 모든 mod를 묶는다.
+
+- mod 하나는 `hooks/<mod 이름>.tsx`에 `(on: On) => void` 함수로 만들고 `hooks/register.tsx`에서 부른다.
+- matcher 없는 hook은 플러그인 전체에서 이벤트마다 한 번만 걸 수 있다. 두 mod가 같은 이벤트를 쓰면 한 hook에서 둘 다 처리한다.
+- `$.state` 값은 `types/index.d.ts`의 `'gongbang-mods'` 아래에 선언한다.
+- 사용자에게 배포할 변경이면 `mods/gongbang-mods/.claude-plugin/plugin.json`의 `version`을 올린다. 이 버전은 `gongbang` 버전과 따로 간다.
+- `docs/mods.md`와 `docs/en/mods.md`를 같은 커밋에서 고친다.
+- 외부 코드를 가져오면 원본 라이선스 파일을 그 폴더에 두고 `docs/mods.md`의 "출처" 절에 적는다.
+- `scripts/check.py`를 실행해 통과시킨다. mod마다 `claude plugin validate`와 `claude plugin test`를 돌린다.
+
 ## 릴리스
 
 `plugin.json`의 `version`을 올린 PR이 머지되면, 최신 `master`에서 다음을 실행한다. 태그 이름은 `gongbang--v<버전>`이다.
