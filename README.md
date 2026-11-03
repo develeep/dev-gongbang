@@ -16,7 +16,7 @@
 
 요청을 구체화하고, 프롬프트와 스킬을 만들고, 문서를 쓰고, 코드 규칙을 정하고 검사하는 일을 Claude Code 스킬로 돕습니다. 플러그인 하나로 설치하고, 필요하면 스킬을 복사해 내 상황에 맞게 고쳐 쓸 수 있습니다. 스킬 파일은 한국어로 쓰여 있습니다.
 
-**목차**: [설치](#설치) · [스킬](#스킬) · [만드는 중인 스킬](#만드는-중인-스킬) · [상황별로 고르기](#상황별로-고르기) · [커스텀](#커스텀) · [기여](#기여) · [전체 문서 목록](docs/README.md)
+**목차**: [설치](#설치) · [스킬](#스킬) · [만드는 중인 스킬](#만드는-중인-스킬) · [Mod](#mod) · [상황별로 고르기](#상황별로-고르기) · [커스텀](#커스텀) · [기여](#기여) · [전체 문서 목록](docs/README.md)
 
 ## 설치
 
@@ -78,6 +78,18 @@ claude plugin update gongbang@dev-gongbang
 ### Model-invoked
 
 - [analyzing-requirements](docs/skills/analyzing-requirements.md): 링크나 PDF·PPT·MD로 받은 기획서를 읽고 요구사항과 서비스·개발 영역별 개발 범위를 마크다운 문서로 정리합니다. `/gongbang:analyzing-requirements [기획서 링크 또는 파일 경로]` · [SKILL.md](skills/in-progress/analyzing-requirements/SKILL.md)
+
+## Mod
+
+`gongbang-mods`는 Claude Code 터미널 화면을 꾸미는 mod 묶음입니다. 스킬 플러그인과 따로 설치합니다.
+
+```bash
+claude plugin install gongbang-mods@dev-gongbang
+```
+
+- [gongbang-mods](docs/mods.md): 도구 호출을 한 줄로 접고, 메시지와 답변을 카드로 나누고, 세션 목표와 컨텍스트 사용량을 우측 패널에 보여 줍니다. `/session-pane` · `/where` · [코드](mods/gongbang-mods/hooks/register.tsx)
+
+함께 쓰면 좋은 외부 mod는 [Mod 문서](docs/mods.md#함께-쓰면-좋은-외부-mod)에 정리했습니다.
 
 ## 상황별로 고르기
 

@@ -34,6 +34,10 @@ dev-gongbang의 모든 사용 문서 목록입니다. 스킬 페이지에는 언
 
 - [analyzing-requirements](skills/analyzing-requirements.md): 기획서를 요구사항과 개발 범위 문서로 정리합니다.
 
+## Mod
+
+- [gongbang-mods](mods.md): 도구 호출 접기, 카드형 메시지와 마크다운, 세션 목표와 컨텍스트 우측 패널
+
 ## 가이드
 
 - [스킬 커스텀하기](customization.md): 스킬을 복사해 고치고, 검사하고, 시험하는 방법

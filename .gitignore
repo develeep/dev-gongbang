@@ -6,3 +6,6 @@ evals-trigger/**/results/
 .claude/settings.local.json
 
 .DS_Store
+
+# Claude Code가 mod를 불러올 때 mod 폴더에 쓰는 타입 파일
+mods/*/.claude-plugin/types/

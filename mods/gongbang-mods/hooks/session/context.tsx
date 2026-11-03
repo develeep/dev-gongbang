@@ -1,0 +1,234 @@
+// Session pane, context half: the context window as a stacked bar with a legend, plus the recap
+// that recap.tsx keeps. Adapted from context-bar in hamzafer/claude-code-mods (MIT, see LICENSE here):
+// the band above the prompt became a side pane, opened at start and by /session-pane.
+import { atom, read, update } from 'claude-code'
+import type { EngineInterface, On } from 'claude-code'
+
+import type { Reading, Slice } from '../../types'
+
+const MIN_WIDTH = 20 // narrower than this, the bar is not drawn
+const SPLIT = '   '
+// /context's theme gives several rows the same grey, so each used row gets its own color, in order.
+const PALETTE = ['#7aa2f7', '#7dcfff', '#bb9af7', '#9ece6a', '#e0af68', '#f7768e', '#73daca', '#ff9e64', '#c0caf5']
+const MESSAGES = '#d97757' // the row that grows, in the accent color
+const FREE = '#808080' // a mid grey thin line reads as empty on dark and light themes alike
+const BUFFER = '#808080'
+const GLYPH = { used: '█', free: '─', buffer: '░' } as const
+
+// Held by the host, so the bar survives a hot reload of this file.
+const reading = atom({ plugin: 'gongbang-mods', key: 'reading' } as const, null as Reading | null)
+const isHidden = atom({ plugin: 'gongbang-mods', key: 'isHidden' } as const, false)
+
+const PANE = 'side'
+// Written by recap.tsx.
+const recapRef = { plugin: 'gongbang-mods', key: 'recap' } as const
+const liveRef = { plugin: 'gongbang-mods', key: 'live' } as const
+const nextStepsActive = { plugin: 'next-steps', key: 'active' } as const
+
+export function sessionContext(on: On) {
+  on('session.start', async ($, e, next) => {
+    const r = await next(e)
+    await $.command.register({ name: 'session-pane', description: 'Open the side pane with the session goal and context window' }).catch(() => {}) // a name Claude Code already has is refused: start anyway
+    await $.command.register({ name: 'where', description: 'Recap the session so far in a few bullets' }).catch(() => {}) // answered in recap.tsx
+    const hidden = (await $.store.get('contextHidden').catch(() => undefined)) === true
+    await update($, isHidden, () => hidden)
+    void refresh($).catch(() => {})
+    // Seats as a sidebar only where the terminal is wide enough; /session-pane opens it anywhere.
+    void $.ui.open({ id: PANE, title: 'Session' }).catch(() => {})
+    return r
+  })
+
+  // turn.complete calls refresh from recap.tsx: one module takes each unmatched event once.
+
+  on('session.compact', async ($, e, next) => {
+    const r = await next(e)
+    if (!e.agentId && 'messages' in r) void refresh($).catch(() => {}) // a /compact empties the window without a turn ending
+    return r
+  }).catch(($, e, next) => next(e)) // a failure here must never block the person's work
+
+  // A /clear starts a new session with no session.start and no turn yet: read the new window once the
+  // end step's time bound has passed (a read still running at it would be aborted).
+  on('session.end', async ($, e, next) => {
+    const r = await next(e)
+    if (e.reason !== 'clear') return r
+    await update($, reading, () => null) // the old window is gone
+    const hidden = (await $.store.get('contextHidden').catch(() => undefined)) === true
+    await update($, isHidden, () => hidden) // a hidden bar stays hidden in the new session
+    const left = next.budget.remainingMs
+    try {
+      $.clock.after(Number.isFinite(left) ? left : 0, () => void refresh($).catch(() => {}))
+    } catch {
+      // no clock: the next turn refreshes
+    }
+    return r
+  })
+
+  on('command.run', { command: 'session-pane' }, async $ => {
+    await update($, isHidden, () => false)
+    await refresh($).catch(() => {})
+    await $.ui.open({ id: PANE, title: 'Session' })
+    return { text: 'Session pane opened' }
+  })
+
+  on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
+    const { Box, Text } = $.ui.resolve(e)
+    const inner = Math.max(MIN_WIDTH, e.props.bodyColumns)
+    const { value: rc = null } = await $.state.get(recapRef)
+    const { value: liveNow = '' } = await $.state.get(liveRef)
+    const { value: hasNextSteps = false } = await $.state.get(nextStepsActive)
+    const r = await read($, reading)
+
+    const goal = rc ? (
+      <Box flexDirection="column">
+        <Text color="cyan" bold>◆ Goal</Text>
+        <Text>{rc.goal}</Text>
+        <Box marginTop={1} flexDirection="column">
+          <Text dimColor>now</Text>
+          <Text>{liveNow || rc.now}</Text>
+        </Box>
+        {!hasNextSteps && rc.next !== '' && (
+          <Box marginTop={1} flexDirection="column">
+            <Text dimColor>next</Text>
+            <Text>{rc.next}</Text>
+          </Box>
+        )}
+        {rc.waiting !== '' && (
+          <Box marginTop={1} flexDirection="column">
+            <Text color="yellow">waiting on you</Text>
+            <Text color="yellow">{rc.waiting}</Text>
+          </Box>
+        )}
+      </Box>
+    ) : (
+      <Text dimColor>◆ Goal: shows after the first turn</Text>
+    )
+
+    if (!r) return <Box flexDirection="column">{goal}<Box marginTop={1}><Text dimColor>◆ Context: shows after the first turn</Text></Box></Box>
+
+    const level = r.compactsAt ? r.total / r.compactsAt : r.total / r.window
+    return (
+      <Box flexDirection="column">
+        {goal}
+        <Box marginTop={1} flexDirection="column">
+          <Box flexDirection="row" justifyContent="space-between">
+            <Text>
+              <Text color="#d97757">{'◆ '}</Text>
+              <Text bold>Context</Text>
+            </Text>
+            <Text bold color="black" backgroundColor={level >= 0.9 ? 'red' : level >= 0.7 ? 'yellow' : 'green'}>{` ${r.percent}% `}</Text>
+          </Box>
+          <Text dimColor>{`${tokens(r.total)} of ${tokens(r.window)}${r.compactsAt ? ` · compacts at ${tokens(r.compactsAt)}` : ''}`}</Text>
+          <Text>
+            {cells(r, inner).map(c => (
+              <Text color={c.color}>{c.text}</Text>
+            ))}
+          </Text>
+          {/* One category per row: the pane is narrow, so the legend is a list. */}
+          {r.slices.map(s => (
+            <Text wrap="truncate-end">
+              <Text color={s.color}>{s.kind === 'used' ? '■ ' : `${GLYPH[s.kind]} `}</Text>
+              <Text dimColor={s.kind !== 'used'}>{`${s.name} `}</Text>
+              <Text bold={s.kind === 'used'}>{tokens(s.tokens)}</Text>
+              {s.kind === 'used' && <Text dimColor>{` ${share(s.tokens, r.window)}`}</Text>}
+            </Text>
+          ))}
+        </Box>
+      </Box>
+    )
+  })
+}
+
+// Asks the engine for /context's breakdown, estimated locally (no token-count calls).
+export async function refresh($: EngineInterface) {
+  if (await read($, isHidden)) return
+  const usage = await $.session.usage({ breakdown: 'summary' })
+  const b = usage.context.breakdown
+  if (!b || !(b.rawMaxTokens > 0)) return // no window to measure against
+  const pct = await $.env.get('CLAUDE_AUTOCOMPACT_PCT_OVERRIDE').catch(() => undefined)
+  const pctOverride = pct ? parseFloat(pct) : undefined // parsed as auto-compaction parses it
+  await update($, reading, () => toReading(b, pctOverride))
+}
+
+// The breakdown's threshold leaves out CLAUDE_AUTOCOMPACT_PCT_OVERRIDE; auto-compaction applies it
+// as min(threshold, effective window * pct / 100) when 0 < pct <= 100. The effective window (the
+// window less room for output) is what the threshold sits a fixed 13k buffer below.
+const AUTOCOMPACT_BUFFER = 13_000
+export function compactPoint(threshold: number, pctOverride?: number) {
+  if (!(pctOverride !== undefined && pctOverride > 0 && pctOverride <= 100)) return threshold
+  return Math.min(threshold, Math.floor((threshold + AUTOCOMPACT_BUFFER) * (pctOverride / 100)))
+}
+
+export function toReading(b: {
+  categories: { name: string; tokens: number; color: string; kind: string }[]
+  totalTokens: number
+  rawMaxTokens: number
+  percentage: number
+  autoCompactThreshold?: number
+  isAutoCompactEnabled: boolean
+}, pctOverride?: number): Reading {
+  const slices: Slice[] = b.categories
+    .filter(c => c.kind !== 'deferred' && c.tokens > 0)
+    .map(c => ({ name: c.name.toLowerCase(), tokens: c.tokens, color: c.color, kind: c.kind as Slice['kind'] }))
+  const order = { used: 0, free: 1, buffer: 2 }
+  slices.sort((x, y) => order[x.kind] - order[y.kind]) // stable: used rows keep /context's order
+  let next = 0
+  for (const s of slices) {
+    s.color = s.kind === 'free' ? FREE : s.kind === 'buffer' ? BUFFER : s.name === 'messages' ? MESSAGES : PALETTE[next++ % PALETTE.length]!
+  }
+  return {
+    slices,
+    total: b.totalTokens,
+    window: b.rawMaxTokens,
+    percent: b.percentage,
+    compactsAt: b.isAutoCompactEnabled && b.autoCompactThreshold !== undefined
+      ? compactPoint(b.autoCompactThreshold, pctOverride)
+      : undefined,
+  }
+}
+
+// The bar as runs of cells: each slice gets its share of `width`, a used one at least one cell.
+export function cells(r: Reading, width: number) {
+  const sizes = r.slices.map(s => Math.max(s.kind === 'used' ? 1 : 0, Math.round((s.tokens / r.window) * width)))
+  // Rounding leaves the sum a few cells off: free space takes the difference first, then the largest slices.
+  let diff = width - sizes.reduce((a, n) => a + n, 0)
+  const isUsed = (i: number) => r.slices[i]!.kind === 'used'
+  const order = r.slices.map((_, i) => i).sort((a, b) => Number(isUsed(a)) - Number(isUsed(b)) || sizes[b]! - sizes[a]!)
+  for (const i of order) {
+    if (diff === 0) break
+    const size = Math.max(isUsed(i) ? 1 : 0, sizes[i]! + diff)
+    diff -= size - sizes[i]!
+    sizes[i] = size
+  }
+  return r.slices.map((s, i) => ({ color: s.color, kind: s.kind, text: GLYPH[s.kind].repeat(sizes[i]!) })).filter(c => c.text !== '')
+}
+
+// The legend, packed into lines no wider than `width`.
+export function legend(r: Reading, width: number) {
+  const lines: Slice[][] = [[]]
+  let used = 0
+  for (const s of r.slices) {
+    const size = 2 + s.name.length + 1 + tokens(s.tokens).length + (s.kind === 'used' ? 1 + share(s.tokens, r.window).length : 0)
+    const line = lines.at(-1)!
+    if (line.length > 0 && used + SPLIT.length + size > width) {
+      lines.push([s])
+      used = size
+    } else {
+      used += (line.length > 0 ? SPLIT.length : 0) + size
+      line.push(s)
+    }
+  }
+  return lines.filter(l => l.length > 0)
+}
+
+export function tokens(n: number) {
+  if (n >= 1_000_000) return `${+(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`
+  if (n >= 10_000) return `${Math.round(n / 1000)}k`
+  if (n >= 1000) return `${+(n / 1000).toFixed(1)}k`
+  return String(n)
+}
+
+export function share(n: number, window: number) {
+  const p = (n / window) * 100
+  if (p > 0 && p < 0.1) return '<0.1%'
+  return `${p >= 10 ? Math.round(p) : +p.toFixed(1)}%`
+}

@@ -14,7 +14,7 @@
 
 These Claude Code skills help you frame requests, build prompts and skills, write docs, and set and check code rules. You install them as one plugin, and you can copy a skill and edit it to fit your situation. The skill files are written in Korean.
 
-**Contents**: [Installation](#installation) · [Skills](#skills) · [In-progress skills](#in-progress-skills) · [Choosing a skill](#choosing-a-skill) · [Customize](#customize) · [Contributing](#contributing) · [All docs](docs/en/README.md)
+**Contents**: [Installation](#installation) · [Skills](#skills) · [In-progress skills](#in-progress-skills) · [Mods](#mods) · [Choosing a skill](#choosing-a-skill) · [Customize](#customize) · [Contributing](#contributing) · [All docs](docs/en/README.md)
 
 ## Installation
 
@@ -76,6 +76,18 @@ Available when you install `gongbang-dev`. Their behavior changes often.
 ### Model-invoked
 
 - [analyzing-requirements](docs/en/skills/analyzing-requirements.md): Reads a planning document received as a link or as PDF/PPT/MD, and organizes requirements and development scope by service and development area into a Markdown document. `/gongbang:analyzing-requirements [planning document link or file path]` · [SKILL.md](skills/in-progress/analyzing-requirements/SKILL.md)
+
+## Mods
+
+`gongbang-mods` is a bundle of mods that restyle the Claude Code terminal. Install it separately from the skills plugin.
+
+```bash
+claude plugin install gongbang-mods@dev-gongbang
+```
+
+- [gongbang-mods](docs/en/mods.md): Folds tool calls to one line, splits your messages and replies into cards, and shows the session goal and context usage in a side pane. `/session-pane` · `/where` · [code](mods/gongbang-mods/hooks/register.tsx)
+
+Outside mods that pair well are listed in the [Mods doc](docs/en/mods.md#outside-mods-that-pair-well).
 
 ## Choosing a skill
 
