@@ -63,6 +63,8 @@ One side pane shows the session goal and context usage together.
 
 Both fill in after the first turn.
 
+With the [pokemon mod](https://github.com/dgokcin/claude-pokemon-mod), the same session view is also drawn at the top of the pane `/pokemon pane` opens. Only one pane shows at a time (the others become tabs), so this keeps the session and the mon in view together. The mon is drawn in the room left under the session view, and the separate `Session` tab can be closed.
+
 | Command | What it does |
 |---|---|
 | `/session-pane` | Opens the Session pane |
@@ -117,6 +119,15 @@ While `next-steps` shows its list, the Session pane hides its own `next` item so
 claude plugin marketplace add YeonwooSung/my-claude-code-mods
 claude plugin install loop-detective@my-claude-code-mods
 claude plugin install context-inspector@my-claude-code-mods
+```
+
+[dgokcin/claude-pokemon-mod](https://github.com/dgokcin/claude-pokemon-mod):
+
+- **pokemon**: a pixel Pokémon above the prompt that reacts to what Claude does. Moved to the side pane with `/pokemon pane`, it shares the pane with the session view. The repository has no license, so none of its code is included here.
+
+```bash
+claude plugin marketplace add dgokcin/claude-pokemon-mod
+claude plugin install pokemon@claude-pokemon
 ```
 
 Don't install `context-bar` or `where-am-i` from the hamzafer repository: they show the same information as the Session pane again above the prompt.
