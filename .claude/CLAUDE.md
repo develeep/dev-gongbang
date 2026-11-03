@@ -45,7 +45,7 @@ mod는 `mods/<플러그인 이름>/`에 두고 `marketplace.json`에 따로 등�
 
 ## Extras
 
-`extras/<이름>/`에는 플러그인에 넣을 수 없어 사용자가 직접 설치하는 파일을 둔다. 지금은 `statusline/` 하나다. 버전을 매기지 않고, 설치 방법과 동작은 `docs/mods.md`와 `docs/en/mods.md`에 함께 적는다.
+`extras/<이름>/`에는 플러그인에 넣을 수 없어 사용자가 직접 설치하는 파일을 둔다. 지금은 `statusline/`과, mod 환경을 한 번에 설정하는 `setup.sh`가 있다. mod나 외부 mod 목록이 바뀌면 `setup.sh`도 고친다. 버전을 매기지 않고, 설치 방법과 동작은 `docs/mods.md`와 `docs/en/mods.md`에 함께 적는다.
 
 ## 릴리스
 

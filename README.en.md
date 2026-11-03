@@ -89,6 +89,8 @@ claude plugin install gongbang-mods@dev-gongbang
 
 Outside mods that pair well are listed in the [Mods doc](docs/en/mods.md#outside-mods-that-pair-well). A [status line script](docs/en/mods.md#status-line) showing the model, branch and plan usage is installed separately. [code](extras/statusline/statusline.py)
 
+To get the same environment on another computer, run `extras/setup.sh`. [details](docs/en/mods.md#same-setup-on-another-computer)
+
 ## Choosing a skill
 
 | Situation | Skill |

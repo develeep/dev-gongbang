@@ -14,6 +14,7 @@
 - [Turning it off and updating](#turning-it-off-and-updating)
 - [Outside mods that pair well](#outside-mods-that-pair-well)
 - [Status line](#status-line)
+- [Same setup on another computer](#same-setup-on-another-computer)
 - [Credits](#credits)
 
 ## Installation
@@ -174,6 +175,39 @@ You can copy it (`cp`) instead of linking. A link follows the repository on `git
 
 - The branch and usage links are clickable only in terminals that support OSC 8. If the status line shows text like `]8;;https://…`, set `LINKS = True` to `False` in the script.
 - The status line redraws when Claude Code updates its state. The times left are computed at that moment.
+
+## Same setup on another computer
+
+`extras/setup.sh` sets up the mod environment on this page in one go. Run it from a clone of the repository, then restart Claude Code.
+
+```bash
+git clone https://github.com/develeep/dev-gongbang && cd dev-gongbang
+extras/setup.sh
+```
+
+What the script does, skipping any step already done, so it is safe to run again:
+
+- Adds four marketplaces and installs `gongbang-mods` and the seven [outside mods](#outside-mods-that-pair-well).
+- Sets `next-steps` to suggest in Korean.
+- Links the status line script to `~/.claude/statusline.py`.
+- Puts `"tui": "fullscreen"` and `statusLine` in `~/.claude/settings.json`, keeping the previous file as `settings.json.bak`. Side panes dock on the right only in the fullscreen layout.
+
+pokemon keeps its settings inside the plugin, so the script can't set them. After restarting Claude Code, type these once:
+
+```
+/pokemon charmander     pick a starter (Bulbasaur, Charmander, Squirtle, Pikachu)
+/pokemon pane           move it into the side pane
+/pokemon size small     so it fits under the session view
+/pokemon images on      only in a terminal that draws images (kitty, Ghostty, WezTerm, Orca)
+```
+
+To try it first without touching your current setup, point the config folder at an empty one. Check the result with `CLAUDE_CONFIG_DIR=<folder> claude plugin list`.
+
+```bash
+CLAUDE_CONFIG_DIR="$HOME/.cache/claude-test" extras/setup.sh
+```
+
+The script doesn't set up what differs per computer, such as the terminal app, fonts or Chrome.
 
 ## Credits
 
