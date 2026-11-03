@@ -2,7 +2,7 @@
 // that recap.tsx keeps. Adapted from context-bar in hamzafer/claude-code-mods (MIT, see LICENSE here):
 // the band above the prompt became a side pane, opened at start and by /session-pane.
 import { atom, read, update } from 'claude-code'
-import type { EngineInterface, On } from 'claude-code'
+import type { EngineInterface, On, RenderInput } from 'claude-code'
 
 import type { Reading, Slice } from '../../types'
 
@@ -20,6 +20,8 @@ const reading = atom({ plugin: 'gongbang-mods', key: 'reading' } as const, null 
 const isHidden = atom({ plugin: 'gongbang-mods', key: 'isHidden' } as const, false)
 
 const PANE = 'side'
+// The pane the pokemon mod (dgokcin/claude-pokemon-mod) opens with /pokemon pane.
+const POKEMON_PANE = 'pokemon'
 // Written by recap.tsx.
 const recapRef = { plugin: 'gongbang-mods', key: 'recap' } as const
 const liveRef = { plugin: 'gongbang-mods', key: 'live' } as const
@@ -70,72 +72,96 @@ export function sessionContext(on: On) {
     return { text: 'Session pane opened' }
   })
 
-  on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
-    const { Box, Text } = $.ui.resolve(e)
-    const inner = Math.max(MIN_WIDTH, e.props.bodyColumns)
-    const { value: rc = null } = await $.state.get(recapRef)
-    const { value: liveNow = '' } = await $.state.get(liveRef)
-    const { value: hasNextSteps = false } = await $.state.get(nextStepsActive)
-    const r = await read($, reading)
+  on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => sessionTree($, e))
 
-    const goal = rc ? (
-      <Box flexDirection="column">
-        <Text color="cyan" bold>◆ Goal</Text>
-        <Text>{rc.goal}</Text>
-        <Box marginTop={1} flexDirection="column">
-          <Text dimColor>now</Text>
-          <Text>{liveNow || rc.now}</Text>
-        </Box>
-        {!hasNextSteps && rc.next !== '' && (
-          <Box marginTop={1} flexDirection="column">
-            <Text dimColor>next</Text>
-            <Text>{rc.next}</Text>
-          </Box>
-        )}
-        {rc.waiting !== '' && (
-          <Box marginTop={1} flexDirection="column">
-            <Text color="yellow">waiting on you</Text>
-            <Text color="yellow">{rc.waiting}</Text>
-          </Box>
-        )}
-      </Box>
-    ) : (
-      <Text dimColor>◆ Goal: shows after the first turn</Text>
-    )
-
-    if (!r) return <Box flexDirection="column">{goal}<Box marginTop={1}><Text dimColor>◆ Context: shows after the first turn</Text></Box></Box>
-
-    const level = r.compactsAt ? r.total / r.compactsAt : r.total / r.window
+  // The pokemon mod's own pane (/pokemon pane): the session goes on top, the mon keeps the rest.
+  // Only one pane shows at a time (the others are tabs), so this is how both stay in view.
+  on('ui.render', { component: 'Pane', requestId: POKEMON_PANE }, async ($, e, next) => {
+    const theirs = await next(e)
+    if (e.surface !== 'terminal' && e.surface !== 'desktop') return theirs
+    const { Box } = $.ui.resolve(e)
+    // Docked, pokemon sizes its scene to the whole body and sits it at the foot. Clipping its tree
+    // from the top keeps the mon in view under the session.
+    const docked = e.props.placement === 'dock'
     return (
-      <Box flexDirection="column">
-        {goal}
-        <Box marginTop={1} flexDirection="column">
-          <Box flexDirection="row" justifyContent="space-between">
-            <Text>
-              <Text color="#d97757">{'◆ '}</Text>
-              <Text bold>Context</Text>
-            </Text>
-            <Text bold color="black" backgroundColor={level >= 0.9 ? 'red' : level >= 0.7 ? 'yellow' : 'green'}>{` ${r.percent}% `}</Text>
-          </Box>
-          <Text dimColor>{`${tokens(r.total)} of ${tokens(r.window)}${r.compactsAt ? ` · compacts at ${tokens(r.compactsAt)}` : ''}`}</Text>
-          <Text>
-            {cells(r, inner).map(c => (
-              <Text color={c.color}>{c.text}</Text>
-            ))}
-          </Text>
-          {/* One category per row: the pane is narrow, so the legend is a list. */}
-          {r.slices.map(s => (
-            <Text wrap="truncate-end">
-              <Text color={s.color}>{s.kind === 'used' ? '■ ' : `${GLYPH[s.kind]} `}</Text>
-              <Text dimColor={s.kind !== 'used'}>{`${s.name} `}</Text>
-              <Text bold={s.kind === 'used'}>{tokens(s.tokens)}</Text>
-              {s.kind === 'used' && <Text dimColor>{` ${share(s.tokens, r.window)}`}</Text>}
-            </Text>
-          ))}
+      <Box flexDirection="column" height={docked ? e.props.scroll.bodyRows : undefined}>
+        <Box flexDirection="column" flexShrink={0}>
+          {await sessionTree($, e)}
+        </Box>
+        <Box flexDirection="column" flexGrow={1} flexShrink={1} justifyContent="flex-end" overflow="hidden" marginTop={1}>
+          {theirs}
         </Box>
       </Box>
     )
   })
+}
+
+// The session's goal and context, as the Session pane draws it; also drawn on top of pokemon's pane.
+async function sessionTree($: EngineInterface, e: RenderInput<'Pane'>) {
+  const { Box, Text } = $.ui.resolve(e)
+  const inner = Math.max(MIN_WIDTH, e.props.bodyColumns)
+  const { value: rc = null } = await $.state.get(recapRef)
+  const { value: liveNow = '' } = await $.state.get(liveRef)
+  const { value: hasNextSteps = false } = await $.state.get(nextStepsActive)
+  const r = await read($, reading)
+
+  const goal = rc ? (
+    <Box flexDirection="column">
+      <Text color="cyan" bold>◆ Goal</Text>
+      <Text>{rc.goal}</Text>
+      <Box marginTop={1} flexDirection="column">
+        <Text dimColor>now</Text>
+        <Text>{liveNow || rc.now}</Text>
+      </Box>
+      {!hasNextSteps && rc.next !== '' && (
+        <Box marginTop={1} flexDirection="column">
+          <Text dimColor>next</Text>
+          <Text>{rc.next}</Text>
+        </Box>
+      )}
+      {rc.waiting !== '' && (
+        <Box marginTop={1} flexDirection="column">
+          <Text color="yellow">waiting on you</Text>
+          <Text color="yellow">{rc.waiting}</Text>
+        </Box>
+      )}
+    </Box>
+  ) : (
+    <Text dimColor>◆ Goal: shows after the first turn</Text>
+  )
+
+  if (!r) return <Box flexDirection="column">{goal}<Box marginTop={1}><Text dimColor>◆ Context: shows after the first turn</Text></Box></Box>
+
+  const level = r.compactsAt ? r.total / r.compactsAt : r.total / r.window
+  return (
+    <Box flexDirection="column">
+      {goal}
+      <Box marginTop={1} flexDirection="column">
+        <Box flexDirection="row" justifyContent="space-between">
+          <Text>
+            <Text color="#d97757">{'◆ '}</Text>
+            <Text bold>Context</Text>
+          </Text>
+          <Text bold color="black" backgroundColor={level >= 0.9 ? 'red' : level >= 0.7 ? 'yellow' : 'green'}>{` ${r.percent}% `}</Text>
+        </Box>
+        <Text dimColor>{`${tokens(r.total)} of ${tokens(r.window)}${r.compactsAt ? ` · compacts at ${tokens(r.compactsAt)}` : ''}`}</Text>
+        <Text>
+          {cells(r, inner).map(c => (
+            <Text color={c.color}>{c.text}</Text>
+          ))}
+        </Text>
+        {/* One category per row: the pane is narrow, so the legend is a list. */}
+        {r.slices.map(s => (
+          <Text wrap="truncate-end">
+            <Text color={s.color}>{s.kind === 'used' ? '■ ' : `${GLYPH[s.kind]} `}</Text>
+            <Text dimColor={s.kind !== 'used'}>{`${s.name} `}</Text>
+            <Text bold={s.kind === 'used'}>{tokens(s.tokens)}</Text>
+            {s.kind === 'used' && <Text dimColor>{` ${share(s.tokens, r.window)}`}</Text>}
+          </Text>
+        ))}
+      </Box>
+    </Box>
+  )
 }
 
 // Asks the engine for /context's breakdown, estimated locally (no token-count calls).
