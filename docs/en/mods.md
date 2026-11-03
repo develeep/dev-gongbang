@@ -65,6 +65,8 @@ Both fill in after the first turn.
 
 With the [pokemon mod](https://github.com/dgokcin/claude-pokemon-mod), the same session view is also drawn at the top of the pane `/pokemon pane` opens. Only one pane shows at a time (the others become tabs), so this keeps the session and the mon in view together. The mon is drawn in the room left under the session view, and the separate `Session` tab can be closed.
 
+If the mon is cut off at the bottom, shrink it to half size with `/pokemon size small`. That size is recommended alongside the session view.
+
 | Command | What it does |
 |---|---|
 | `/session-pane` | Opens the Session pane |
