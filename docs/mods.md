@@ -65,6 +65,8 @@ claude plugin install gongbang-mods@dev-gongbang
 
 [pokemon mod](https://github.com/dgokcin/claude-pokemon-mod)를 함께 쓰면, `/pokemon pane`으로 연 포켓몬 패널 위쪽에도 같은 Session 내용을 그립니다. 패널은 한 번에 하나만 보이고 나머지는 탭으로 바뀌기 때문에, 이렇게 해야 세션 정보와 포켓몬을 한 화면에서 함께 볼 수 있습니다. 포켓몬은 Session 내용 아래 남은 칸에 그려집니다. 이때 따로 열린 `Session` 탭은 닫아도 됩니다.
 
+포켓몬이 아래쪽에서 잘리면 `/pokemon size small`로 절반 크기로 줄이세요. Session과 함께 쓸 때는 이 크기를 추천합니다.
+
 | 명령 | 하는 일 |
 |---|---|
 | `/session-pane` | Session 패널을 엽니다 |
