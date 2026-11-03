@@ -43,6 +43,10 @@ mod는 `mods/<플러그인 이름>/`에 두고 `marketplace.json`에 따로 등�
 - 외부 코드를 가져오면 원본 라이선스 파일을 그 폴더에 두고 `docs/mods.md`의 "출처" 절에 적는다.
 - `scripts/check.py`를 실행해 통과시킨다. mod마다 `claude plugin validate`와 `claude plugin test`를 돌린다.
 
+## Extras
+
+`extras/<이름>/`에는 플러그인에 넣을 수 없어 사용자가 직접 설치하는 파일을 둔다. 지금은 `statusline/` 하나다. 버전을 매기지 않고, 설치 방법과 동작은 `docs/mods.md`와 `docs/en/mods.md`에 함께 적는다.
+
 ## 릴리스
 
 `plugin.json`의 `version`을 올린 PR이 머지되면, 최신 `master`에서 다음을 실행한다. 태그 이름은 `gongbang--v<버전>`이다.

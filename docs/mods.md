@@ -4,7 +4,7 @@
 
 # Mod
 
-`gongbang-mods`는 Claude Code 터미널 화면을 꾸미는 mod 묶음입니다. mod는 Claude Code의 화면과 동작에 hook을 거는 플러그인입니다. 이 문서를 읽으면 `gongbang-mods`가 화면을 어떻게 바꾸는지, 설치하고 끄는 방법, 함께 쓰면 좋은 외부 mod를 알 수 있습니다.
+`gongbang-mods`는 Claude Code 터미널 화면을 꾸미는 mod 묶음입니다. mod는 Claude Code의 화면과 동작에 hook을 거는 플러그인입니다. 이 문서를 읽으면 `gongbang-mods`가 화면을 어떻게 바꾸는지, 설치하고 끄는 방법, 함께 쓰면 좋은 외부 mod, 따로 설치하는 상태줄 스크립트를 알 수 있습니다.
 
 ## 목차
 
@@ -13,6 +13,7 @@
 - [알아 둘 점](#알아-둘-점)
 - [끄기와 업데이트](#끄기와-업데이트)
 - [함께 쓰면 좋은 외부 mod](#함께-쓰면-좋은-외부-mod)
+- [상태줄](#상태줄)
 - [출처](#출처)
 
 ## 설치
@@ -133,6 +134,46 @@ claude plugin install pokemon@claude-pokemon
 ```
 
 hamzafer 저장소의 `context-bar`와 `where-am-i`는 따로 설치하지 마세요. Session 패널과 같은 정보를 입력창 위에 한 번 더 보여 줍니다.
+
+## 상태줄
+
+`extras/statusline/statusline.py`는 입력창 아래 상태줄을 꾸미는 스크립트입니다. 플러그인이 사용자의 `statusLine` 설정을 바꿀 수 없어서 `gongbang-mods`에 넣지 않고 따로 둡니다.
+
+```
+~/dev-gongbang │ ◆ Opus 5.5 medium │ ⎇ master* │ 5h ▱▱▱▱▱ 5% ↻3h11m  7d ▰▰▰▰▱ 72% ↻2d7h │ cache 39m │ $5.79
+```
+
+| 항목 | 뜻 |
+|---|---|
+| `~/dev-gongbang` | 작업 폴더 |
+| `◆ Opus 5.5 medium` | 모델과 effort. effort를 지원하지 않는 모델에서는 effort가 빠집니다 |
+| `⎇ master*` | git 브랜치. `*`는 커밋하지 않은 변경이 있다는 뜻입니다. 누르면 GitHub의 브랜치 페이지가 열립니다 |
+| `5h`, `7d` | 요금제의 5시간·주간 한도 사용률과 초기화까지 남은 시간. 누르면 claude.ai 사용량 페이지가 열립니다. 구독 요금제에서 첫 응답을 받은 뒤에 나옵니다 |
+| `cache 39m` | 프롬프트 캐시가 만료되기까지 남은 시간. 이보다 오래 쉬면 다음 요청에서 캐시를 다시 만듭니다 |
+| `$5.79` | 세션 비용 |
+
+사용률은 70% 이상이면 노랑, 90% 이상이면 빨강으로 바뀝니다.
+
+### 설치
+
+Python 3와 git이 필요합니다. 저장소를 받은 폴더에서 스크립트를 연결하고, `~/.claude/settings.json`에 `statusLine`을 넣으세요.
+
+```bash
+ln -s "$PWD/extras/statusline/statusline.py" ~/.claude/statusline.py
+```
+
+```json
+{
+  "statusLine": { "type": "command", "command": "python3 ~/.claude/statusline.py" }
+}
+```
+
+링크(`ln -s`) 대신 복사(`cp`)해도 됩니다. 링크로 두면 저장소를 `git pull`할 때 상태줄도 함께 바뀌고, 복사하면 직접 고친 내용이 그대로 남습니다.
+
+### 알아 둘 점
+
+- 브랜치와 사용량 링크는 OSC 8을 지원하는 터미널에서만 눌립니다. 상태줄에 `]8;;https://…` 같은 글자가 보이면 스크립트의 `LINKS = True`를 `False`로 바꾸세요.
+- 상태줄은 Claude Code가 상태를 갱신할 때 다시 그려집니다. 남은 시간은 그때 계산한 값입니다.
 
 ## 출처
 

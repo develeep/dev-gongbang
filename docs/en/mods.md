@@ -4,7 +4,7 @@
 
 # Mods
 
-`gongbang-mods` is a bundle of mods that restyle the Claude Code terminal. A mod is a plugin that hooks into Claude Code's screen and behavior. This page covers how `gongbang-mods` changes the screen, how to install and turn it off, and which outside mods pair well with it.
+`gongbang-mods` is a bundle of mods that restyle the Claude Code terminal. A mod is a plugin that hooks into Claude Code's screen and behavior. This page covers how `gongbang-mods` changes the screen, how to install and turn it off, which outside mods pair well with it, and the status line script installed separately.
 
 ## Contents
 
@@ -13,6 +13,7 @@
 - [Good to know](#good-to-know)
 - [Turning it off and updating](#turning-it-off-and-updating)
 - [Outside mods that pair well](#outside-mods-that-pair-well)
+- [Status line](#status-line)
 - [Credits](#credits)
 
 ## Installation
@@ -133,6 +134,46 @@ claude plugin install pokemon@claude-pokemon
 ```
 
 Don't install `context-bar` or `where-am-i` from the hamzafer repository: they show the same information as the Session pane again above the prompt.
+
+## Status line
+
+`extras/statusline/statusline.py` is a script that restyles the status line under the prompt. A plugin can't change a person's `statusLine` setting, so it lives apart from `gongbang-mods`.
+
+```
+~/dev-gongbang │ ◆ Opus 5.5 medium │ ⎇ master* │ 5h ▱▱▱▱▱ 5% ↻3h11m  7d ▰▰▰▰▱ 72% ↻2d7h │ cache 39m │ $5.79
+```
+
+| Item | Meaning |
+|---|---|
+| `~/dev-gongbang` | working folder |
+| `◆ Opus 5.5 medium` | model and effort. Effort is left out on models without it |
+| `⎇ master*` | git branch. `*` means uncommitted changes. Clicking it opens the branch on GitHub |
+| `5h`, `7d` | plan usage for the 5-hour and weekly limits, and time until each resets. Clicking it opens the claude.ai usage page. Shows on a subscription after the first reply |
+| `cache 39m` | time left before the prompt cache expires. A longer pause rebuilds the cache on the next request |
+| `$5.79` | session cost |
+
+Usage turns yellow at 70% and red at 90%.
+
+### Installation
+
+Needs Python 3 and git. From your clone of the repository, link the script and add `statusLine` to `~/.claude/settings.json`.
+
+```bash
+ln -s "$PWD/extras/statusline/statusline.py" ~/.claude/statusline.py
+```
+
+```json
+{
+  "statusLine": { "type": "command", "command": "python3 ~/.claude/statusline.py" }
+}
+```
+
+You can copy it (`cp`) instead of linking. A link follows the repository on `git pull`; a copy keeps your own edits.
+
+### Good to know
+
+- The branch and usage links are clickable only in terminals that support OSC 8. If the status line shows text like `]8;;https://…`, set `LINKS = True` to `False` in the script.
+- The status line redraws when Claude Code updates its state. The times left are computed at that moment.
 
 ## Credits
 
