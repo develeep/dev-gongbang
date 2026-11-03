@@ -87,7 +87,7 @@ claude plugin install gongbang-mods@dev-gongbang
 
 - [gongbang-mods](docs/en/mods.md): Folds tool calls to one line, splits your messages and replies into cards, and shows the session goal and context usage in a side pane. `/session-pane` · `/where` · [code](mods/gongbang-mods/hooks/register.tsx)
 
-Outside mods that pair well are listed in the [Mods doc](docs/en/mods.md#outside-mods-that-pair-well).
+Outside mods that pair well are listed in the [Mods doc](docs/en/mods.md#outside-mods-that-pair-well). A [status line script](docs/en/mods.md#status-line) showing the model, branch and plan usage is installed separately. [code](extras/statusline/statusline.py)
 
 ## Choosing a skill
 

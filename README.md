@@ -89,7 +89,7 @@ claude plugin install gongbang-mods@dev-gongbang
 
 - [gongbang-mods](docs/mods.md): 도구 호출을 한 줄로 접고, 메시지와 답변을 카드로 나누고, 세션 목표와 컨텍스트 사용량을 우측 패널에 보여 줍니다. `/session-pane` · `/where` · [코드](mods/gongbang-mods/hooks/register.tsx)
 
-함께 쓰면 좋은 외부 mod는 [Mod 문서](docs/mods.md#함께-쓰면-좋은-외부-mod)에 정리했습니다.
+함께 쓰면 좋은 외부 mod는 [Mod 문서](docs/mods.md#함께-쓰면-좋은-외부-mod)에 정리했습니다. 모델·브랜치·요금제 사용량을 보여 주는 [상태줄 스크립트](docs/mods.md#상태줄)는 따로 설치합니다. [코드](extras/statusline/statusline.py)
 
 ## 상황별로 고르기
 
