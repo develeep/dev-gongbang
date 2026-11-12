@@ -2,6 +2,7 @@
 
 출처: https://platform.claude.com/docs/ko/build-with-claude/prompt-engineering/prompting-claude-haiku-5-5
 사고 설정 출처: https://platform.claude.com/docs/en/build-with-claude/thinking-troubleshooting
+마이그레이션 출처: https://platform.claude.com/docs/en/models/haiku-5-5/migration-guide
 확인일: 2026-11-12 (출처 문서와 대조)
 각 스니펫 아래에 공식 문서의 영어 원문을 둔다. B2=영어이면 원문을 바탕으로 쓰고, 그 외 언어이면 한국어 스니펫을 바탕으로 쓴다. 공식 문서는 Haiku 4.5용 프롬프트가 수정 없이도 잘 동작한다고 본다. 아래 스니펫은 해당 문제가 보일 때만 넣는다.
 
@@ -16,7 +17,12 @@
 ## 특성 요약
 
 - effort를 지원하는 첫 Haiku다. **기본 effort는 `medium`**이고 `low`, `medium`, `high`, `xhigh`, `max`가 있다. effort가 Haiku 4.5의 사고 예산(`budget_tokens`)을 대신한다.
-- 적응형 사고가 기본으로 켜져 있고 사고 토큰이 `max_tokens`(최대 128,000)에 포함된다. `thinking: disabled`는 effort `high` 이하에서만 받고, `xhigh`·`max`에서는 400 오류다.
+- 적응형 사고가 기본으로 켜져 있고 사고 토큰이 `max_tokens`(최대 128,000)에 포함된다. `thinking: disabled`는 effort `high` 이하에서만 받고, `xhigh`·`max`에서는 400 오류다. `{"type": "enabled", "budget_tokens": N}`도 400 오류다.
+- 사고 블록은 기본적으로 `thinking` 필드가 비어 있고 `signature`만 온다. Haiku 4.5는 요약된 사고를 돌려줬다.
+- 이전 assistant 턴의 사고 블록이 컨텍스트에 남아 입력 토큰으로 계산된다. Haiku 4.5는 최신 턴의 사고만 남겼다.
+- Claude 4.7 이후 모델과 같은 토크나이저를 쓴다. 같은 텍스트가 Haiku 4.5보다 약 30% 많은 토큰이 된다. 큰 이미지도 고해상도 등급으로 처리되어 시각 토큰이 늘어난다(2,000×1,500 이미지는 약 2.5배).
+- 마지막 assistant 턴 prefill은 사고를 꺼도 400 오류다. Haiku 4.5는 사고를 끄면 받았다.
+- 컨텍스트 창은 1M 토큰, 최대 출력은 128K 토큰이다(Haiku 4.5는 200K, 64K).
 - "바로 답하라"는 지시로 사고를 막을 수 없다.
 - `low`에서는 필요한 검색을 건너뛰거나, 긴 에이전트 프롬프트에서 일찍 멈추거나, 검증을 빼먹기 쉽다.
 - `xhigh` 멀티턴 대화에서 답 전체를 사고 안에 쓰고 보이는 텍스트 없이 턴을 끝낼 때가 있다.
@@ -104,20 +110,26 @@ The rules in this system prompt hold for the whole conversation. Keep to them wh
 
 - "답하기 전에 숙고하지 말고 바로 답하라" 같은 문구. 사고를 막지 못한다. effort를 낮추거나 `high` 이하에서 사고를 끈다.
 - "현재에 관한 사실 질문은 모두 검색하라" 같은 일괄 검색 지시. 불필요한 검색만 늘린다. P1·P2로 바꾼다.
-- `budget_tokens` 사고 예산 설정. effort로 바꾼다.
+- `budget_tokens` 사고 예산 설정. 400 오류가 난다. `thinking: {"type": "adaptive"}`와 effort로 바꾼다.
+- 마지막 assistant 턴 prefill. 400 오류가 난다. 형식 강제는 structured outputs나 enum 필드 도구로, 서두 제거는 system 프롬프트의 "바로 답하라" 지시로, 이어 쓰기와 맥락 알림은 user 턴으로 옮긴다.
+- `temperature`, `top_p`, `top_k`. 요청에서 빼고 프롬프트로 동작을 조절한다.
 - 사고를 끄고 쓰던 통합에서, 도구를 반드시 호출해야 하는 요청의 `output_config.format`. 적응형 사고로 돌리거나 그 요청에서 형식 지정을 뺀다.
 
 ## 실행 설정 권고
 
 - `output_config.effort`: 기본값 `medium`에서 시작해 두세 단계를 자체 평가로 비교한다. 에이전트 코딩을 포함한 대부분의 작업은 `medium`, 지식 작업·긴 에이전트 작업·엄격한 지시 준수는 `high`를 쓴다. `xhigh`·`max`는 평가 이득이 비용을 정당화할 때만 쓰고, 그때는 Sonnet 5.5와도 성능·비용·속도를 비교한다. `xhigh`에서는 응답마다 빈 답이 없는지 확인한다.
-- `max_tokens`: 사고가 포함되므로 Haiku 4.5에서 사고 없이 잡은 값을 그대로 쓰면 답이 잘린다. 사고 몫까지 넉넉히 잡는다.
-- `thinking`: 기본(필드 생략 또는 `{"type": "adaptive"}`)을 유지한다. 사용자에게 보이는 답에 추론 텍스트가 섞이면 적응형 사고와 `medium`으로 돌린다. 끄려면 effort `high` 이하에서만 `{"type": "disabled"}`를 쓴다.
+- `max_tokens`: 사고가 포함되고 토큰 수도 약 30% 늘어나므로, Haiku 4.5에서 잡은 값을 그대로 쓰면 답이 잘린다. 값이 작으면 사고 블록 뒤 텍스트 없이 `stop_reason: "max_tokens"`로 끝날 수 있다. 프롬프트 토큰 수와 비용 추정도 `claude-haiku-5-5`로 다시 센다.
+- `thinking`: 기본(필드 생략 또는 `{"type": "adaptive"}`)을 유지한다. 사용자에게 보이는 답에 추론 텍스트가 섞이면 적응형 사고와 `medium`으로 돌린다. 끄려면 effort `high` 이하에서만 `{"type": "disabled"}`를 쓴다. 사고 요약을 읽으려면 `"display": "summarized"`를 넣는다.
+- 응답 파싱: 응답이 사고 블록으로 시작할 수 있으므로, 첫 콘텐츠 블록을 답으로 읽지 말고 `type`으로 블록을 고른다.
+- 오래된 사고 블록이 입력 토큰을 차지하면 context editing의 사고 블록 정리로 지운다.
 - effort를 대화 중에 바꿀 때: 메시지별 effort(베타 헤더 `mid-conversation-output-config-2026-07-01`, 적응형 사고 필요)는 프롬프트 캐시를 유지한다. 최상위 effort를 바꾸면 캐시가 무효가 된다. 사고를 끈 상태에서 메시지별 effort를 바꾸면 400 오류다.
-- 도구 호출 강제: 사고를 끈 채 JSON 형식을 쓰면서 도구 호출이 빠지면 `tool_choice`로 강제할 수 있다. 이때 호출 앞에 텍스트는 쓰지 않는다.
+- 도구 호출 강제: 사고를 끈 채 JSON 형식을 쓰면서 도구 호출이 빠지면 `tool_choice`(`any` 또는 도구 이름)로 강제할 수 있다. 이때 응답은 사고 블록과 앞 텍스트 없이 도구 호출로 시작한다. 먼저 사고하게 하려면 `tool_choice: {"type": "auto"}`를 쓴다.
+- 컴퓨터 사용: `computer_20250124`는 400 오류다. `computer_toolset_20260801` 도구 모음으로 바꾸고 `computer-use-2025-01-24` 베타 헤더를 뺀다. 이 도구 모음과 함께 보내면 400 오류가 나는 `fine-grained-tool-streaming-2025-05-14` 헤더도 뺀다.
 - 작업 중 사용자 메시지(M6): 사용자 텍스트를 `tool_result` 블록 안에 넣지 않는다. 같은 user 메시지에서 마지막 `tool_result` 뒤에 텍스트 블록으로 붙인다. 하네스 알림은 별도의 대화 중간 시스템 메시지로 보내고, 알림과 사용자 말을 한 블록에 섞지 않는다.
-- system 프롬프트 변경은 새 대화에만 적용한다. 대화 중 지시 변경은 최신 턴이나 대화 중간 시스템 메시지로 한다.
+- 대화 기록은 추가만 한다(append-only). system 프롬프트 변경은 새 대화에만 적용하고, 대화 중 지시 변경은 최신 턴이나 대화 중간 시스템 메시지로 한다. 대화 중에 `system`, `tools`, 이전 메시지를 바꾸고 사고 블록을 돌려보내면, `thinking.block_binding.prefix_mismatch_behavior`를 설정하지 않은 경우 400 오류다. 2026-08-31 00:00 UTC 이후 만든 계정에 적용되고, 그 전에 만든 계정은 오류가 날 수도 있고 안 날 수도 있다.
+- 저장한 대화를 다시 보낼 때는 그 대화를 만든 계정으로 보낸다. 다른 계정에서 보낸 사고 블록은 API가 모델에 전달하기 전에 지운다. 요청은 성공하지만 그 추론 없이 처리된다.
 - 거부 처리: 클라이언트에서 `stop_reason: "refusal"`을 처리한다. 정당한 사이버·생명과학 작업이 막히면 Cyber Verification Program이나 Life Sciences Verification Program에 신청한다.
-- 깨지는 API 변경 전체는 Haiku 5.5 마이그레이션 가이드(https://platform.claude.com/docs/en/models/haiku-5-5/migration-guide)를 안내한다.
+- Haiku 3.5 이하에서 옮기는 경우나 위에 없는 API 변경은 마이그레이션 가이드(맨 위 출처)를 안내한다.
 
 ## 검수 항목
 
@@ -125,4 +137,5 @@ The rules in this system prompt hold for the whole conversation. Keep to them wh
 - [ ] 검색 도구가 있으면 오늘 날짜가 들어갔고, P2는 system 프롬프트가 길거나 `low`일 때만 들어갔다
 - [ ] P3은 사고를 끌 때만 들어갔다
 - [ ] P4와 원칙 G의 과잉 엔지니어링 방지 문구가 함께 들어가지 않았다
-- [ ] `max_tokens`가 사고 몫을 포함하도록 실행 설정 권고에 기재됐다
+- [ ] `max_tokens`가 사고 몫과 토큰 증가를 포함하도록 실행 설정 권고에 기재됐다
+- [ ] prefill, `budget_tokens`, `temperature`·`top_p`·`top_k`에 의존하지 않는다
