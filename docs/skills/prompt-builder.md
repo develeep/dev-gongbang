@@ -26,7 +26,7 @@
 ## 준비물
 
 - 초안이 있으면 본문, 파일 경로, 첨부 중 하나로 넘기세요.
-- 대상 모델 가이드는 Opus 5.5, Opus 5, Sonnet 5.5, Sonnet 5, Fable 5.1, Haiku 4.5용이 있습니다. 다른 모델이면 모델 전용 조정 없이 공통 best practice만 적용합니다.
+- 대상 모델 가이드는 Opus 5.5, Opus 5, Sonnet 5.5, Sonnet 5, Fable 5.2, Fable 5.1, Haiku 5.5, Haiku 4.5용이 있습니다. 다른 모델이면 모델 전용 조정 없이 공통 best practice만 적용합니다.
 
 ## 진행 과정
 

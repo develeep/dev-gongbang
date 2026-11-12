@@ -7,7 +7,7 @@ Haiku 4.5에는 모델 전용 프롬프팅 문서가 없다. 공통 best practic
 - https://platform.claude.com/docs/en/build-with-claude/thinking-troubleshooting
 - https://platform.claude.com/docs/en/build-with-claude/extended-thinking
 - https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
-확인일: 2026-10-01 (출처 문서와 대조)
+확인일: 2026-11-12 (출처 문서와 대조)
 
 ## 목차
 - 특성 요약

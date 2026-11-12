@@ -1,6 +1,7 @@
 # CLAUDE.md / SKILL.md 작성 규칙
 
-출처: https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices (확인일: 2026-10-01)
+출처: https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices (확인일: 2026-11-12)
+출처: https://code.claude.com/docs/en/skills, https://code.claude.com/docs/en/memory (확인일: 2026-11-12)
 출처: https://agentskills.io/skill-creation/best-practices, https://agentskills.io/skill-creation/optimizing-descriptions, https://agentskills.io/specification (확인일: 2026-10-20)
 
 ## 인터뷰 항목
@@ -24,7 +25,7 @@ K7은 0라운드의 B1을 대신한다. 고른 모델마다 해당 모델 가이
 
 ## SKILL.md 규칙
 
-- **frontmatter**: `name`(64자 이하, 소문자·숫자·하이픈, XML 태그 불가, 예약어 불가), `description`(비어 있으면 안 되고 1,024자 이하, XML 태그 불가).
+- **frontmatter**: `name`(64자 이하, 소문자·숫자·하이픈, XML 태그 불가, 예약어 불가), `description`(비어 있으면 안 되고 1,024자 이하, XML 태그 불가). Claude Code는 스킬 목록에서 `description`과 `when_to_use`를 합쳐 1,536자에서 자르므로 핵심 용도를 맨 앞에 둔다.
 - **description**은 3인칭으로 쓰고, "도와드립니다"나 "당신은 이것으로" 같은 1인칭·2인칭 표현은 피한다. 나머지는 K10에 따라 다르다.
   - **Model-invoked**: 무엇을 하는지와 언제 쓰는지("~할 때 사용한다")를 모두 담는다. 언제 쓰는지는 트리거 문구 나열보다 사용자가 처한 상황과 의도로 쓴다. K8의 near-miss 요청에서 경계(쓰지 않는 경우)를 한 문장 넣는다.
   - **User-invoked**: frontmatter에 `disable-model-invocation: true`를 넣고, description은 사람이 읽는 한 줄 요약으로 쓴다. 트리거 문구는 넣지 않는다. 이 설정이면 description이 모델 컨텍스트에 들어가지 않아 트리거 문구가 쓸모없다.
@@ -45,6 +46,8 @@ K7은 0라운드의 B1을 대신한다. 고른 모델마다 해당 모델 가이
 
 ## CLAUDE.md 규칙
 
+- 파일 하나를 200줄 이하로 쓴다. 길수록 컨텍스트를 더 쓰고 지시를 덜 따른다. 여러 단계 절차나 코드베이스 일부에만 해당하는 내용은 스킬이나 경로 범위 규칙(`.claude/rules/`)으로 옮긴다.
+- 서로 모순되는 지시가 없게 한다. 모순되면 Claude가 아무 쪽이나 고를 수 있다.
 - 규칙마다 이유를 한 줄 붙인다.
 - 코드와 git 기록에서 알 수 있는 내용은 넣지 않는다.
 - `CRITICAL`이나 `MUST`를 남발하지 않는다.

@@ -1,7 +1,7 @@
 # Claude Sonnet 5 가이드
 
 출처: https://platform.claude.com/docs/ko/build-with-claude/prompt-engineering/prompting-claude-sonnet-5
-확인일: 2026-10-01 (출처 문서와 대조)
+확인일: 2026-11-12 (출처 문서와 대조)
 각 스니펫 아래에 공식 문서의 영어 원문을 둔다. B2=영어이면 원문을 바탕으로 쓰고, 그 외 언어이면 한국어 스니펫을 바탕으로 쓴다. Sonnet 5.5는 이 파일이 아니라 [sonnet-5-5.md](sonnet-5-5.md)를 쓴다.
 
 ## 목차

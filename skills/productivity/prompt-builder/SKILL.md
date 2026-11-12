@@ -65,7 +65,9 @@ B1(또는 K7)에서 고른 대상 모델로 아래 표를 위에서부터 맞춰
 | `claude-opus-5*` | [reference/models/opus-5.md](reference/models/opus-5.md) |
 | `claude-sonnet-5-5*` | [reference/models/sonnet-5-5.md](reference/models/sonnet-5-5.md) |
 | `claude-sonnet-5*` | [reference/models/sonnet-5.md](reference/models/sonnet-5.md) |
+| `claude-fable-5-2*`, `claude-mythos-5-2*` | [reference/models/fable-5-2.md](reference/models/fable-5-2.md) |
 | `claude-fable-5-1*`, `claude-mythos-5-1*` | [reference/models/fable-5-1.md](reference/models/fable-5-1.md) |
+| `claude-haiku-5-5*` | [reference/models/haiku-5-5.md](reference/models/haiku-5-5.md) |
 | `claude-haiku-4-5*` | [reference/models/haiku-4-5.md](reference/models/haiku-4-5.md) |
 | 그 외 또는 확인 불가 | 모델 가이드 없이 공통 원칙만 적용 |
 

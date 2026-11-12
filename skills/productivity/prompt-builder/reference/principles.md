@@ -2,7 +2,7 @@
 
 출처: https://platform.claude.com/docs/ko/build-with-claude/prompt-engineering/claude-prompting-best-practices
 사고 설정 출처: https://platform.claude.com/docs/en/build-with-claude/thinking-troubleshooting
-확인일: 2026-10-01 (출처 문서와 대조)
+확인일: 2026-11-12 (출처 문서와 대조)
 
 ## 목차
 - 원칙 A. 명확성과 맥락
@@ -52,6 +52,8 @@
   - 4.6 이후 모델은 적응형 사고(`thinking: {type: "adaptive"}`)를 쓰고, 사고 깊이는 `effort`로 조절한다.
   - 수동 확장 사고(`thinking: {type: "enabled", budget_tokens: N}`)는 4.6에서 deprecated, 4.7 이후 모델에서는 400 오류다.
   - Haiku 4.5 같은 4.5 이하 모델은 반대로 확장 사고(`budget_tokens`)만 지원하고 `adaptive`는 400 오류다.
+  - 사고를 끄는 `disabled`는 Opus 5.5, Fable 5.x처럼 사고가 항상 켜진 모델과 Sonnet 5.5에서 400 오류다. Opus 5와 Haiku 5.5는 effort `high` 이하에서만 받는다.
+- Fable 5.1 이후, Opus 5.5, Sonnet 5.5, Haiku 5.5에서는 대화 기록을 추가만 한다(append-only). assistant 턴은 사고 블록까지 받은 그대로 돌려보낸다. 이전 메시지를 고치거나 `system`·`tools`를 다시 만들면 사고 블록 서명 오류(400)가 난다. 지시 변경은 최신 턴이나 대화 중간 시스템 메시지로 하고, 기록을 줄일 때는 서버 압축이나 context editing을 쓴다.
 - 사고를 이끌 때는 사람이 짠 단계별 계획보다 "철저히 생각하라" 같은 일반 지시가 대개 낫다.
 - few-shot 예시에 `<thinking>`을 넣으면 사고 스타일이 전파된다.
 - 과잉 사고를 줄이려면 접근법을 하나 정해 밀고 나가게 하고, 모순되는 새 정보가 나올 때만 다시 검토하게 한다. 그보다 먼저 effort를 낮추는 쪽이 확실하다.
@@ -125,7 +127,7 @@
 - [ ] 긴 자료는 위, 질문은 끝에 있다 (해당 시)
 - [ ] 예시가 다양하고 `<example>`로 감싸져 있다 (해당 시)
 - [ ] `CRITICAL`/`MUST` 같은 과한 강조가 없다
-- [ ] 대상 모델이 받지 않는 설정(4.6 이후 모델의 prefill, 4.7 이후 모델의 `budget_tokens`, 4.5 이하 모델의 `adaptive`)에 의존하지 않는다
+- [ ] 대상 모델이 받지 않는 설정(4.6 이후 모델의 prefill, 4.7 이후 모델의 `budget_tokens`, 4.5 이하 모델의 `adaptive`, 사고가 항상 켜진 모델의 `disabled`)에 의존하지 않는다
 - [ ] 런타임 변수가 `{{VAR}}`로 표시되어 있고 목록을 확인받았다
 - [ ] 완성 프롬프트가 B2에서 고른 언어로 쓰였다
 - [ ] 원칙 G·H 항목은 트리거 답이 있는 것만 들어갔고, 모델 가이드 스니펫과 겹치지 않는다

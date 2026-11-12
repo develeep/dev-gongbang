@@ -2,7 +2,7 @@
 
 출처: https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5-5
 사고 설정 출처: https://platform.claude.com/docs/en/build-with-claude/thinking-troubleshooting
-확인일: 2026-10-01 (출처 문서와 대조)
+확인일: 2026-11-12 (출처 문서와 대조)
 각 스니펫 아래에 공식 문서의 영어 원문을 둔다. B2=영어이면 원문을 바탕으로 쓰고, 그 외 언어이면 한국어 스니펫을 바탕으로 쓴다. Sonnet 5용 프롬프트도 대체로 잘 작동하므로, [sonnet-5.md](sonnet-5.md)의 패턴은 출발점으로만 참고한다.
 
 ## 목차
@@ -57,7 +57,7 @@ M1=범위 제한만이면 둘째 문단만 넣는다. 요청하지 않은 테스
 ```text
 Keep working until everything the user asked for is done, and only stop to ask when you can't go on without the user or before a risky step.
 
-When the work the user asked for is done and checked, stop and report. Don't add features, tests, files, docs or refactors that weren't asked for. If you think one would help, mention it at the end instead of doing it.
+When the work the user asked for is done and checked, stop and report. Don't add features, tests, files, docs, or refactors that weren't asked for. If you think one would help, mention it at the end instead of doing it.
 ```
 G8=금지하고 제안만이면 원칙 G의 과잉 엔지니어링 방지 문구 대신 이 둘째 문단을 쓴다.
 
@@ -67,7 +67,7 @@ G8=금지하고 제안만이면 원칙 G의 과잉 엔지니어링 방지 문구
 ```
 원문:
 ```text
-When the work the user asked for is done and its checks pass, stop and report. Don't start extra rounds of review or hardening on your own, and don't launch reviewer sub-agents unless the user asked for a review. If you think a deeper review is worth doing, say so at the end.
+When the work the user asked for is done and its checks pass, stop and report. Don't start extra rounds of review or hardening on your own, and don't launch reviewer subagents unless the user asked for a review. If you think a deeper review is worth doing, say so at the end.
 ```
 
 **P3. 아이디어·계획 요청** (M3=예) 시스템 프롬프트 대신 요청 자체에 "아이디어부터"라고 적는 방법도 있다. 단발 작업 프롬프트라면 그쪽을 쓴다.
@@ -76,7 +76,7 @@ When the work the user asked for is done and its checks pass, stop and report. D
 ```
 원문:
 ```text
-When the user asks for ideas, options or a plan, give them that and stop. Don't start building or changing anything until they say to go ahead.
+When the user asks for ideas, options, or a plan, give them that and stop. Don't start building or changing anything until they say to go ahead.
 ```
 
 **P4. JSON 추론 작업에서 먼저 생각하기** (M5=structured outputs) 적응형 사고에서 시스템 프롬프트 끝에 넣는다. `between_tools`에서는 효과가 없으므로 이 요청에는 적응형 사고를 쓰라고 실행 설정에 적는다.
@@ -103,7 +103,7 @@ M6=그대로 보여 줄 콘텐츠 있음이면, 사용자 메시지 전송 도�
 ```
 원문:
 ```text
-Use the search tool to check specifics that may have changed since your training, such as what is allowed, required or charged, even when you feel confident. For researched work such as a report or a comparison, gather current sources rather than writing from your training knowledge.
+Use the search tool to check specifics that may have changed since your training, such as what is allowed, required, or charged, even when you feel confident. For researched work such as a report or a comparison, gather current sources rather than writing from your training knowledge.
 ```
 
 **P7. 코딩 변경 검증** (M9=예) 시스템 프롬프트에 넣는다.
@@ -112,7 +112,7 @@ Use the search tool to check specifics that may have changed since your training
 ```
 원문:
 ```text
-When you change code that can be run, built, or type-checked, run a real check that exercises the change before reporting it done: the project's tests, type-checker, or build, or the changed command itself. A syntax-only check, or a check command that failed to start, does not count; if all that is missing is the project's declared dependencies, install them with its own package manager and lockfile (e.g. npm install, pip install -r requirements.txt), never via sudo or the system package manager, unless told not to. Only if no real check can run here, say which one you did not run and why instead of reporting the change as done.
+When you change code that can be run, built, or type-checked, run a real check that exercises the change before reporting it done: the project's tests, type-checker, or build, or the changed command itself. A syntax-only check, or a check command that failed to start, does not count; if all that is missing is the project's declared dependencies, install them with its own package manager and lockfile (for example, npm install or pip install -r requirements.txt), never through sudo or the system package manager, unless told not to. Only if no real check can run here, say which one you did not run and why instead of reporting the change as done.
 ```
 
 M4와 M8은 프롬프트 문구가 아니라 실행 설정 권고로 반영한다.
@@ -140,7 +140,7 @@ M4와 M8은 프롬프트 문구가 아니라 실행 설정 권고로 반영한�
   - M4=between_tools이면 `{type: "between_tools"}`를 쓴다. `high` 이하 effort에서만 쓸 수 있고, 다른 필드(`display`, `budget_tokens`, `block_binding`)를 함께 보내면 400 오류다. 대화 중 effort를 바꿀 수 없다. 도구가 없는 추론 작업에는 쓰지 않는다.
   - 진행 보고를 보이게 하려면 적응형에서 `display: "updates"`(베타 헤더 `thinking-display-updates-2026-08-18`)를 쓴다. `between_tools`에서는 요약 텍스트가 함께 오므로 필요 없다.
 - 턴마다 effort를 바꿀 때는 최상위 `effort` 대신 메시지별 effort 변경(베타)을 쓴다. 최상위 값을 바꾸면 캐시가 깨진다. 적응형 사고에서만 된다.
-- 조용한 구간: 텍스트도 진행 보고도 없는 도구 단계가 연속 5번쯤 나오면 턴 범위 시스템 메시지(`clear_at: "next_user_message"`, 베타 헤더 `mid-conversation-system-clear-at-2026-08-21`)로 "잠시 소식이 없었으니 무엇을 하는지 짧게 말하고 계속하라"는 알림을 붙인다. 2~3회까지만 보내고, 붙인 알림은 지우지 않는다. 도구 결과 뒤에 하네스 텍스트가 자주 붙으면 모델이 인젝션으로 의심할 수 있으므로, 그런 반응이 보이면 알림 빈도를 줄인다.
+- 조용한 구간: 텍스트도 진행 보고도 없는 도구 단계가 연속 5번쯤 나오면 턴 범위 시스템 메시지(`clear_at: "next_user_message"`, 베타 헤더 `mid-conversation-system-clear-at-2026-08-21`)로 "잠시 소식이 없었으니 무엇을 하는지 짧게 말하고 계속하라"는 알림을 붙인다. 2~3회까지만 보내고, 붙인 알림은 지우지 않는다. 원문: "The user hasn't heard from you in a while: say in a few words what you're doing, then continue." 이 알림은 `thinking.display: "updates"`를 켰을 때만 효과가 있다. 도구 결과 뒤에 하네스 텍스트가 자주 붙으면 모델이 인젝션으로 의심할 수 있으므로, 그런 반응이 보이면 알림 빈도를 줄인다.
 - 작업 중 사용자 메시지(M8): 사용자 텍스트를 `tool_result` 블록 안에 넣지 않는다. 마지막 `tool_result` 뒤에 같은 user 메시지의 텍스트 블록으로 붙인다. 하네스 알림은 사용자 말과 다른 블록의 대화 중간 시스템 메시지로 둔다. 사용자가 작업 중 입력할 수 있는 세션에는 도구 결과마다 토큰 카운트다운이나 단계별 지시를 붙이지 않는다. Task budgets(베타)는 이런 오인을 일으킨 사례가 없지만, 오인이 보이면 task budget 없이 시험한다.
 - 도구 호출 관대 처리: 대소문자만 다른 도구 이름은 모호하지 않으면 받아들이거나, 정확한 이름을 적은 `is_error: true` 결과를 돌려준다.
 - structured outputs(M5): `stop_reason: "max_tokens"`인 응답은 JSON이 유효해도 실패로 보고 재시도한다. `max_tokens`는 사고와 JSON을 담을 만큼 잡되, 한 번의 시도에 쓸 수 있는 비용을 넘지 않게 한다.

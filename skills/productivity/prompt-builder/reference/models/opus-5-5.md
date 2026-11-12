@@ -1,7 +1,7 @@
 # Claude Opus 5.5 가이드
 
 출처: https://platform.claude.com/docs/ko/build-with-claude/prompt-engineering/prompting-claude-opus-5-5
-확인일: 2026-10-01 (출처 문서와 대조)
+확인일: 2026-11-12 (출처 문서와 대조)
 각 스니펫 아래에 공식 문서의 영어 원문을 둔다. B2=영어이면 원문을 바탕으로 쓰고, 그 외 언어이면 한국어 스니펫을 바탕으로 쓴다.
 
 ## 목차
@@ -71,7 +71,7 @@ P1을 넣으면 상태 메모가 도구 호출 사이의 진행 업데이트로 
 ```
 원문:
 ```text
-Before taking any action, explore broadly with tool calls: list and open the emails, documents, spreadsheet tabs and records across the available apps that could be relevant to this task, including ones the task does not explicitly mention, and use what you find.
+Before taking any action, explore broadly with tool calls: list and open the emails, documents, spreadsheet tabs, and records across the available apps that could be relevant to this task, including ones the task does not explicitly mention, and use what you find.
 ```
 
 **P5. 시간 신호** (M4=경과 시간만 + 리서치·검증 비중이 크지 않음)
@@ -133,7 +133,7 @@ Answer directly without deliberating.
 - 턴마다 effort를 바꿀 때는 최상위 `effort`를 바꾸지 말고 메시지별 effort 변경(베타)을 쓴다. 최상위 값을 바꾸면 캐시가 깨진다.
 - 응답은 블록 타입별로 읽는다. 첫 블록이 `thinking`일 수 있다.
 - 무인 루프: 텍스트만으로 끝난 턴은 완료가 아니라 보고로 취급한다. 할 일 체크리스트가 남아 있으면 남은 항목을 명시해 계속하라는 user 메시지를 보낸다. 자동 계속은 2~3회까지만 한다. 실행 중인 백그라운드 작업은 끝날 때까지 기다린다.
-- 조용한 구간: 텍스트도 진행 보고도 없는 도구 단계가 연속 5번 나오면, 턴 범위 시스템 메시지(`clear_at: "next_user_message"`, 베타 헤더 `mid-conversation-system-clear-at-2026-08-21`)로 "잠시 소식이 없었으니 무엇을 하는지 짧게 말하고 계속하라"는 알림을 보낸다. 2~3회까지만 보낸다.
+- 조용한 구간: 텍스트도 진행 보고도 없는 도구 단계가 연속 5번 나오면, 턴 범위 시스템 메시지(`clear_at: "next_user_message"`, 베타 헤더 `mid-conversation-system-clear-at-2026-08-21`)로 "잠시 소식이 없었으니 무엇을 하는지 짧게 말하고 계속하라"는 알림을 보낸다. 2~3회까지만 보낸다. 원문: "The user hasn't heard from you in a while: say in a few words what you're doing, then continue." 이 알림은 `thinking.display: "updates"`를 켰을 때만 효과가 있다.
 - 시스템 프롬프트와 도구 목록은 세션 첫 요청에서 확정한다. 도중에 바꾸면 이전 사고 블록이 무효화된다.
 
 ## 검수 항목
