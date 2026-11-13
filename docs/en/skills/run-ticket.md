@@ -35,7 +35,7 @@ Implements and reviews one ticket made by set-ticket in a new session, then upda
 2. It reads the ticket, the full brief, the completion records of finished tickets in the same brief, and the repo's CLAUDE.md and AGENTS.md.
 3. It implements "만들 것" (what to build). It does not fix problems outside the ticket's scope and leaves them in the report.
 4. It checks each done criterion with a command or observation. If one fails, it fixes it. If it cannot fix it, it stops and reports.
-5. It reviews, using the first method that applies in this order: the review skill named in the repo rules, the `code-review` skill, its own review.
+5. It reviews, using the first method that applies in this order: the review skill named in the repo rules, the `code-review` skill, its own review. If the review skill runs in the background, it waits for the result before writing the completion record.
 6. It sets the ticket status to done or closes the issue, updates the brief checkboxes, and leaves a completion record. For the last ticket, it runs the brief's "확인 기준" (verification criteria) and closes the brief.
 
 If the ticket and the repo rules conflict, it asks before continuing. The priority is: the ticket's "하면 안 되는 것" (what not to do) and "작업 경계" (work boundaries), then the repo rules, then the skill's default behavior.
