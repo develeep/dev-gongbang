@@ -1,0 +1,39 @@
+schema_version: "1.1"
+name: numbered-select-no-tool
+description: 의도·이상·제약을 근거 파일로 미리 줘 첫 메시지 질문이 모두 선택형일 때, 선택지 질문 도구 없이 번호 목록 평문으로 묻고 추천을 첫 선택지에 "(추천)"으로 두는지 (폴백 경로 점검)
+tags: [frontier, fallback]
+execution:
+  # 계기·이상·현재·제약을 docs/notes/order-latency.md에 미리 적어 R1~R3의 서술형 질문이 필요 없게 했다.
+  # 남는 질문(어느 원인을 목표로 할지, 제약 확인 등)은 선택형이 된다.
+  # allowed_tools에 선택지 질문 도구를 넣지 않아 "없으면 번호 목록" 폴백만 남는다.
+  prompt: docs/notes/order-latency.md에 정리한 주문 조회 API 지연 건, 구체화해줘
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/productivity/framing-problems/SKILL.md:3
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?framing-problems"'
+  # 근거: skills/productivity/framing-problems/SKILL.md:72
+  - name: numbered-plain-text
+    type: llm
+    criteria: |
+      PASS: 첫 질문 메시지의 질문을 번호 목록 평문으로 쓰고, 질문마다 고를 선택지를 단다. 선택창이나 질문 도구를 띄우겠다/띄웠다고 말하지 않는다.
+      FAIL: 선택지 없이 묻는 질문만 있거나, 쓸 수 없는 질문 도구를 부르겠다고 말하거나, 도구가 없어 물을 수 없다며 멈춘다.
+  # 근거: skills/productivity/framing-problems/SKILL.md:72
+  # 근거: skills/productivity/framing-problems/SKILL.md:70
+  - name: recommended-first-option
+    type: llm
+    criteria: |
+      PASS: 선택지를 단 질문마다 추천 답이 첫 선택지이고, 그 선택지 끝에 "(추천)"이 붙어 있다.
+      FAIL: 추천이 첫 선택지가 아닌 질문이 있거나, "(추천)" 표시가 없는 질문이 있다.
+  # 근거: skills/productivity/framing-problems/SKILL.md:21
+  # 근거: skills/productivity/framing-problems/SKILL.md:72
+  - name: no-mixed-free-text
+    type: llm
+    criteria: |
+      PASS: 첫 질문 메시지에 선택지 없이 자유 서술로 답해야 하는 질문이 없다. 서술형이 필요했다면 선택지 + 기타(자유 입력)로 바꿔 묻는다.
+      FAIL: 선택지를 단 질문과 선택지 없는 자유 서술 질문이 같은 메시지에 섞여 있다.

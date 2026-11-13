@@ -1,0 +1,47 @@
+schema_version: "1.1"
+name: review-fallback-no-skill
+description: 리뷰 스킬을 불러올 수 없을 때(Skill 도구 없음, 레포 규칙 없음) git diff로 직접 리뷰하는 폴백을 밝히고, 리뷰 뒤에 완료 기록을 쓰며 커밋하지 않는지
+tags: [review, fallback]
+execution:
+  # mark-done과 같은 fixture다. allowed_tools에서 Skill을 빼 리뷰 스킬을 불러올 수 없게 했고,
+  # fixture에 CLAUDE.md·AGENTS.md가 없어 레포 규칙이 지정한 리뷰 스킬도 없다.
+  prompt: /run-ticket docs/context/2026-10-22-greeting/01-exclaim.md
+  max_turns: 30
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/in-progress/run-ticket/SKILL.md:89
+  - name: direct-review-declared
+    type: llm
+    criteria: |
+      PASS: 쓸 수 있는 리뷰 스킬이 없거나 불러올 수 없어서 직접 리뷰한다고 밝히고, `git diff`(와 새 파일)를 읽어 버그·작업 경계 위반을 확인한 결과를 적는다.
+      FAIL: 리뷰를 건너뛰거나, 리뷰 스킬을 실행했다고 지어내거나, 직접 리뷰로 바꿨다는 말 없이 끝낸다.
+  # 근거: skills/in-progress/run-ticket/SKILL.md:89
+  - name: ran-git-diff
+    type: tool_used
+    tool: Bash
+    input_match: 'git\s+(?:--no-pager\s+)?diff'
+    min: 1
+  # 근거: skills/in-progress/run-ticket/SKILL.md:83-93
+  # 근거: skills/in-progress/run-ticket/SKILL.md:91
+  - name: record-after-review
+    type: llm
+    criteria: |
+      PASS: 직접 리뷰(git diff 읽기)를 마친 뒤에 티켓의 상태를 done으로 바꾸고 `## 완료 기록`을 붙인다.
+      FAIL: 리뷰보다 먼저 완료 기록을 쓰거나 상태를 done으로 바꾸거나, 완료 기록을 쓰지 않는다.
+  # 근거: skills/in-progress/run-ticket/SKILL.md:109-113
+  # 근거: skills/in-progress/run-ticket/SKILL.md:16
+  - name: record-says-no-commit
+    type: regex
+    target: {source: file, path: docs/context/2026-10-22-greeting/01-exclaim.md}
+    pattern: '커밋: 안 함'
+    match: contains
+  # 근거: skills/in-progress/run-ticket/SKILL.md:16
+  - name: no-commit
+    type: tool_used
+    arm: both
+    tool: Bash
+    input_match: 'git\s+commit'
+    min: 0
+    max: 0
