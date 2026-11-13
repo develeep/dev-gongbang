@@ -19,11 +19,12 @@ FILES = {
     "skills/engineering/README.md": "## User-invoked\n- [good](./good/SKILL.md)\n- [bad](./bad/SKILL.md)\n",
     "skills/engineering/good/SKILL.md": "---\nname: good\ndescription: 좋은 스킬을 요약한다.\ndisable-model-invocation: true\n---\n\n본문. [ref](ref.md)\n",
     "skills/engineering/good/ref.md": "참조.\n",
+    "skills/engineering/good/agents/openai.yaml": "policy:\n  allow_implicit_invocation: false\n",
     "evals/good/case.yaml": "x: 1\n",
     "skills/engineering/bad/SKILL.md": (
         "---\nname: Bad_Claude\ndescription: <b>You can</b> use this\ndisable-model-invokation: true\n"
         "effort: huge\n---\n\n[x](missing.md) [y](../good/SKILL.md) [z](a.md)\nC:\\dir\\file.txt\n2025년 8월 이후에는 다르게 한다.\n"
-        "Skill 도구로 `good`을 호출한다.\nMUST MUST MUST MUST\n"
+        "`good` 스킬을 불러와 그 지시를 따른다. AskUserQuestion으로 묻는다.\nMUST MUST MUST MUST\n"
     ),
     "skills/engineering/bad/a.md": "[b](b.md)\n",
     "skills/engineering/bad/b.md": "\n" * 120,
@@ -49,10 +50,13 @@ with tempfile.TemporaryDirectory() as d:
     assert run.returncode == 1
     assert ids(out, "good") == set(), ids(out, "good")
     bad = ids(out, "bad")
-    for rule in ("E3", "E4", "E5", "E6", "E7", "E8", "E9", "E12", "E13", "E14", "W3", "W4", "W5", "W6", "W7", "W11", "W12"):
+    for rule in ("E3", "E4", "E5", "E6", "E7", "E8", "E9", "E12", "E13", "E14", "E15", "W3", "W4", "W5", "W6", "W7", "W11", "W12"):
         assert rule in bad, (rule, bad)
     assert ids(out, "broken") == {"E2"}, ids(out, "broken")
     assert "E1" in ids(out, "nofm")
+    (root / "skills/engineering/good/agents/openai.yaml").unlink()  # User-invoked인데 짝이 없다
+    out = json.loads(subprocess.run([sys.executable, str(SCRIPT)], cwd=root, capture_output=True, text=True).stdout)
+    assert ids(out, "good") == {"E16"}, ids(out, "good")
     repo_ids = {x["id"] for x in out["repo_findings"]}
     assert "E11" in repo_ids, repo_ids
 

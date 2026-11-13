@@ -1,0 +1,60 @@
+schema_version: "1.1"
+name: gpt61-sol-full-assembly
+description: "GPT-6.1 Sol 대상 에이전트 프롬프트에서 필수 항목을 모두 미리 답해 조립까지 갔을 때, gpt-6-1-sol 가이드를 읽고 이름 붙은 절 구조로 조립하며 Claude 전용 설정과 effort none을 권하지 않는지"
+tags: [model, gpt]
+execution:
+  # gpt6-astra-agent를 바탕으로, 에이전트 종류의 ● 항목(interview.md:32-47, 72-86)과
+  # 조건이 맞는 결정 질문(gpt-6-astra.md:58-63, gpt-6-1-sol.md:39), 기본값 표·보완 제안 승인을
+  # 미리 답해 인터뷰에서 멈추지 않고 조립까지 가게 했다.
+  prompt: |
+    /prompt-builder GPT-6.1 Sol(gpt-6.1-sol)로 돌릴 코딩 에이전트 프롬프트 만들어줘. Responses API로 돌릴 거야.
+    종류는 에이전트·하네스, 프롬프트 언어는 영어, 빠른 모드. 인터뷰 답:
+    - C1 목적과 성공 기준: 사내 결제 서비스의 버그 리포트를 받아 원인을 고치는 PR을 만든다. 성공 = 테스트가 통과하고 리뷰어가 바로 머지할 수 있는 PR
+    - C3 역할: 결제 도메인을 아는 시니어 백엔드 엔지니어
+    - C4 배경: TypeScript 모노레포, pnpm workspace. 결제 금액은 모두 정수 원 단위(minor unit)로 다룬다
+    - C5 입력: 이슈 트래커의 버그 리포트 본문 1건(보통 200~800단어)과 재현 로그. 변수는 {{bug_report}}, {{logs}}
+    - C6 작업 단계: 재현 테스트 작성 → 원인 수정 → pnpm test → PR 설명 작성
+    - C7 규칙과 이유: (1) 결제 금액 계산에 부동소수점을 쓰지 않는다. 이유: 반올림 오차가 정산 불일치를 만든다. (2) 공개 API 응답 형식을 바꾸지 않는다. 이유: 가맹점 SDK 호환이 깨진다
+    - C9 불확실할 때: 가정을 밝히고 진행
+    - C14 성공 검증: pnpm test 통과와 재현 테스트가 수정 전 실패, 수정 후 통과
+    - G1 도구: shell(빌드·테스트·git 조회), apply_patch(파일 수정). 서브에이전트 도구 없음
+    - G2 실행 방식: 사람이 대화하며 진행
+    - G3 기본 성향: 적극 실행
+    - G4 확인 필요 행동: git push, 프로덕션 DB 접근
+    - G5 완료 조건: pnpm test 통과 후 PR 설명 초안을 채팅에 낸다
+    - G11 작업 영역: 코딩. G13 코딩 세부: 테스트 통과가 완료 조건에 포함
+    - C16 실행 시 구체화: 아니오
+    - 스킬·AGENTS.md 같은 지침 파일은 쓰지 않는다
+    - 모델 특화 결정 질문: M1 진행 + 파괴적 행동만 확인, M3 목록·표 줄이기 예·상투 표현 목록 아니오, M5 예, M6 예, M7 목표가 턴마다 대체로 같음
+    빠른 모드 기본값 표와 보완 제안은 보여 주기만 하면 모두 승인한 것으로 보고, 더 묻지 말고 조립과 출력까지 진행해.
+  max_turns: 25
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  # 근거: skills/productivity/prompt-builder/SKILL.md:73
+  - name: loads-sol-guide
+    type: tool_used
+    arm: both
+    tool: Read
+    input_match: 'gpt-6-1-sol\.md'
+  # 근거: skills/productivity/prompt-builder/SKILL.md:17
+  # 근거: skills/productivity/prompt-builder/reference/principles.md:32
+  # 근거: skills/productivity/prompt-builder/reference/models/gpt-6-astra.md:39-50
+  - name: named-sections-not-xml
+    type: llm
+    criteria: |
+      PASS: 완성 프롬프트를 출력하고, 그 구조가 Claude용 XML 태그 골격(<context>, <instructions>, <constraints> 등) 대신 이름 붙은 절(Role, Goal, Success criteria, Constraints, Tools, Output, Stop rules 등)이다.
+      FAIL: 완성 프롬프트를 내지 않고 인터뷰에서 멈추거나, Claude용 XML 태그 골격으로 조립한다.
+  # 근거: skills/productivity/prompt-builder/reference/models/gpt-6-astra.md:144
+  # 근거: skills/productivity/prompt-builder/reference/models/gpt-6-astra.md:174
+  - name: no-claude-only-settings
+    type: llm
+    criteria: |
+      PASS: 프롬프트와 실행 설정 권고 어디에서도 Claude 전용 설정(thinking, output_config.effort, budget_tokens, assistant prefill, 베타 헤더)을 권하지 않는다.
+      FAIL: Claude 전용 설정을 하나라도 권한다.
+  # 근거: skills/productivity/prompt-builder/reference/models/gpt-6-1-sol.md:26-27
+  # 근거: skills/productivity/prompt-builder/reference/models/gpt-6-astra.md:171-172
+  - name: no-effort-none
+    type: llm
+    criteria: |
+      PASS: 실행 설정 권고의 reasoning effort가 low, medium, high, xhigh, max 중 하나이거나 생략(기본 medium)이고, temperature·top_p·top_logprobs를 권하지 않는다.
+      FAIL: reasoning effort none이나 minimal을 권하거나, temperature·top_p·top_logprobs를 권한다.

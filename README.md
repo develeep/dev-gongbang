@@ -35,6 +35,21 @@ claude plugin install gongbang@dev-gongbang
 claude plugin install gongbang-dev@dev-gongbang
 ```
 
+### 다른 에이전트
+
+스킬은 OMP(oh-my-pi)와 Codex에서도 같은 마켓플레이스로 설치합니다. `gongbang-mods`는 Claude Code 전용이라 두 곳에서는 동작하지 않습니다.
+
+```bash
+# OMP
+omp plugin marketplace add develeep/dev-gongbang
+omp plugin install gongbang@dev-gongbang
+
+# Codex: 마켓플레이스를 추가한 뒤 Codex CLI의 /plugins 화면에서 gongbang을 설치하고 새 세션을 엽니다
+codex plugin marketplace add develeep/dev-gongbang
+```
+
+Codex에서는 `$<스킬 이름>`으로 부릅니다. User-invoked 스킬은 `agents/openai.yaml`로 Codex가 알아서 부르지 않게 막아 둡니다.
+
 ### 업데이트
 
 플러그인은 `plugin.json`의 `version`이 바뀔 때만 갱신됩니다. 버전마다 바뀐 내용은 [Releases](https://github.com/develeep/dev-gongbang/releases)에서 볼 수 있습니다. 마켓플레이스를 갱신한 뒤 플러그인을 업데이트하고 Claude Code를 다시 시작하세요.

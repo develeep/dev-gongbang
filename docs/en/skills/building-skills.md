@@ -54,7 +54,7 @@ It runs in one of three modes depending on the input.
 ## Output
 
 - The finished skill folder
-- A `<name>.skill` package if there are bundled files or extra frontmatter. In Claude Code, you can also copy it to `~/.claude/skills/<name>/` (user) or `.claude/skills/<name>/` (project).
+- A `<name>.skill` package if there are bundled files or extra frontmatter. You can also copy it to your agent's skill folder (for example `~/.claude/skills/<name>/` or `.claude/skills/<name>/` in Claude Code, `~/.agents/skills/<name>/` or `.agents/skills/<name>/` in Codex and OMP).
 - Wrap-up report: final pass rate and number of iterations, fixes applied, and remaining WARNs, failures, and unapproved fix proposals
 
 ## Customize

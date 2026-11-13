@@ -26,7 +26,7 @@ It does not run on its own for general work requests. Ask for it explicitly, as 
 ## Prerequisites
 
 - With a web search tool, it fills R4 External evidence with sources. Without one, it writes the source as "모델 지식, 미검증" (model knowledge, unverified).
-- With the Agent tool, it runs broad investigations in the background.
+- If it can start subagents, it runs broad investigations in the background. Otherwise it investigates directly.
 
 ## How it works
 

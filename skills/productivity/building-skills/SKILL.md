@@ -21,7 +21,7 @@ disable-model-invocation: true
 
 - **인터뷰형 스킬은 서브에이전트 실행에서 멈춘다.** 테스트 대상 스킬이 사용자에게 질문하면 서브에이전트에는 답할 사람이 없다. 시나리오마다 예상 답변을 정해 실행 프롬프트에 함께 넘기고, 그 답변은 사용자에게 확인받는다.
 - **`disable-model-invocation`은 실행 테스트와 무관하다.** 실행 서브에이전트는 SKILL.md를 직접 읽는다. 호출 방식은 description 검증에서만 의미가 있다.
-- **timing은 완료 알림에서만 얻는다.** 서브에이전트 완료 알림의 `total_tokens`, `duration_ms`는 다른 곳에 남지 않으므로 알림이 올 때마다 바로 `timing.json`에 쓴다.
+- **timing은 완료 알림에서만 얻는다.** 서브에이전트 완료 알림이 `total_tokens`, `duration_ms`를 주면(Claude Code) 다른 곳에 남지 않으므로 알림이 올 때마다 바로 `timing.json`에 쓴다. 주지 않으면 `timing.json`을 쓰지 않고, benchmark에 시간·토큰이 빠진다고 사용자에게 알린다.
 - **prompt-builder의 "다음 단계" 경고를 버리지 않는다.** 승인받지 못한 보완 제안, 생략·기본값 항목, 통과하지 못한 검수 항목은 실패 원인 후보 1순위다.
 - **저장 경로에 따라 frontmatter가 잘린다.** claude.ai/Cowork의 `propose_skills` 저장 카드는 `name`, `description`과 본문만 남기고 `disable-model-invocation` 같은 다른 키를 버리며, 번들 파일도 담지 못한다. User-invoked 스킬은 저장소 규칙이 막지 않으면 description에도 "명시적으로 요청할 때만 사용한다"를 넣어 두고, 번들 파일이나 추가 frontmatter가 있으면 `.skill` 패키지로 전달한다.
 
@@ -72,15 +72,15 @@ python3 scripts/check_skill.py <skill-folder>
 
 ### 5. 검증 강도 선택
 
-AskUserQuestion으로 고르게 한다. 단계는 누적된다.
+사용자에게 고르게 한다. 선택지를 보여 주는 질문 도구가 있으면 그것으로, 없으면 번호 목록으로 묻고 답을 기다린다. 단계는 누적된다.
 
 | 단계 | 하는 일 | 비용 |
 |---|---|---|
 | 1. 점검 (권장, 기본) | 대표 요청을 스킬을 쓴 실행으로만 돌리고 채점·리뷰한다 | 서브에이전트 3개 안팎 |
 | 2. 비교 | 1에 더해 기준 실행(모드 A·C는 스킬 없이, 모드 B는 스냅숏으로)을 함께 돌려 benchmark로 비교한다. K7에 모델이 여럿이면 모델마다 돌린다 | 서브에이전트 6개 이상 |
-| 3. description | 2에 더해 description의 실행 여부를 측정하고 다듬는다 | `claude -p` 수십 회 이상 |
+| 3. description | 2에 더해 description의 실행 여부를 측정하고 다듬는다 | `claude -p` 수십 회 이상(Claude Code CLI 필요) |
 
-K10=User-invoked이면 3단계를 빼고, 이름으로 부르는 스킬이라 실행 여부 측정이 의미 없다고 한 줄로 알린다. 사용자가 테스트 없이 끝내겠다고 하면 9단계로 가되, 실행 검증을 하지 않았다는 사실을 마무리 응답에 남긴다.
+K10=User-invoked이면 3단계를 빼고, 이름으로 부르는 스킬이라 실행 여부 측정이 의미 없다고 한 줄로 알린다. Claude Code CLI(`claude`)가 없으면 3단계는 쿼리 세트까지만 만들고 측정은 건너뛴다고 알린다. 사용자가 테스트 없이 끝내겠다고 하면 9단계로 가되, 실행 검증을 하지 않았다는 사실을 마무리 응답에 남긴다.
 
 ### 6. 테스트 작성·실행·채점
 
@@ -114,7 +114,7 @@ python3 scripts/review.py <workspace>/iteration-N --skill-name <name> \
 정적 검사를 마지막으로 한 번 더 돌려 ERROR가 없는지 확인한 뒤 전달한다.
 
 - **SKILL.md 하나뿐이고 추가 frontmatter가 없을 때**: `propose_skills`가 있으면 저장 카드를 띄운다.
-- **그 외**: `python3 scripts/package.py <skill-folder> <out-dir>`로 `<name>.skill`을 만들어 전달한다. Claude Code라면 `~/.claude/skills/<name>/`(사용자) 또는 `.claude/skills/<name>/`(프로젝트)에 복사하는 방법도 알린다.
+- **그 외**: `python3 scripts/package.py <skill-folder> <out-dir>`로 `<name>.skill`을 만들어 전달한다. 사용하는 에이전트의 스킬 폴더(예: Claude Code는 `~/.claude/skills/<name>/`·`.claude/skills/<name>/`, Codex·OMP는 `~/.agents/skills/<name>/`·`.agents/skills/<name>/`)에 복사하는 방법도 알린다.
 - 모드 A로 시작했고 validating-skills나 이전 판이 함께 설치돼 있으면, 역할이 겹치는 스킬을 정리할지 묻는다.
 
 마무리 응답에는 다음을 넣는다.

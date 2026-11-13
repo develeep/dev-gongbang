@@ -304,6 +304,8 @@ def check_references(skill_md_text, folder):
         if ignore_parts & set(rel_parts):
             continue
         rel = str(p.relative_to(folder))
+        if rel == "agents/openai.yaml":  # Codex reads it as harness metadata; the agent never needs to
+            continue
         mentioned = rel in referenced or rel in skill_md_text or p.name in skill_md_text
         if not mentioned:
             add("WARN", "files.unreferenced", f"{rel} is never mentioned in SKILL.md, so the agent will not know to use it")

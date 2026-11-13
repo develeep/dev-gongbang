@@ -24,6 +24,9 @@ NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 LINK_RE = re.compile(r"\]\(([^)\s]+)\)")
 PROMOTED = ("engineering", "productivity")
 TOC_LINES = 100  # 플랫폼 best practices 기준. skill-creator는 300을 쓴다.
+# 특정 에이전트의 도구 이름. 스킬은 Claude Code·OMP·Codex에서 함께 쓰므로 본문은 행동으로 쓴다(CLAUDE.md "도구 이름").
+TOOL_NAMES_RE = re.compile(r"AskUserQuestion|Agent 도구|Skill 도구|Task 도구|WebFetch|WebSearch|TodoWrite|request_user_input|spawn_agent")
+TOOL_NAMES_OK = "prompt-builder/reference/models/"  # 대상 모델 가이드는 프롬프트 내용으로 도구를 다룬다
 
 
 def find_repo(start):
@@ -154,7 +157,7 @@ def check_skill(skill_dir, repo):
             dest = (p.parent / target).resolve()
             ln = t.count("\n", 0, m.start()) + 1
             if not dest.is_relative_to(skill_dir.resolve()):
-                E("E9", pf, ln, f"스킬 폴더 밖을 가리키는 링크 `{target}`. 다른 스킬은 'Skill 도구로 `<이름>`을 호출한다'고 쓴다")
+                E("E9", pf, ln, f"스킬 폴더 밖을 가리키는 링크 `{target}`. 다른 스킬은 '`<이름>` 스킬을 불러와 그 지시를 따른다'고 쓴다")
             elif not dest.exists():
                 E("E8", pf, ln, f"링크 `{target}`가 가리키는 파일이 없다")
             elif p != md and dest.suffix == ".md" and dest not in direct and dest != md.resolve():
@@ -253,11 +256,26 @@ def repo_checks(repo, results, fms):
             add("W7", f"evals-trigger/{s.name}", 0, "Model-invoked인데 트리거 eval 폴더가 없다", "warnings")
         for md in sorted(s.rglob("*.md")):
             t = md.read_text(encoding="utf-8")
-            for m in re.finditer(r"Skill 도구로 `([\w:-]+)`", t):
+            mf = str(md.relative_to(repo))
+            for m in re.finditer(r"`([\w:-]+)` 스킬을 불러", t):
                 target = m.group(1).split(":")[-1]
                 if user_invoked.get(target):
-                    add("E13", str(md.relative_to(repo)), line_of(t, m.group(0)),
-                        f"`{target}`는 User-invoked라 Skill 도구로 호출할 수 없다. 사용자에게 실행을 안내한다")
+                    add("E13", mf, line_of(t, m.group(0)),
+                        f"`{target}`는 User-invoked라 다른 스킬에서 불러올 수 없다. 사용자에게 실행을 안내한다")
+            if TOOL_NAMES_OK not in md.as_posix():
+                for m in TOOL_NAMES_RE.finditer(t):
+                    add("E15", mf, line_of(t, m.group(0)),
+                        f"도구 이름 `{m.group(0)}`. 행동으로 쓰고 폴백을 붙인다(CLAUDE.md \"도구 이름\")")
+        oa = s / "agents/openai.yaml"
+        no_implicit = False
+        if oa.exists():
+            try:
+                no_implicit = ((yaml.safe_load(oa.read_text(encoding="utf-8")) or {}).get("policy") or {}).get("allow_implicit_invocation") is False
+            except (yaml.YAMLError, AttributeError):
+                pass
+        if no_implicit != user_invoked[s.name]:
+            add("E16", str(oa.relative_to(repo)), 1,
+                "`disable-model-invocation: true`와 `policy.allow_implicit_invocation: false`(Codex)는 함께 있거나 함께 없어야 한다")
 
     # W8: 승격 버킷 스킬이 바뀌었는데 plugin.json version이 그대로인지 (커밋 안 된 변경 기준)
     try:
