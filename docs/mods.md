@@ -65,10 +65,6 @@ claude plugin install gongbang-mods@dev-gongbang
 
 두 값 모두 첫 턴이 끝난 뒤에 채워집니다.
 
-[pokemon mod](https://github.com/dgokcin/claude-pokemon-mod)를 함께 쓰면, `/pokemon pane`으로 연 포켓몬 패널 위쪽에도 같은 Session 내용을 그립니다. 패널은 한 번에 하나만 보이고 나머지는 탭으로 바뀌기 때문에, 이렇게 해야 세션 정보와 포켓몬을 한 화면에서 함께 볼 수 있습니다. 포켓몬은 Session 내용 아래 남은 칸에 그려집니다. 이때 따로 열린 `Session` 탭은 닫아도 됩니다.
-
-포켓몬이 아래쪽에서 잘리면 `/pokemon size small`로 절반 크기로 줄이세요. Session과 함께 쓸 때는 이 크기를 추천합니다.
-
 | 명령 | 하는 일 |
 |---|---|
 | `/session-pane` | Session 패널을 엽니다 |
@@ -123,15 +119,6 @@ echo '{"language":"Korean"}' | claude plugin configure next-steps@claude-code-mo
 claude plugin marketplace add YeonwooSung/my-claude-code-mods
 claude plugin install loop-detective@my-claude-code-mods
 claude plugin install context-inspector@my-claude-code-mods
-```
-
-[dgokcin/claude-pokemon-mod](https://github.com/dgokcin/claude-pokemon-mod):
-
-- **pokemon**: 입력창 위에 픽셀 포켓몬이 살면서 Claude가 하는 일에 반응합니다. `/pokemon pane`으로 우측 패널로 옮기면 Session 내용과 함께 보입니다. 라이선스가 없는 저장소라 이 저장소에 코드를 넣지 않았습니다.
-
-```bash
-claude plugin marketplace add dgokcin/claude-pokemon-mod
-claude plugin install pokemon@claude-pokemon
 ```
 
 hamzafer 저장소의 `context-bar`와 `where-am-i`는 따로 설치하지 마세요. Session 패널과 같은 정보를 입력창 위에 한 번 더 보여 줍니다.
@@ -191,15 +178,6 @@ extras/setup.sh
 - `next-steps`의 제안 언어를 한국어로 설정합니다.
 - 상태줄 스크립트를 `~/.claude/statusline.py`로 연결합니다.
 - `~/.claude/settings.json`에 `"tui": "fullscreen"`과 `statusLine`을 넣습니다. 바꾸기 전 파일은 `settings.json.bak`으로 남깁니다. 패널은 fullscreen 화면에서만 우측에 붙습니다.
-
-pokemon 설정은 플러그인 안에 저장되어 스크립트로 넣을 수 없습니다. Claude Code를 다시 시작한 뒤 한 번 입력하세요.
-
-```
-/pokemon charmander     스타팅 포켓몬 고르기 (Bulbasaur, Charmander, Squirtle, Pikachu)
-/pokemon pane           우측 패널로 옮기기
-/pokemon size small     Session 아래에 들어가도록 줄이기
-/pokemon images on      이미지를 그리는 터미널에서만 (kitty, Ghostty, WezTerm, Orca)
-```
 
 지금 쓰는 설정을 건드리지 않고 먼저 시험하려면 빈 폴더를 설정 폴더로 지정하세요. 설치 결과는 `CLAUDE_CONFIG_DIR=<폴더> claude plugin list`로 확인합니다.
 
