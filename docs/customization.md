@@ -78,7 +78,7 @@ set-brief, set-ticket, run-ticket은 같은 형식을 주고받습니다. brief�
 - **User-invoked로 바꾸기**: `disable-model-invocation: true`를 넣으세요. 사용자가 이름을 입력할 때만 실행됩니다.
 - **Model-invoked로 바꾸기**: 그 줄을 지우세요. Claude가 `description`을 보고 스킬을 고르므로, `description`에 언제 쓰는지 구체적으로 적으세요.
 
-User-invoked 스킬은 다른 스킬이 Skill 도구로 부를 수 없습니다. 예를 들어 set-brief는 set-ticket을 부르지 않고 사용자에게 실행을 안내합니다.
+User-invoked 스킬은 다른 스킬이 불러올 수 없습니다. 예를 들어 set-brief는 set-ticket을 부르지 않고 사용자에게 실행을 안내합니다.
 
 ## 고친 스킬 검사하기
 

@@ -102,9 +102,9 @@ Execute this task:
 - Also write outputs/transcript.md: the steps you took in order, files you read, questions you would have asked, and your final reply to the user.
 ```
 
-`transcript.md`는 채점(절차 확인)과 진단(어디서 헤맸는지)에 쓴다. K7에 모델이 여럿이고 2단계 이상이면 Agent 도구의 `model` 옵션으로 모델마다 실행하고 설정 이름에 붙인다(`with_skill-sonnet`).
+`transcript.md`는 채점(절차 확인)과 진단(어디서 헤맸는지)에 쓴다. K7에 모델이 여럿이고 2단계 이상이면 서브에이전트를 띄울 때 모델을 지정해 모델마다 실행하고 설정 이름에 붙인다(`with_skill-sonnet`). 서브에이전트의 모델을 지정할 수 없으면 현재 모델로만 돌리고 그렇다고 알린다.
 
-완료 알림이 올 때마다 바로 실행 폴더에 `timing.json`을 쓴다: `{"total_tokens": N, "duration_ms": N, "total_duration_seconds": N}`.
+완료 알림이 토큰 수와 소요 시간을 주면(Claude Code), 알림이 올 때마다 바로 실행 폴더에 `timing.json`을 쓴다. 주지 않으면 쓰지 않고 시간·토큰 비교를 건너뛴다고 알린다. 형식: `{"total_tokens": N, "duration_ms": N, "total_duration_seconds": N}`.
 
 ## assertion 쓰기
 

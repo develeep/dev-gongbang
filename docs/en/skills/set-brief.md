@@ -25,7 +25,7 @@ Records what was decided in the conversation as one brief. The readers of this b
 ## Prerequisites
 
 - To record it as a GitHub issue, `git remote -v` must include github.com and `gh auth status` must succeed. Otherwise it recommends a docs document.
-- The cold-read check needs the Agent tool. Without it, that step is skipped and you are told.
+- The cold-read check needs subagents. Without it, that step is skipped and you are told.
 
 ## How it works
 

@@ -78,7 +78,7 @@ The invocation type is set in the `SKILL.md` frontmatter.
 - **Change to User-invoked**: Add `disable-model-invocation: true`. The skill runs only when the user types its name.
 - **Change to Model-invoked**: Delete that line. Claude picks skills by reading `description`, so state specifically in `description` when to use the skill.
 
-Another skill cannot call a User-invoked skill with the Skill tool. For example, set-brief does not call set-ticket. It tells the user to run it.
+Another skill cannot load a User-invoked skill. For example, set-brief does not call set-ticket. It tells the user to run it.
 
 ## Check a modified skill
 

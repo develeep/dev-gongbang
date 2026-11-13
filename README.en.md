@@ -33,6 +33,21 @@ To also use in-progress skills, install `gongbang-dev` as well.
 claude plugin install gongbang-dev@dev-gongbang
 ```
 
+### Other agents
+
+OMP (oh-my-pi) and Codex install the skills from the same marketplace. `gongbang-mods` is Claude Code only and does not work in either.
+
+```bash
+# OMP
+omp plugin marketplace add develeep/dev-gongbang
+omp plugin install gongbang@dev-gongbang
+
+# Codex: add the marketplace, install gongbang from the /plugins screen in Codex CLI, then start a new session
+codex plugin marketplace add develeep/dev-gongbang
+```
+
+In Codex, run a skill with `$<skill-name>`. User-invoked skills ship an `agents/openai.yaml` so Codex does not invoke them on its own.
+
 ### Updating
 
 The plugin updates only when `version` in `plugin.json` changes. See [Releases](https://github.com/develeep/dev-gongbang/releases) for what changed in each version. Update the marketplace, update the plugin, then restart Claude Code.

@@ -54,7 +54,7 @@
 ## 결과물
 
 - 완성한 스킬 폴더
-- 번들 파일이나 추가 frontmatter가 있으면 `<name>.skill` 패키지. Claude Code에서는 `~/.claude/skills/<name>/`(사용자)이나 `.claude/skills/<name>/`(프로젝트)에 복사해 쓸 수도 있습니다.
+- 번들 파일이나 추가 frontmatter가 있으면 `<name>.skill` 패키지. 사용하는 에이전트의 스킬 폴더(예: Claude Code는 `~/.claude/skills/<name>/`·`.claude/skills/<name>/`, Codex·OMP는 `~/.agents/skills/<name>/`·`.agents/skills/<name>/`)에 복사해 쓸 수도 있습니다.
 - 마무리 보고: 최종 통과율과 반복 횟수, 반영한 수정, 남은 WARN·실패·승인받지 못한 수정안
 
 ## 커스텀
