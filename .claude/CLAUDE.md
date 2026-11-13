@@ -15,6 +15,7 @@
 1. frontmatter `name`은 폴더 이름과 같게 한다.
 2. 버킷 `README.md`에 한 줄 설명과 `SKILL.md` 링크를 넣는다.
 3. 승격 버킷이면 `.claude-plugin/plugin.json`의 `skills` 배열에 넣는다. `in-progress/`는 넣지 않는다.
+   User-invoked 스킬이면 `agents/openai.yaml`을 둔다(아래 "도구 이름").
 4. 최상위 `README.md`와 `README.en.md`에 한 줄 설명, 사용 문서 링크, `SKILL.md` 링크를 넣는다. 승격 버킷은 "스킬" 절에, `in-progress/`는 "만드는 중인 스킬" 절에 두고, 각 절 안에서 호출 방식 제목 아래에 둔다.
 5. 아래 "사용 문서" 규칙대로 스킬 문서와 문서 목록을 고친다.
 6. 사용자에게 배포할 변경이면 `plugin.json`의 `version`을 올린다. 설치된 플러그인은 버전이 바뀔 때만 갱신된다. 버전은 `plugin.json`에만 둔다. 버전을 올린 PR이 머지되면 아래 "릴리스" 절대로 태그와 릴리스를 만든다.
@@ -66,7 +67,18 @@ gh release create gongbang--v<버전> --generate-notes
 - **User-invoked**: frontmatter에 `disable-model-invocation: true`. 사람이 이름을 입력할 때만 실행된다. `description`은 사람이 읽는 한 줄 요약으로 쓰고 트리거 문구를 넣지 않는다.
 - **Model-invoked**: 기본값. `description`에 언제 쓰는지 트리거 문구를 구체적으로 적어 모델이 스스로 고를 수 있게 한다.
 
-다른 스킬을 쓰게 할 때는 `../다른-스킬/FILE.md` 같은 폴더 간 링크 대신 "Skill 도구로 `<이름>`을 호출한다"고 적는다. User-invoked 스킬은 다른 스킬에서 호출할 수 없으니 사용자에게 실행을 안내한다.
+다른 스킬을 쓰게 할 때는 `../다른-스킬/FILE.md` 같은 폴더 간 링크 대신 "`<이름>` 스킬을 불러와 그 지시를 따른다. 스킬 도구가 없으면 그 스킬의 SKILL.md를 읽는다"고 적는다. User-invoked 스킬은 다른 스킬에서 불러올 수 없으니 사용자에게 실행을 안내한다.
+
+## 도구 이름
+
+스킬은 Claude Code, OMP, Codex에서 함께 쓴다. 본문에는 특정 에이전트의 도구 이름(`AskUserQuestion`, `Agent`, `Skill`, `WebFetch`, `request_user_input`, `spawn_agent` 등)을 쓰지 않고, 행동과 그 행동을 못 할 때의 폴백을 같은 문장에 쓴다.
+
+- 묻기: "사용자에게 묻는다. 선택지를 보여 주는 질문 도구가 있으면 그것으로, 없으면 번호 목록으로 묻고 답을 기다린다."
+- 서브에이전트: "새 컨텍스트로 서브에이전트를 띄운다. 띄울 수 없으면 같은 세션에서 차례로 한다."
+- 스킬: "`<이름>` 스킬을 불러와 그 지시를 따른다. 스킬 도구가 없으면 그 스킬의 SKILL.md를 읽는다."
+- 웹: "웹 페이지를 가져와 읽는다." 못 가져오면 그렇다고 알린다.
+
+"AskUserQuestion(OMP는 ask)"처럼 에이전트별 이름을 괄호로 나열하지 않는다. 한 에이전트에서만 되는 기능(`claude -p` 등)은 "있으면 …, 없으면 건너뛰고 알린다"로 쓴다. `prompt-builder/reference/models/`처럼 프롬프트 내용으로 도구를 다루는 글은 예외다. `disable-model-invocation: true`인 스킬은 Codex용 `agents/openai.yaml`에 `policy.allow_implicit_invocation: false`를 함께 둔다. `scripts/check.py`가 둘 다 검사한다.
 
 ## Eval
 
