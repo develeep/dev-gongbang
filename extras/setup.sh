@@ -15,7 +15,6 @@ MARKETPLACES=(
   develeep/dev-gongbang
   hamzafer/claude-code-mods
   YeonwooSung/my-claude-code-mods
-  dgokcin/claude-pokemon-mod
 )
 PLUGINS=(
   gongbang-mods@dev-gongbang
@@ -25,7 +24,6 @@ PLUGINS=(
   agent-radar@claude-code-mods
   loop-detective@my-claude-code-mods
   context-inspector@my-claude-code-mods
-  pokemon@claude-pokemon
 )
 
 step() { printf '\n== %s\n' "$1"; }
@@ -74,10 +72,4 @@ for k in changed:
 PY
 
 step "Done"
-cat <<'EOF'
-Restart Claude Code, then once in a session:
-  /pokemon charmander      pick a starter (Bulbasaur, Charmander, Squirtle or Pikachu)
-  /pokemon pane            move it into the side pane, under the session view
-  /pokemon size small      so it fits under the session view
-  /pokemon images on       only in a terminal that draws images (kitty, Ghostty, WezTerm, Orca)
-EOF
+echo "Restart Claude Code."

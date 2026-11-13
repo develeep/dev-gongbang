@@ -1,6 +1,6 @@
 {
   "name": "gongbang-mods",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Claude Code 터미널 화면을 꾸미는 mod 묶음. 도구 호출 한 줄 접기, 카드형 메시지와 마크다운, 세션 목표와 컨텍스트를 보여 주는 우측 패널.",
   "author": {
     "name": "Develeep",

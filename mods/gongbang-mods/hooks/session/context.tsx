@@ -20,8 +20,6 @@ const reading = atom({ plugin: 'gongbang-mods', key: 'reading' } as const, null 
 const isHidden = atom({ plugin: 'gongbang-mods', key: 'isHidden' } as const, false)
 
 const PANE = 'side'
-// The pane the pokemon mod (dgokcin/claude-pokemon-mod) opens with /pokemon pane.
-const POKEMON_PANE = 'pokemon'
 // Written by recap.tsx.
 const recapRef = { plugin: 'gongbang-mods', key: 'recap' } as const
 const liveRef = { plugin: 'gongbang-mods', key: 'live' } as const
@@ -73,30 +71,9 @@ export function sessionContext(on: On) {
   })
 
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => sessionTree($, e))
-
-  // The pokemon mod's own pane (/pokemon pane): the session goes on top, the mon keeps the rest.
-  // Only one pane shows at a time (the others are tabs), so this is how both stay in view.
-  on('ui.render', { component: 'Pane', requestId: POKEMON_PANE }, async ($, e, next) => {
-    const theirs = await next(e)
-    if (e.surface !== 'terminal' && e.surface !== 'desktop') return theirs
-    const { Box } = $.ui.resolve(e)
-    // Docked, pokemon sizes its scene to the whole body and sits it at the foot. Clipping its tree
-    // from the top keeps the mon in view under the session.
-    const docked = e.props.placement === 'dock'
-    return (
-      <Box flexDirection="column" height={docked ? e.props.scroll.bodyRows : undefined}>
-        <Box flexDirection="column" flexShrink={0}>
-          {await sessionTree($, e)}
-        </Box>
-        <Box flexDirection="column" flexGrow={1} flexShrink={1} justifyContent="flex-end" overflow="hidden" marginTop={1}>
-          {theirs}
-        </Box>
-      </Box>
-    )
-  })
 }
 
-// The session's goal and context, as the Session pane draws it; also drawn on top of pokemon's pane.
+// The session's goal and context, as the Session pane draws it.
 async function sessionTree($: EngineInterface, e: RenderInput<'Pane'>) {
   const { Box, Text } = $.ui.resolve(e)
   const inner = Math.max(MIN_WIDTH, e.props.bodyColumns)

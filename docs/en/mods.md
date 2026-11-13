@@ -65,10 +65,6 @@ One side pane shows the session goal and context usage together.
 
 Both fill in after the first turn.
 
-With the [pokemon mod](https://github.com/dgokcin/claude-pokemon-mod), the same session view is also drawn at the top of the pane `/pokemon pane` opens. Only one pane shows at a time (the others become tabs), so this keeps the session and the mon in view together. The mon is drawn in the room left under the session view, and the separate `Session` tab can be closed.
-
-If the mon is cut off at the bottom, shrink it to half size with `/pokemon size small`. That size is recommended alongside the session view.
-
 | Command | What it does |
 |---|---|
 | `/session-pane` | Opens the Session pane |
@@ -123,15 +119,6 @@ While `next-steps` shows its list, the Session pane hides its own `next` item so
 claude plugin marketplace add YeonwooSung/my-claude-code-mods
 claude plugin install loop-detective@my-claude-code-mods
 claude plugin install context-inspector@my-claude-code-mods
-```
-
-[dgokcin/claude-pokemon-mod](https://github.com/dgokcin/claude-pokemon-mod):
-
-- **pokemon**: a pixel Pokémon above the prompt that reacts to what Claude does. Moved to the side pane with `/pokemon pane`, it shares the pane with the session view. The repository has no license, so none of its code is included here.
-
-```bash
-claude plugin marketplace add dgokcin/claude-pokemon-mod
-claude plugin install pokemon@claude-pokemon
 ```
 
 Don't install `context-bar` or `where-am-i` from the hamzafer repository: they show the same information as the Session pane again above the prompt.
@@ -191,15 +178,6 @@ What the script does, skipping any step already done, so it is safe to run again
 - Sets `next-steps` to suggest in Korean.
 - Links the status line script to `~/.claude/statusline.py`.
 - Puts `"tui": "fullscreen"` and `statusLine` in `~/.claude/settings.json`, keeping the previous file as `settings.json.bak`. Side panes dock on the right only in the fullscreen layout.
-
-pokemon keeps its settings inside the plugin, so the script can't set them. After restarting Claude Code, type these once:
-
-```
-/pokemon charmander     pick a starter (Bulbasaur, Charmander, Squirtle, Pikachu)
-/pokemon pane           move it into the side pane
-/pokemon size small     so it fits under the session view
-/pokemon images on      only in a terminal that draws images (kitty, Ghostty, WezTerm, Orca)
-```
 
 To try it first without touching your current setup, point the config folder at an empty one. Check the result with `CLAUDE_CONFIG_DIR=<folder> claude plugin list`.
 
