@@ -1,0 +1,26 @@
+schema_version: "1.1"
+name: from-request
+description: 요청 문장을 받으면 요구사항 정리를 건너뛰고 2단계(구체화)부터 시작하며 framing-problems를 불러오는지
+tags: [start-stage, request]
+execution:
+  prompt: /run-flow 주문이 배송 시작되면 고객에게 이메일 알림을 보내줘
+  max_turns: 6
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/in-progress/run-flow/SKILL.md:116
+  # 근거: skills/in-progress/run-flow/SKILL.md:129-133
+  - name: framing-problems-loaded
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?framing-problems"'
+    min: 1
+  # 근거: skills/in-progress/run-flow/SKILL.md:104
+  # 근거: skills/in-progress/run-flow/SKILL.md:116-117
+  - name: analyzing-requirements-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?analyzing-requirements"'
+    min: 0
+    max: 0

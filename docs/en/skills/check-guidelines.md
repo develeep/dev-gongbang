@@ -64,4 +64,4 @@ The check criteria themselves come from the repo's rule files, CLAUDE.md/AGENTS.
 
 ---
 
-← Previous: [framing-problems](framing-problems.md) · [All docs](../README.md) · Next: [set-brief](set-brief.md) →
+← Previous: [framing-problems](framing-problems.md) · [All docs](../README.md) · Next: [run-flow](run-flow.md) →

@@ -11,7 +11,7 @@ Splits one brief recorded with set-brief into several tickets. Each ticket is wr
 | Field | Value |
 |---|---|
 | Bucket | in-progress |
-| Invocation | User-invoked |
+| Invocation | Model-invoked (only when you ask or run-flow tells it to) |
 | Command | `/gongbang:set-ticket [brief issue number/URL or docs path]` |
 | Source | [SKILL.md](../../../skills/in-progress/set-ticket/SKILL.md) |
 
@@ -34,7 +34,7 @@ Splits one brief recorded with set-brief into several tickets. Each ticket is wr
    - Each ticket is a vertical slice that cuts narrowly through every layer it needs (schema, API, UI, tests).
    - Each ticket gets done criteria and a blocked-by relation (tickets that must finish first).
    - When one ticket uses another ticket's result, it points to it as "NN 티켓의 산출물" (output artifact of ticket NN).
-   - A broad refactor where no slice can go green on its own is split in expand → migrate → contract order.
+   - A broad refactor where no slice can go green on its own is split in expand → migrate → contract order. If groups also cannot go green on their own and share an integration branch, write `(통합 브랜치 공유)` (shared integration branch) on the blocked-by line. run-ticket runs the tickets with this marker one after another in a single working tree.
 4. It shows the split plan as a numbered list and asks about size, blocked-by relations, and tickets to merge or split. It revises until you approve.
 5. It publishes in blocked-by order and appends a "티켓" (Tickets) section to the brief.
 
@@ -58,7 +58,7 @@ If you change section names in the ticket templates or the `- 상태:` (status) 
 ## Related skills
 
 - **set-brief**: creates the brief to split.
-- **run-ticket**: runs the published tickets one at a time in a new session. It is User-invoked, so set-ticket does not call it directly and tells you how to run it.
+- **run-ticket**: runs the published tickets one at a time in a new session. set-ticket tells you how to run it; when run-flow called set-ticket, run-flow runs it next.
 
 ---
 

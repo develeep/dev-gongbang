@@ -26,12 +26,13 @@ Install `gongbang-dev` to use these.
 
 ### User-invoked
 
-- [set-brief](skills/set-brief.md): Records what was decided in the conversation as a brief.
-- [set-ticket](skills/set-ticket.md): Splits a large brief into tickets.
-- [run-ticket](skills/run-ticket.md): Implements and reviews one ticket in a new session. Runs several tickets in parallel with Orca.
+- [run-flow](skills/run-flow.md): Loads the stage skills in order, from a planning document or request to a PR.
 
 ### Model-invoked
 
+- [set-brief](skills/set-brief.md): Records what was decided in the conversation as a brief.
+- [set-ticket](skills/set-ticket.md): Splits a large brief into tickets.
+- [run-ticket](skills/run-ticket.md): Implements and reviews one ticket in a new session. Runs several tickets in parallel with Orca.
 - [analyzing-requirements](skills/analyzing-requirements.md): Turns a planning document into a requirements and development scope document.
 
 ## Mods

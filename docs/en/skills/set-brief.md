@@ -11,7 +11,7 @@ Records what was decided in the conversation as one brief. The readers of this b
 | Field | Value |
 |---|---|
 | Bucket | in-progress |
-| Invocation | User-invoked |
+| Invocation | Model-invoked (only when you ask or run-flow tells it to) |
 | Command | `/gongbang:set-brief [summary of the work to record]` |
 | Source | [SKILL.md](../../../skills/in-progress/set-brief/SKILL.md) |
 
@@ -31,8 +31,8 @@ Records what was decided in the conversation as one brief. The readers of this b
 
 1. It collects the framing record and the work done after it (changed files, commits, new decisions). If there is no record, it collects only facts confirmed and decisions agreed in the conversation.
 2. You choose where to save: a GitHub issue or a `docs/context/` document.
-3. It writes a draft from the template. If there are several goals, it asks whether to split the brief before writing.
-4. It asks the same questions to 3 subagents that get only the draft, without the conversation. Where their answers differ from what was agreed or from each other, it fixes the sentences. This is called the cold-read check.
+3. It writes a draft from the template. If there are several goals, it asks whether to split the brief before writing. If a requirements document exists, it checks that each requirement in the chosen development scope has a matching "남은 일" (remaining work) or "확인 기준" (verification criteria) item, and it also copies over rejected solutions and the reasons.
+4. It asks the same questions to 3 subagents that get only the draft, without the conversation. Where their answers differ from what was agreed or from each other, it fixes the sentences. This is called the cold-read check. If the agent rules name an agent for the cold-read check, it uses that agent.
 5. It shows the draft, the fixed items, and the external actions to run, and asks you to confirm. For a public repository, it asks you to confirm there are no secrets, internal URLs, or personal data.
 6. It publishes.
 
@@ -59,8 +59,8 @@ If you change section names, line names such as "남은 일" (remaining work), o
 - **set-ticket**: if "남은 일" is too big to finish in one new context window, splits it into tickets.
 - **run-ticket**: if it fits in one window, runs it right away in a new session.
 
-set-ticket and run-ticket are User-invoked, so set-brief does not call them directly. After publishing, it tells you which one to run.
+After publishing, set-brief tells you whether to run set-ticket or run-ticket next. When run-flow called it, run-flow continues to the next stage instead.
 
 ---
 
-← Previous: [check-guidelines](check-guidelines.md) · [All docs](../README.md) · Next: [set-ticket](set-ticket.md) →
+← Previous: [run-flow](run-flow.md) · [All docs](../README.md) · Next: [set-ticket](set-ticket.md) →

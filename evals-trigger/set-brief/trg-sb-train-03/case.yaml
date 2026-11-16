@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: trg-sb-train-03
+description: "트리거해야 함 / train"
+tags: [trigger, train, positive]
+execution:
+  prompt: "구체화 끝났으니 GitHub 이슈로 brief 남겨줘"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?set-brief"'

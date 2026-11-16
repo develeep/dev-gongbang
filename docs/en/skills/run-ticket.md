@@ -4,14 +4,14 @@
 
 # run-ticket
 
-Implements and reviews one ticket made by set-ticket in a new session, then updates the ticket status and the brief checkboxes. It works without the conversation that made the brief, using only the brief, the ticket, and the completion records of earlier tickets. It does not commit. If you ask for several tickets, it runs them in parallel with Orca workers, one worktree per ticket, and only then commits to ticket branches and merges them.
+Implements and reviews one ticket made by set-ticket in a new session, then updates the ticket status and the brief checkboxes. It works without the conversation that made the brief, using only the brief, the ticket, and the completion records of earlier tickets. It does not commit. If you ask for several tickets and two or more of them can start together, it runs them in parallel with Orca workers, one worktree per ticket, and only then commits to ticket branches and merges them.
 
 > This skill is in progress. Install `gongbang-dev` to use it. Its behavior may change.
 
 | Field | Value |
 |---|---|
 | Bucket | in-progress |
-| Invocation | User-invoked |
+| Invocation | Model-invoked (only when you ask or run-flow tells it to) |
 | Command | `/gongbang:run-ticket [ticket/brief path, issue number/URL] [range for multiple tickets]` |
 | Source | [SKILL.md](../../../skills/in-progress/run-ticket/SKILL.md) |
 
@@ -21,7 +21,7 @@ Implements and reviews one ticket made by set-ticket in a new session, then upda
 
 - Run the tickets split with set-ticket one at a time.
 - Run a small brief that was not split into tickets. The whole brief is treated as one ticket.
-- Run several tickets at once, as in "all remaining tickets". With Orca it runs them in parallel; without it, in order.
+- Run several tickets at once, as in "all remaining tickets". If Orca is available and two or more tickets can start together, it runs them in parallel; otherwise, in order.
 
 ## Prerequisites
 
@@ -35,32 +35,32 @@ Implements and reviews one ticket made by set-ticket in a new session, then upda
 
 1. It picks a ticket. Without an argument, it takes the most recent brief that still has unfinished tickets, and picks the lowest-numbered ticket whose blocked-by relations are cleared.
 2. It reads the ticket, the full brief, the completion records of finished tickets in the same brief, and the repo's CLAUDE.md and AGENTS.md.
-3. It implements "만들 것" (what to build). It does not fix problems outside the ticket's scope and leaves them in the report.
-4. It checks each done criterion with a command or observation. If one fails, it fixes it. If it cannot fix it, it stops and reports.
-5. It reviews. It runs the code review (the first method that applies in this order: the review skill named in the repo rules, the `code-review` skill, its own review), a check-guidelines rule check, and a cross review by another company's model together, and writes the completion record only after it has all the results.
-6. It sets the ticket status to done or closes the issue, updates the brief checkboxes, and leaves a completion record. For the last ticket, it runs the brief's "확인 기준" (verification criteria) and closes the brief.
+3. It implements "만들 것" (what to build). If the agent rules name an agent for implementing tickets, it hands over the brief, the ticket, the repo rules path, the verification commands, and earlier tickets' output artifacts. It does not fix problems outside the ticket's scope and leaves them in the report.
+4. It checks each done criterion with a command or observation. If the agent rules name a UI-check agent, criteria that must be seen on screen go to it. If one fails, it fixes it. If it cannot fix it, it stops and reports.
+5. It reviews. It runs the code review (the first method that applies in this order: the review skill named in the repo rules, the `code-review` skill, its own review), a check-guidelines rule check, and a cross review by another company's model together, and writes the completion record only after it has all the results. If the model that actually ran the cross review is from the same company as this session, it reports the review as skipped. If the change touches authentication, authorization, payments, or personal data and the agent rules name a security review agent, it also hands the change to a security review.
+6. It sets the ticket status to done or closes the issue, updates the brief checkboxes, and leaves a completion record. For the last ticket, it runs the brief's "확인 기준" (verification criteria) and closes the brief. In a multi-ticket run, it does this once after the final review.
 
 If the ticket and the repo rules conflict, it asks before continuing. The priority is: the ticket's "하면 안 되는 것" (what not to do) and "작업 경계" (work boundaries), then the repo rules, then the skill's default behavior.
 
 ### Running multiple tickets
 
-If you ask for a number range or "all remaining tickets", the method depends on whether Orca is available.
+If you ask for a number range or "all remaining tickets", the method differs. If Orca is available, two or more tickets can start together, and no ticket shares an integration branch, it runs the Orca parallel run; if any of these is not true, it runs sequentially.
 
 **Orca parallel run**: it starts one Orca worker per ticket, each in a child worktree branched from the current branch.
 
 1. The working tree must be clean. Workers cannot read uncommitted brief and ticket documents, so it asks whether to commit them.
 2. It shows the execution groups, the branch to merge into, the number of concurrent workers (3 by default), and the starting HEAD, and asks for approval. If the current branch is the default branch, it also asks whether to create a work branch.
-3. It creates one Orca Run for the brief and one Task per ticket, with the blocked-by relations as Task deps.
+3. It creates one Orca Run for the brief and one Task per ticket, with the blocked-by relations as Task deps. If a resumed Run has a Task that finished but was not merged, it merges it first instead of starting it again.
 4. It starts workers for tickets whose blockers are all merged. Each worker implements its ticket, commits to the ticket branch, and reports.
-5. It merges each finished branch into the current branch, puts the completion record in the merge commit, and removes the worktree. On a conflict it asks the worker to rebase; if it conflicts again, it stops and tells you. A failed ticket and the tickets it blocks are not run.
-6. When all are done, it reviews everything from the starting HEAD once and reports the results and the list of commits. You decide on push, PR, and merging into the default branch.
+5. After merging each finished branch into the current branch and before creating the merge commit, it runs the repo's verification commands (type check, lint, tests). If they pass, it puts the completion record in the merge commit and removes the worktree. If they fail, it undoes the merge, starts no new worker, and stops. If a merged ticket blocks other tickets, it runs only the cross review on that merge before starting the blocked tickets. On a conflict it asks the worker to rebase; if it conflicts again, it stops and tells you. A failed ticket and the tickets it blocks are not run.
+6. When all are done, it reviews everything from the starting HEAD once, runs the brief's "확인 기준" (verification criteria), and reports the results and the list of commits. You decide on push, PR, and merging into the default branch.
 
-**Sequential run**: without Orca, it starts one subagent per ticket, one after another. They edit the same working tree, so it does not run them in parallel and does not commit. If a ticket fails its done criteria, it stops. When all are done, it reviews the whole change once.
+**Sequential run**: it starts one subagent per ticket, one after another. They edit the same working tree, so it does not run them in parallel and does not commit. If a ticket fails its done criteria, it stops. When all are done, it reviews the whole change once and then runs the brief's "확인 기준".
 
 ## Output
 
 - The implemented code changes. Not committed, except in an Orca parallel run, which creates one merge commit per ticket.
-- A completion record attached to the ticket: completion date, commit info (a not-committed note with the HEAD at work start, or the merged ticket branch and commit in an Orca parallel run), and changed files. Results other tickets will use go under `## 산출물` (output artifact).
+- A completion record attached to the ticket: completion date, commit info (a not-committed note with the HEAD at work start, or the merged ticket branch and commit in an Orca parallel run), changed files, the commands run and their results, criteria that could not be checked, and findings not fixed. Results other tickets will use go under `## 산출물` (output artifact).
 - A report: finished ticket, done criteria results, changed files, output artifact location, review findings not fixed, skipped reviews, next ticket
 
 ## Customize
@@ -70,7 +70,7 @@ If you ask for a number range or "all remaining tickets", the method depends on 
 | Ticket selection rules | SKILL.md "1. 티켓 고르기" (1. Pick a ticket) |
 | Priority of review methods | SKILL.md "5. 리뷰" (5. Review) |
 | Completion record format | SKILL.md "6. 완료 기록" (6. Completion record) |
-| Agent for the cross review | Name it in the repo rules (CLAUDE.md, AGENTS.md) or edit SKILL.md "5. 리뷰" (5. Review) |
+| Agents for implementation, UI check, cross review, security review, and code-review sub-reviews | Name them in the repo or agent rules (CLAUDE.md, AGENTS.md) or edit SKILL.md "3. 구현" through "5. 리뷰" (3. Implementation through 5. Review) |
 | Number of concurrent workers, merge method | SKILL.md "Orca 병렬 실행" (Orca parallel run) |
 
 Not committing is a core rule. Even if the repo rules require commits, it leaves that to the user. The only exception is the Orca parallel run. To copy and modify the skill, see the [customization guide](../customization.md).
@@ -78,6 +78,7 @@ Not committing is a core rule. Even if the repo rules require commits, it leaves
 ## Related skills
 
 - **set-brief**, **set-ticket**: create the brief and tickets to run.
+- **run-flow**: uses this skill in its stage 5 to run the brief's remaining tickets.
 - If the **code-review** skill is installed, it is used for the code review in step 5.
 - **check-guidelines**: used for the rule check in step 5.
 - **orchestration** (Orca): used for running several tickets in parallel and for cross-review workers.

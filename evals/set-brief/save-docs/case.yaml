@@ -26,31 +26,31 @@ execution:
 context:
   scaffold_script: fixture.sh
 graders:
-  # 근거: skills/in-progress/set-brief/SKILL.md:94
+  # 근거: skills/in-progress/set-brief/SKILL.md:99
   - name: saved-path
     type: llm
     criteria: |
       PASS: brief를 `docs/context/YYYY-MM-DD-<slug>.md` 형식의 새 파일로 저장한다. 날짜는 숫자 날짜이고, slug는 영문 소문자와 하이픈으로만 되어 있다.
       FAIL: 저장하지 않거나, `docs/context/` 밖에 저장하거나, 파일 이름에 날짜가 없거나 slug에 한글·대문자·공백이 있거나, 기존 `2026-09-01-signup-email-verify.md`를 덮어쓴다.
-  # 근거: skills/in-progress/set-brief/SKILL.md:47, :102-142
+  # 근거: skills/in-progress/set-brief/SKILL.md:48, :107-149
   - name: template-literal
     type: llm
     criteria: |
       PASS: 저장한 brief에 `- 작성일: YYYY-MM-DD` 줄이 굵게 하지 않은 그대로 있고, `## 요약`, `## 합의한 작업`, `## 작업 경계`, `## 확인 기준` 같은 템플릿 섹션 이름과 "남은 일"·"바꾸지 않는 범위"·"바꿀 수 없는 조건" 줄 이름이 템플릿과 글자 하나 다르지 않다.
       FAIL: 작성일 줄이 `**작성일**`처럼 바뀌었거나, 섹션 이름이나 줄 이름을 바꾸거나 굵게 했다.
-  # 근거: skills/in-progress/set-brief/SKILL.md:95
+  # 근거: skills/in-progress/set-brief/SKILL.md:100
   - name: index-line-format
     type: regex
     target: {source: file, path: docs/context/README.md}
     pattern: '- \[(?!2026-09-01)(\d{4}-\d{2}-\d{2}) [^\]]+\]\(\./\1-[a-z0-9-]+\.md\): \S'
     match: contains
-  # 근거: skills/in-progress/set-brief/SKILL.md:95
+  # 근거: skills/in-progress/set-brief/SKILL.md:100
   - name: index-line-appended
     type: regex
     target: {source: file, path: docs/context/README.md}
     pattern: '\(\./2026-09-01-signup-email-verify\.md\)'
     match: contains
-  # 근거: skills/in-progress/set-brief/SKILL.md:96
+  # 근거: skills/in-progress/set-brief/SKILL.md:101
   - name: no-commit
     type: tool_used
     arm: both
