@@ -12,20 +12,20 @@ execution:
 context:
   scaffold_script: fixture.sh
 graders:
-  # 근거: skills/in-progress/run-flow/SKILL.md:106, skills/in-progress/run-flow/SKILL.md:109
+  # 근거: skills/in-progress/run-flow/SKILL.md:118, skills/in-progress/run-flow/SKILL.md:121
   - name: set-brief-loaded
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?set-brief"'
     min: 1
-  # 근거: skills/in-progress/run-flow/SKILL.md:109
+  # 근거: skills/in-progress/run-flow/SKILL.md:121
   - name: earlier-stages-not-fired
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?(?:analyzing-requirements|framing-problems)"'
     min: 0
     max: 0
-  # 근거: skills/in-progress/run-flow/SKILL.md:109
+  # 근거: skills/in-progress/run-flow/SKILL.md:121
   - name: framing-record-reused
     type: llm
     criteria: |

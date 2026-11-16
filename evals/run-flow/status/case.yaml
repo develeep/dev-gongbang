@@ -9,26 +9,26 @@ execution:
 context:
   scaffold_script: fixture.sh
 graders:
-  # 근거: skills/in-progress/run-flow/SKILL.md:99
+  # 근거: skills/in-progress/run-flow/SKILL.md:111
   - name: shows-unfinished-only
     type: llm
     criteria: |
       PASS: 응답에 인사말 흐름(2026-10-22-greeting)의 제목, 현재 단계 5(구현과 리뷰), 멈춘 이유, 남은 티켓 1개가 있고, `- 현재 단계: 완료`인 로그인 제한 흐름은 목록에 없다.
       FAIL: 인사말 흐름의 네 항목 중 하나라도 없거나, 완료된 흐름을 끝나지 않은 흐름으로 보여 준다.
-  # 근거: skills/in-progress/run-flow/SKILL.md:99
+  # 근거: skills/in-progress/run-flow/SKILL.md:111
   - name: no-stage-skill
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?(?:analyzing-requirements|framing-problems|set-brief|set-ticket|run-ticket)"'
     min: 0
     max: 0
-  # 근거: skills/in-progress/run-flow/SKILL.md:99
+  # 근거: skills/in-progress/run-flow/SKILL.md:111
   - name: no-write
     type: tool_used
     tool: Write
     min: 0
     max: 0
-  # 근거: skills/in-progress/run-flow/SKILL.md:99
+  # 근거: skills/in-progress/run-flow/SKILL.md:111
   - name: no-edit
     type: tool_used
     tool: Edit

@@ -9,16 +9,16 @@ execution:
 context:
   scaffold_script: fixture.sh
 graders:
-  # 근거: skills/in-progress/run-flow/SKILL.md:102
-  # 근거: skills/in-progress/run-flow/SKILL.md:106
-  # 근거: skills/in-progress/run-flow/SKILL.md:139
+  # 근거: skills/in-progress/run-flow/SKILL.md:114
+  # 근거: skills/in-progress/run-flow/SKILL.md:118
+  # 근거: skills/in-progress/run-flow/SKILL.md:153
   - name: branch-before-run-ticket
     type: llm
     criteria: |
       PASS: brief(2026-10-22-greeting)를 스스로 골라 5단계부터 진행하고, 현재 브랜치(master)가 기본 브랜치라서 run-ticket을 부르기 전에 작업 브랜치 이름을 묻거나, 받은 이름으로 작업 브랜치를 만든 뒤 run-ticket을 부른다.
       FAIL: 작업 브랜치를 묻거나 만들지 않고 master에서 run-ticket을 부르거나, brief가 하나뿐인데 어느 brief인지 묻거나, 1~4단계를 시작한다.
-  # 근거: skills/in-progress/run-flow/SKILL.md:102
-  # 근거: skills/in-progress/run-flow/SKILL.md:106
+  # 근거: skills/in-progress/run-flow/SKILL.md:114
+  # 근거: skills/in-progress/run-flow/SKILL.md:118
   - name: earlier-stages-not-fired
     type: tool_used
     tool: Skill

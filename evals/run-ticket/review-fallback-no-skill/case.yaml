@@ -11,33 +11,33 @@ execution:
 context:
   scaffold_script: fixture.sh
 graders:
-  # 근거: skills/in-progress/run-ticket/SKILL.md:90
+  # 근거: skills/in-progress/run-ticket/SKILL.md:94
   - name: direct-review-declared
     type: llm
     criteria: |
       PASS: 쓸 수 있는 리뷰 스킬이 없거나 불러올 수 없어서 직접 리뷰한다고 밝히고, `git diff`(와 새 파일)를 읽어 버그·작업 경계 위반을 확인한 결과를 적는다.
       FAIL: 리뷰를 건너뛰거나, 리뷰 스킬을 실행했다고 지어내거나, 직접 리뷰로 바꿨다는 말 없이 끝낸다.
-  # 근거: skills/in-progress/run-ticket/SKILL.md:90
+  # 근거: skills/in-progress/run-ticket/SKILL.md:94
   - name: ran-git-diff
     type: tool_used
     tool: Bash
     input_match: 'git\s+(?:--no-pager\s+)?diff'
     min: 1
-  # 근거: skills/in-progress/run-ticket/SKILL.md:82-102
-  # 근거: skills/in-progress/run-ticket/SKILL.md:100
+  # 근거: skills/in-progress/run-ticket/SKILL.md:86-112
+  # 근거: skills/in-progress/run-ticket/SKILL.md:110
   - name: record-after-review
     type: llm
     criteria: |
       PASS: 직접 리뷰(git diff 읽기)를 마친 뒤에 티켓의 상태를 done으로 바꾸고 `## 완료 기록`을 붙인다.
       FAIL: 리뷰보다 먼저 완료 기록을 쓰거나 상태를 done으로 바꾸거나, 완료 기록을 쓰지 않는다.
-  # 근거: skills/in-progress/run-ticket/SKILL.md:92-98
-  # 근거: skills/in-progress/run-ticket/SKILL.md:135
+  # 근거: skills/in-progress/run-ticket/SKILL.md:98-104
+  # 근거: skills/in-progress/run-ticket/SKILL.md:148
   - name: other-reviews-accounted
     type: llm
     criteria: |
       PASS: 최종 보고에 규칙 검사와 교차 리뷰 각각의 결과가 있거나, 하지 못해 건너뛴 이유가 적혀 있다.
       FAIL: 규칙 검사나 교차 리뷰를 언급하지 않고 끝내거나, 실행하지 않은 검사·리뷰를 했다고 지어낸다.
-  # 근거: skills/in-progress/run-ticket/SKILL.md:118-122
+  # 근거: skills/in-progress/run-ticket/SKILL.md:128-132
   # 근거: skills/in-progress/run-ticket/SKILL.md:15
   - name: record-says-no-commit
     type: regex
