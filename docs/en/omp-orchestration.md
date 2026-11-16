@@ -4,7 +4,7 @@
 
 # omp multi-agent setup
 
-This guide sets up omp (oh-my-pi) to use a different model at each development stage, with per-role models, five subagents, and delegation rules. Design and orchestration use Opus 5.5 high, routine implementation uses Sonnet 5.5 medium, exploration and docs use Haiku 5.5, and cross review uses GPT-6.1 Sol high. Only problems that get stuck move up to Opus 5.5 xhigh with Fable 5.2 as an advisor. After reading it, you can install the files in `extras/omp/`, check that they work, and change models.
+This guide sets up omp (oh-my-pi) to use a different model at each development stage, with per-role models, six subagents, and delegation rules. Design and orchestration use Opus 5.5 high, routine implementation uses Sonnet 5.5 medium, exploration and docs use Haiku 5.5, and cross review uses GPT-6.1 Sol high. Only problems that get stuck move up to Opus 5.5 xhigh with Fable 5.2 as an advisor. After reading it, you can install the files in `extras/omp/`, check that they work, and change models.
 
 ## Contents
 
@@ -21,7 +21,7 @@ This guide sets up omp (oh-my-pi) to use a different model at each development s
 | File | Install location | Role |
 |---|---|---|
 | [`extras/omp/config.yml`](../../extras/omp/config.yml) | Merge into `~/.omp/agent/config.yml` | Per-role models and effort, reviewer and security-reviewer models, fallback models |
-| [`extras/omp/agents/`](../../extras/omp/agents/) | `~/.omp/agent/agents/` | implementer, hard-implementer, test-writer, ui-checker, doc-writer |
+| [`extras/omp/agents/`](../../extras/omp/agents/) | `~/.omp/agent/agents/` | brief-writer, implementer, hard-implementer, test-writer, ui-checker, doc-writer |
 | [`extras/omp/AGENTS.md`](../../extras/omp/AGENTS.md) | `~/.omp/agent/AGENTS.md` | Development stages, delegation targets, escalation on failure, when to use Orca |
 
 The agents and the delegation rules live at the user level, so every project and every Orca worker uses the same setup. If a project's `.omp/agents/` has an agent with the same name, the project's agent wins.
@@ -46,10 +46,11 @@ To keep your existing settings, copy the `modelRoles`, `advisor`, `task`, and `r
 | Stage | omp setting | Model · effort |
 |---|---|---|
 | Orchestrator, design | Main session `default`, plan mode `plan` | Opus 5.5 · high |
+| Brief drafting | brief-writer (`default`) | Opus 5.5 · high |
 | Code exploration | Bundled scout (`smol`) | Haiku 5.5 · medium |
-| Routine implementation, tests | implementer, test-writer (`task`) | Sonnet 5.5 · medium |
+| Routine implementation, tests, brief cold-read check | implementer, test-writer (`task`) | Sonnet 5.5 · medium |
 | Hard implementation, debugging | hard-implementer (`slow`) + advisor (`advisor`) | Opus 5.5 · xhigh + Fable 5.2 · high |
-| Cross review | Bundled reviewer (`review`) | GPT-6.1 Sol · high |
+| Cross review, sub-reviews of the code review skill | Bundled reviewer (`review`) | GPT-6.1 Sol · high |
 | Security and core-logic review | Bundled security-reviewer | Opus 5.5 · high |
 | UI and screen checks | ui-checker (`vision`) | GPT-6.1 Terra · medium |
 | Commit messages, PR descriptions | `commit`, doc-writer (`smol`) | Haiku 5.5 · medium |
@@ -62,9 +63,9 @@ When a model is unavailable (for example, over its usage limit), the rest of the
 
 - **Development stages**: the seven stages from planning document to PR, the skill for each stage, and the points where you confirm. Running [run-flow](skills/run-flow.md) goes through them in order.
 - **Delegation**: which agent takes each kind of work
-- **What to hand over**: subagents get the brief and one ticket instead of the conversation; review agents get the diff range and the brief.
-- **On failure**: if implementer fails the same ticket twice, hard-implementer takes it. If that also fails, the session stops and suggests splitting the ticket again.
-- **Orca**: Orca workers are used only to run several tickets in parallel in separate worktrees, to hand work to another agent, or when you want to watch a worker directly.
+- **What to hand over**: implementation, test, and UI agents get the brief and one ticket, the repo rules file paths, the verification commands, and earlier tickets' output artifacts instead of the conversation. Review agents get the diff range and the brief. doc-writer gets the changed-file list, completion records, and review record instead of the full diff.
+- **On failure**: if implementer fails, it is handed the task once more along with the failure report; if it fails the same ticket twice, hard-implementer takes it. If that also fails, or the cause of failure is an ambiguous ticket, the session stops and suggests splitting the ticket again. A large refactor or a debugging task with an unknown cause from the start goes straight to hard-implementer.
+- **Orca**: Orca workers are used only to run tickets in parallel in separate worktrees when two or more tickets can start together, to hand work to another agent, or when you want to watch a worker directly.
 
 How several tickets run in parallel is described in [run-ticket](skills/run-ticket.md#running-multiple-tickets).
 
@@ -72,7 +73,7 @@ How several tickets run in parallel is described in [run-ticket](skills/run-tick
 
 Check in a new omp session:
 
-- `/agents` lists implementer, hard-implementer, test-writer, ui-checker, and doc-writer.
+- `/agents` lists brief-writer, implementer, hard-implementer, test-writer, ui-checker, and doc-writer.
 - After running each agent once, its record in the session folder (`~/.omp/agent/sessions/<project>/<session>/`) shows the model from the table above.
 - After running hard-implementer, its agent folder has an `__advisor.jsonl`. This is the advisor model's (Fable 5.2) record.
 
