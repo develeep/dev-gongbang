@@ -28,7 +28,7 @@ Install `gongbang-dev` to use these.
 
 - [set-brief](skills/set-brief.md): Records what was decided in the conversation as a brief.
 - [set-ticket](skills/set-ticket.md): Splits a large brief into tickets.
-- [run-ticket](skills/run-ticket.md): Implements and reviews one ticket in a new session.
+- [run-ticket](skills/run-ticket.md): Implements and reviews one ticket in a new session. Runs several tickets in parallel with Orca.
 
 ### Model-invoked
 
@@ -41,4 +41,5 @@ Install `gongbang-dev` to use these.
 ## Guides
 
 - [Customizing skills](customization.md): How to copy, edit, check, and test a skill
+- [omp multi-agent setup](omp-orchestration.md): How to install omp roles, agents, and delegation rules that use a different model at each stage
 - [Choosing a skill](../../README.en.md#choosing-a-skill): Which skill fits which situation, and how skills chain together

@@ -88,7 +88,7 @@ claude plugin update gongbang@dev-gongbang
 
 - [set-brief](docs/skills/set-brief.md): 구체화 기록이나 세션 결과를 맥락 없는 작업자도 이어받을 수 있는 작업 지시서(brief)로 정리해 GitHub 이슈나 `docs/context/` 문서로 남깁니다. `/gongbang:set-brief [남길 작업 요약]` · [SKILL.md](skills/in-progress/set-brief/SKILL.md)
 - [set-ticket](docs/skills/set-ticket.md): 큰 brief를 혼자 검증할 수 있는 티켓으로 나눠 GitHub sub-issue나 docs 파일로 남기고 brief에 연결합니다. `/gongbang:set-ticket [brief 이슈 번호·URL 또는 docs 경로]` · [SKILL.md](skills/in-progress/set-ticket/SKILL.md)
-- [run-ticket](docs/skills/run-ticket.md): 새 세션에서 티켓 하나를 구현·리뷰하고 티켓 상태와 brief 체크박스를 갱신합니다. 커밋은 하지 않습니다. `/gongbang:run-ticket [티켓·brief 경로, 이슈 번호·URL] [여러 티켓이면 범위]` · [SKILL.md](skills/in-progress/run-ticket/SKILL.md)
+- [run-ticket](docs/skills/run-ticket.md): 새 세션에서 티켓 하나를 구현·리뷰하고 티켓 상태와 brief 체크박스를 갱신합니다. 커밋은 하지 않습니다. 여러 티켓은 Orca 워커로 병렬 실행합니다. `/gongbang:run-ticket [티켓·brief 경로, 이슈 번호·URL] [여러 티켓이면 범위]` · [SKILL.md](skills/in-progress/run-ticket/SKILL.md)
 
 ### Model-invoked
 
@@ -126,7 +126,7 @@ claude plugin install gongbang-mods@dev-gongbang
 - **프롬프트 만들기**: `/gongbang:framing-problems`로 작업을 먼저 구체화하고, 확정된 구체화 기록을 초안으로 `/gongbang:prompt-builder`에 넘기세요. 사람과 대화하는 에이전트 프롬프트나 재사용 템플릿은 실행할 때마다 framing-problems를 호출하게 만들 수 있습니다.
 - **스킬 만들기**: `/gongbang:prompt-builder`로 SKILL.md 초안을 만들고, 그 결과를 `/gongbang:building-skills`에 넘겨 테스트하고 다듬으세요.
 - **코드 규칙**: `/gongbang:set-guidelines`로 규칙을 만들고, `/gongbang:check-guidelines`로 코드를 검사하세요.
-- **큰 작업 넘기기**: framing-problems로 구체화한 결과를 `/gongbang:set-brief`로 남기고, 크면 `/gongbang:set-ticket`으로 나눈 뒤, 새 세션에서 `/gongbang:run-ticket`으로 티켓을 하나씩 실행하세요.
+- **큰 작업 넘기기**: framing-problems로 구체화한 결과를 `/gongbang:set-brief`로 남기고, 크면 `/gongbang:set-ticket`으로 나눈 뒤, 새 세션에서 `/gongbang:run-ticket`으로 티켓을 하나씩 실행하세요. Orca를 쓰면 "남은 티켓 전부"로 병렬 실행할 수 있습니다.
 
 ## 커스텀
 
