@@ -7,11 +7,18 @@ modelRoles:
   default: anthropic/claude-opus-5-5:high
   plan: anthropic/claude-opus-5-5:high
 
+  # brief 초안 (brief-writer). 문서 산출물은 high보다 xhigh에서 품질이 오른다.
+  brief: anthropic/claude-opus-5-5:xhigh
+
+  # Orca 티켓 구현 워커. extras/omp/AGENTS.md가 `--model @worker`로 띄운다.
+  worker: anthropic/claude-opus-5-5:medium
+
   # 어려운 구현·대규모 리팩터링 (hard-implementer)
   slow: anthropic/claude-opus-5-5:xhigh
 
-  # 일반 구현·테스트 (bundled task, implementer, test-writer)
-  task: anthropic/claude-sonnet-5-5:medium
+  # 일반 구현·테스트, 코드 리뷰 스킬의 하위 리뷰 (bundled task, implementer, test-writer)
+  # Sonnet 5.5는 토큰을 더 써서 작업당 비용이 Opus 5.5와 비슷하고 점수는 max에서만 앞선다.
+  task: anthropic/claude-opus-5-5:medium
 
   # 코드 탐색 (bundled scout, sonic), PR 설명 (doc-writer), 세션 제목 등 가벼운 작업
   smol: anthropic/claude-haiku-5-5:medium

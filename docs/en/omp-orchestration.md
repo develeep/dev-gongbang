@@ -4,7 +4,7 @@
 
 # omp multi-agent setup
 
-This guide sets up omp (oh-my-pi) to use a different model at each development stage, with per-role models, six subagents, and delegation rules. Design and orchestration use Opus 5.5 high, routine implementation uses Sonnet 5.5 medium, exploration and docs use Haiku 5.5, and cross review uses GPT-6.1 Sol high. Only problems that get stuck move up to Opus 5.5 xhigh with Fable 5.2 as an advisor. After reading it, you can install the files in `extras/omp/`, check that they work, and change models.
+This guide sets up omp (oh-my-pi) to use a different model at each development stage, with per-role models, six subagents, and delegation rules. Design and orchestration use Opus 5.5 high, brief drafting uses Opus 5.5 xhigh, routine implementation uses Opus 5.5 medium, exploration and PR descriptions use Haiku 5.5, and cross review uses GPT-6.1 Sol high. Only problems that get stuck move up to Opus 5.5 xhigh with Fable 5.2 as an advisor. After reading it, you can install the files in `extras/omp/`, check that they work, and change models.
 
 ## Contents
 
@@ -46,14 +46,20 @@ To keep your existing settings, copy the `modelRoles`, `advisor`, `task`, and `r
 | Stage | omp setting | Model · effort |
 |---|---|---|
 | Orchestrator, design | Main session `default`, plan mode `plan` | Opus 5.5 · high |
-| Brief drafting | brief-writer (`default`) | Opus 5.5 · high |
+| Brief drafting | brief-writer (`brief`) | Opus 5.5 · xhigh |
+| Ticket implementation worker (Orca parallel run) | Started by `AGENTS.md` with `--model @worker` (`worker`) | Opus 5.5 · medium |
 | Code exploration | Bundled scout (`smol`) | Haiku 5.5 · medium |
-| Routine implementation, tests, brief cold-read check | implementer, test-writer (`task`) | Sonnet 5.5 · medium |
+| Routine implementation, tests, brief cold-read check | implementer, test-writer (`task`) | Opus 5.5 · medium |
+| Sub-reviews of the code review skill | Bundled task (`task`) | Opus 5.5 · medium |
 | Hard implementation, debugging | hard-implementer (`slow`) + advisor (`advisor`) | Opus 5.5 · xhigh + Fable 5.2 · high |
-| Cross review, sub-reviews of the code review skill | Bundled reviewer (`review`) | GPT-6.1 Sol · high |
+| Cross review | Bundled reviewer (`review`) | GPT-6.1 Sol · high |
+| Cross review worker (a Claude Code worker, when the main session is not Claude) | Set by `AGENTS.md` with `--model` | Opus 5.5 · medium |
+| Cross review worker (a Codex worker, when the main session is Claude and the reviewer fell back to Claude) | Set by `AGENTS.md` with `--model` | GPT-6.1 Sol · high |
 | Security and core-logic review | Bundled security-reviewer | Opus 5.5 · high |
 | UI and screen checks | ui-checker (`vision`) | GPT-6.1 Terra · medium |
 | Commit messages, PR descriptions | `commit`, doc-writer (`smol`) | Haiku 5.5 · medium |
+
+Effort follows the kind of work. Coding and code review scores stop rising at Opus 5.5 medium and GPT-6.1 Sol high, while document output keeps improving up to xhigh. Sonnet 5.5 costs half as much per token as Opus 5.5 but uses more tokens, so its cost per task is about the same, and it is not used for implementation.
 
 When a model is unavailable (for example, over its usage limit), the rest of the turn continues on GPT-6.1 Sol high. Review and UI checks fall back the other way, to Opus 5.5.
 
@@ -62,10 +68,10 @@ When a model is unavailable (for example, over its usage limit), the rest of the
 `AGENTS.md` is read only by the main session and by omp workers started by Orca. Task subagents do not read it. It covers:
 
 - **Development stages**: the seven stages from planning document to PR, the skill for each stage, and the points where you confirm. Running [run-flow](skills/run-flow.md) goes through them in order.
-- **Delegation**: which agent takes each kind of work
+- **Delegation**: which agent takes each kind of work. The reviewer (another company's model) is used only for the cross review, and sub-reviews of the code review skill go to task. Giving both to the reviewer makes the same model read the same diff twice.
 - **What to hand over**: implementation, test, and UI agents get the brief and one ticket, the repo rules file paths, the verification commands, and earlier tickets' output artifacts instead of the conversation. Review agents get the diff range and the brief. doc-writer gets the changed-file list, completion records, and review record instead of the full diff.
-- **On failure**: if implementer fails, it is handed the task once more along with the failure report; if it fails the same ticket twice, hard-implementer takes it. If that also fails, or the cause of failure is an ambiguous ticket, the session stops and suggests splitting the ticket again. A large refactor or a debugging task with an unknown cause from the start goes straight to hard-implementer.
-- **Orca**: Orca workers are used only to run tickets in parallel in separate worktrees when two or more tickets can start together, to hand work to another agent, or when you want to watch a worker directly.
+- **On failure**: if implementer fails, it is handed the task once more along with the failure report; if it fails the same ticket twice, hard-implementer takes it. If that also fails, or the cause of failure is an ambiguous ticket, the session stops and suggests splitting the ticket again. A large refactor or a debugging task with an unknown cause from the start goes straight to hard-implementer. An Orca implementation worker that implements a ticket itself and fails hands it straight to hard-implementer.
+- **Orca**: Orca workers are used only to run tickets in parallel in separate worktrees when two or more tickets can start together, to hand work to another agent, or when you want to watch a worker directly. Ticket implementation workers start on Opus 5.5 medium and do the implementation and tests themselves instead of handing them to implementer. The worker and implementer run the same model, so handing over would only read the same documents twice. Only screen checks go to ui-checker. To change it, edit `modelRoles.worker`.
 
 How several tickets run in parallel is described in [run-ticket](skills/run-ticket.md#running-multiple-tickets).
 
@@ -79,7 +85,7 @@ Check in a new omp session:
 
 ## Change models
 
-- To change a stage's model, change only that role in `modelRoles`. Agent files point to roles such as `@task`, so you do not need to edit them.
+- To change a stage's model, change only that role in `modelRoles`. Agent files point to roles such as `@task`, so you do not need to edit them. Only the models of the Claude Code and Codex cross review workers are written directly in the "Orca" section of `AGENTS.md`, because omp roles cannot be used for another agent's workers.
 - To cut cost, lower the effort before switching to another model.
 - Do not use `max` as a default. Cost rises sharply and scores sometimes drop.
 - Keep the effort fixed within one conversation. Changing it invalidates the prompt cache.
@@ -87,8 +93,8 @@ Check in a new omp session:
 ## Notes
 
 - **Escalation on failure is a rule, not a setting.** omp fallback models apply only when a model is unavailable. The main session, reading `AGENTS.md`, decides when to move from implementer to hard-implementer.
-- **Escalation has one step.** It goes straight from Sonnet 5.5 medium to Opus 5.5 xhigh with the Fable 5.2 advisor. To add a Sonnet 5.5 high step in between, create one more agent with `model: anthropic/claude-sonnet-5-5:high` and add it to "실패했을 때" (On failure) in `AGENTS.md`.
-- **No setting picks a model by input size.** GPT doubles its price when input exceeds 272K tokens, so `AGENTS.md` has large diffs split by directory before review.
+- **Escalation has one step.** It goes straight from Opus 5.5 medium to Opus 5.5 xhigh with the Fable 5.2 advisor. To add an Opus 5.5 high step in between, create one more agent with `model: anthropic/claude-opus-5-5:high` and add it to "실패했을 때" (On failure) in `AGENTS.md`.
+- **No setting picks a model by input size.** GPT doubles its input price and raises its output price 1.5 times when input exceeds 272K tokens, so `AGENTS.md` has large diffs split by directory before review.
 - **Only hard-implementer has an advisor.** `advisor: true` in the agent file attaches an advisor to that agent alone, regardless of the global `advisor.enabled: false`. An advisor reads every turn of its session, so keep it off in the main session.
 - **Haiku 5.5 has a 100K context.** It is smaller than the other models (1M), so give scout a narrow search scope.
 
