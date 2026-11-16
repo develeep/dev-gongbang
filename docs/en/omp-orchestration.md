@@ -60,7 +60,7 @@ When a model is unavailable (for example, over its usage limit), the rest of the
 
 `AGENTS.md` is read only by the main session and by omp workers started by Orca. Task subagents do not read it. It covers:
 
-- **Development stages**: the seven stages from planning document to PR, the skill for each stage, and the points where you confirm (framing record, ticket split, merge decision)
+- **Development stages**: the seven stages from planning document to PR, the skill for each stage, and the points where you confirm. Running [run-flow](skills/run-flow.md) goes through them in order.
 - **Delegation**: which agent takes each kind of work
 - **What to hand over**: subagents get the brief and one ticket instead of the conversation; review agents get the diff range and the brief.
 - **On failure**: if implementer fails the same ticket twice, hard-implementer takes it. If that also fails, the session stops and suggests splitting the ticket again.

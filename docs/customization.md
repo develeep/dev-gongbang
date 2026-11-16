@@ -68,6 +68,7 @@ dev-gongbang의 스킬을 복사해 팀 규칙, 쓰는 모델, 문서 양식에 
 | [set-brief](skills/set-brief.md) | `SKILL.md` | brief 템플릿, 저장 경로 |
 | [set-ticket](skills/set-ticket.md) | `SKILL.md` | 티켓 템플릿, 분할 기준 |
 | [run-ticket](skills/run-ticket.md) | `SKILL.md` | 티켓 고르는 규칙, 리뷰 순서, 완료 기록, Orca 병렬 실행 |
+| [run-flow](skills/run-flow.md) | `SKILL.md` | 인자별 시작 단계, PR 만들기 |
 
 set-brief, set-ticket, run-ticket은 같은 형식을 주고받습니다. brief의 섹션 이름, `- 작성일:` 줄, 티켓의 `- 상태:` 줄을 바꾸면 세 스킬을 함께 고치세요.
 
@@ -78,7 +79,7 @@ set-brief, set-ticket, run-ticket은 같은 형식을 주고받습니다. brief�
 - **User-invoked로 바꾸기**: `disable-model-invocation: true`를 넣으세요. 사용자가 이름을 입력할 때만 실행됩니다.
 - **Model-invoked로 바꾸기**: 그 줄을 지우세요. Claude가 `description`을 보고 스킬을 고르므로, `description`에 언제 쓰는지 구체적으로 적으세요.
 
-User-invoked 스킬은 다른 스킬이 불러올 수 없습니다. 예를 들어 set-brief는 set-ticket을 부르지 않고 사용자에게 실행을 안내합니다.
+User-invoked 스킬은 다른 스킬이 불러올 수 없습니다. 그래서 run-flow가 이어 부르는 set-brief, set-ticket, run-ticket은 "사용자나 다른 스킬이 지시할 때만 쓴다"는 설명을 단 Model-invoked로 둡니다.
 
 ## 고친 스킬 검사하기
 

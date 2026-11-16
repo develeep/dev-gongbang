@@ -11,7 +11,7 @@
 | 항목 | 값 |
 |---|---|
 | 버킷 | in-progress |
-| 호출 방식 | User-invoked |
+| 호출 방식 | Model-invoked (요청하거나 run-flow가 지시할 때만) |
 | 호출 | `/gongbang:set-brief [남길 작업 요약]` |
 | 원문 | [SKILL.md](../../skills/in-progress/set-brief/SKILL.md) |
 
@@ -59,8 +59,8 @@ brief에는 요약, 배경·의도, 최종 목적, 확인된 사실, 합의한 �
 - **set-ticket**: "남은 일"이 새 컨텍스트 창 하나로 끝나지 않을 크기면 티켓으로 나눕니다.
 - **run-ticket**: 한 창으로 끝날 크기면 새 세션에서 바로 실행합니다.
 
-set-ticket과 run-ticket은 User-invoked라 set-brief가 직접 부르지 않습니다. 게시를 마치면 어느 쪽을 실행할지 안내합니다.
+set-brief는 게시를 마치면 set-ticket과 run-ticket 중 어느 쪽을 실행할지 안내합니다. run-flow가 불렀으면 안내 대신 run-flow가 다음 단계를 이어 갑니다.
 
 ---
 
-← 이전: [check-guidelines](check-guidelines.md) · [문서 목록](../README.md) · 다음: [set-ticket](set-ticket.md) →
+← 이전: [run-flow](run-flow.md) · [문서 목록](../README.md) · 다음: [set-ticket](set-ticket.md) →

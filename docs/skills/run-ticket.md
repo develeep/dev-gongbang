@@ -11,7 +11,7 @@ set-ticket이 만든 티켓 하나를 새 세션에서 구현하고 리뷰한 �
 | 항목 | 값 |
 |---|---|
 | 버킷 | in-progress |
-| 호출 방식 | User-invoked |
+| 호출 방식 | Model-invoked (요청하거나 run-flow가 지시할 때만) |
 | 호출 | `/gongbang:run-ticket [티켓·brief 경로, 이슈 번호·URL] [여러 티켓이면 범위]` |
 | 원문 | [SKILL.md](../../skills/in-progress/run-ticket/SKILL.md) |
 
@@ -78,6 +78,7 @@ set-ticket이 만든 티켓 하나를 새 세션에서 구현하고 리뷰한 �
 ## 함께 쓰는 스킬
 
 - **set-brief**, **set-ticket**: 실행할 brief와 티켓을 만듭니다.
+- **run-flow**: 5단계에서 이 스킬로 brief의 남은 티켓을 실행합니다.
 - **code-review** 스킬이 설치돼 있으면 5단계 코드 리뷰에 씁니다.
 - **check-guidelines**: 5단계 규칙 검사에 씁니다.
 - **orchestration**(Orca): 여러 티켓 병렬 실행과 교차 리뷰 워커에 씁니다.

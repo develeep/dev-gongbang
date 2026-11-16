@@ -11,7 +11,7 @@ Records what was decided in the conversation as one brief. The readers of this b
 | Field | Value |
 |---|---|
 | Bucket | in-progress |
-| Invocation | User-invoked |
+| Invocation | Model-invoked (only when you ask or run-flow tells it to) |
 | Command | `/gongbang:set-brief [summary of the work to record]` |
 | Source | [SKILL.md](../../../skills/in-progress/set-brief/SKILL.md) |
 
@@ -59,8 +59,8 @@ If you change section names, line names such as "남은 일" (remaining work), o
 - **set-ticket**: if "남은 일" is too big to finish in one new context window, splits it into tickets.
 - **run-ticket**: if it fits in one window, runs it right away in a new session.
 
-set-ticket and run-ticket are User-invoked, so set-brief does not call them directly. After publishing, it tells you which one to run.
+After publishing, set-brief tells you whether to run set-ticket or run-ticket next. When run-flow called it, run-flow continues to the next stage instead.
 
 ---
 
-← Previous: [check-guidelines](check-guidelines.md) · [All docs](../README.md) · Next: [set-ticket](set-ticket.md) →
+← Previous: [run-flow](run-flow.md) · [All docs](../README.md) · Next: [set-ticket](set-ticket.md) →

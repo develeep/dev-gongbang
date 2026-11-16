@@ -11,7 +11,7 @@ Splits one brief recorded with set-brief into several tickets. Each ticket is wr
 | Field | Value |
 |---|---|
 | Bucket | in-progress |
-| Invocation | User-invoked |
+| Invocation | Model-invoked (only when you ask or run-flow tells it to) |
 | Command | `/gongbang:set-ticket [brief issue number/URL or docs path]` |
 | Source | [SKILL.md](../../../skills/in-progress/set-ticket/SKILL.md) |
 
@@ -58,7 +58,7 @@ If you change section names in the ticket templates or the `- 상태:` (status) 
 ## Related skills
 
 - **set-brief**: creates the brief to split.
-- **run-ticket**: runs the published tickets one at a time in a new session. It is User-invoked, so set-ticket does not call it directly and tells you how to run it.
+- **run-ticket**: runs the published tickets one at a time in a new session. set-ticket tells you how to run it; when run-flow called set-ticket, run-flow runs it next.
 
 ---
 

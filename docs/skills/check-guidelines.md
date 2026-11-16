@@ -64,4 +64,4 @@
 
 ---
 
-← 이전: [framing-problems](framing-problems.md) · [문서 목록](../README.md) · 다음: [set-brief](set-brief.md) →
+← 이전: [framing-problems](framing-problems.md) · [문서 목록](../README.md) · 다음: [run-flow](run-flow.md) →

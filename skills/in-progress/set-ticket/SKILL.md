@@ -1,7 +1,6 @@
 ---
 name: set-ticket
-description: set-brief로 남긴 이슈나 docs/context/ 문서가 한 번에 작업하기에 클 때, 혼자 검증할 수 있는 작은 티켓으로 나눠 GitHub sub-issue나 docs 파일로 남기고 원래 brief에 티켓 목록을 연결한다.
-disable-model-invocation: true
+description: set-brief로 남긴 이슈나 docs/context/ 문서가 한 번에 작업하기에 클 때, 혼자 검증할 수 있는 작은 티켓으로 나눠 GitHub sub-issue나 docs 파일로 남기고 원래 brief에 티켓 목록을 연결한다. 사용자가 brief를 티켓으로 나눠 달라고 하거나, run-flow 같은 다른 스킬이 지시할 때만 사용한다. brief가 없는 일반 작업 분할이나 할 일 목록 요청에는 스스로 실행하지 않는다.
 argument-hint: "[brief 이슈 번호·URL 또는 docs 경로]"
 ---
 
@@ -115,7 +114,7 @@ brief가 있는 곳에 게시한다. 막는 티켓을 먼저 만들어야 막힘
 
 **실행 안내**
 
-게시를 마친 뒤 새 세션에서 `/run-ticket`으로 티켓을 하나씩 실행하라고 안내한다. run-ticket은 User-invoked라 이 스킬에서 호출할 수 없다.
+게시를 마친 뒤 새 세션에서 `/run-ticket`으로 티켓을 하나씩 실행하라고 안내한다. 다른 스킬이 이 스킬을 불렀으면 안내하지 않고 그 스킬로 돌아간다.
 
 ## 이슈 티켓 템플릿
 

@@ -11,7 +11,7 @@ Implements and reviews one ticket made by set-ticket in a new session, then upda
 | Field | Value |
 |---|---|
 | Bucket | in-progress |
-| Invocation | User-invoked |
+| Invocation | Model-invoked (only when you ask or run-flow tells it to) |
 | Command | `/gongbang:run-ticket [ticket/brief path, issue number/URL] [range for multiple tickets]` |
 | Source | [SKILL.md](../../../skills/in-progress/run-ticket/SKILL.md) |
 
@@ -78,6 +78,7 @@ Not committing is a core rule. Even if the repo rules require commits, it leaves
 ## Related skills
 
 - **set-brief**, **set-ticket**: create the brief and tickets to run.
+- **run-flow**: uses this skill in its stage 5 to run the brief's remaining tickets.
 - If the **code-review** skill is installed, it is used for the code review in step 5.
 - **check-guidelines**: used for the rule check in step 5.
 - **orchestration** (Orca): used for running several tickets in parallel and for cross-review workers.

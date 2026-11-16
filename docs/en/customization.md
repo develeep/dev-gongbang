@@ -68,6 +68,7 @@ Paths are relative to the skill folder. Details are in the "Customize" section o
 | [set-brief](skills/set-brief.md) | `SKILL.md` | Brief template, save path |
 | [set-ticket](skills/set-ticket.md) | `SKILL.md` | Ticket template, splitting criteria |
 | [run-ticket](skills/run-ticket.md) | `SKILL.md` | Ticket selection rules, review order, completion record, Orca parallel run |
+| [run-flow](skills/run-flow.md) | `SKILL.md` | Starting stage per argument, opening the PR |
 
 set-brief, set-ticket, and run-ticket exchange the same format. If you change the brief section names, the `- 작성일:` (Date written) line, or the ticket's `- 상태:` (Status) line, edit all three skills together.
 
@@ -78,7 +79,7 @@ The invocation type is set in the `SKILL.md` frontmatter.
 - **Change to User-invoked**: Add `disable-model-invocation: true`. The skill runs only when the user types its name.
 - **Change to Model-invoked**: Delete that line. Claude picks skills by reading `description`, so state specifically in `description` when to use the skill.
 
-Another skill cannot load a User-invoked skill. For example, set-brief does not call set-ticket. It tells the user to run it.
+Another skill cannot load a User-invoked skill. That is why set-brief, set-ticket, and run-ticket, which run-flow loads in turn, are Model-invoked with a description saying they run only when the user or another skill asks.
 
 ## Check a modified skill
 

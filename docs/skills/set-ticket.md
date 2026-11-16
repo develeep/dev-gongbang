@@ -11,7 +11,7 @@ set-brief로 남긴 brief 하나를 티켓 여러 개로 나눕니다. 티켓 �
 | 항목 | 값 |
 |---|---|
 | 버킷 | in-progress |
-| 호출 방식 | User-invoked |
+| 호출 방식 | Model-invoked (요청하거나 run-flow가 지시할 때만) |
 | 호출 | `/gongbang:set-ticket [brief 이슈 번호·URL 또는 docs 경로]` |
 | 원문 | [SKILL.md](../../skills/in-progress/set-ticket/SKILL.md) |
 
@@ -58,7 +58,7 @@ brief는 닫지 않고, "티켓" 섹션을 덧붙이는 것 외에는 고치지 
 ## 함께 쓰는 스킬
 
 - **set-brief**: 나눌 brief를 만듭니다.
-- **run-ticket**: 게시한 티켓을 새 세션에서 하나씩 실행합니다. User-invoked라 set-ticket이 직접 부르지 않고 실행 방법을 안내합니다.
+- **run-ticket**: 게시한 티켓을 새 세션에서 하나씩 실행합니다. set-ticket은 실행 방법을 안내하고, run-flow가 불렀으면 run-flow가 이어서 실행합니다.
 
 ---
 
