@@ -86,7 +86,7 @@ Available when you install `gongbang-dev`. Their behavior changes often.
 
 - [set-brief](docs/en/skills/set-brief.md): Turns a framing record or session result into a brief that a worker with no context can pick up, and saves it as a GitHub issue or a `docs/context/` document. `/gongbang:set-brief [summary of the work to record]` · [SKILL.md](skills/in-progress/set-brief/SKILL.md)
 - [set-ticket](docs/en/skills/set-ticket.md): Splits a large brief into tickets that can each be verified on their own, saves them as GitHub sub-issues or docs files, and links them to the brief. `/gongbang:set-ticket [brief issue number/URL or docs path]` · [SKILL.md](skills/in-progress/set-ticket/SKILL.md)
-- [run-ticket](docs/en/skills/run-ticket.md): Implements and reviews one ticket in a new session, then updates the ticket status and the brief checkbox. Does not commit. `/gongbang:run-ticket [ticket/brief path, issue number/URL] [range, for multiple tickets]` · [SKILL.md](skills/in-progress/run-ticket/SKILL.md)
+- [run-ticket](docs/en/skills/run-ticket.md): Implements and reviews one ticket in a new session, then updates the ticket status and the brief checkbox. Does not commit. Runs several tickets in parallel with Orca workers. `/gongbang:run-ticket [ticket/brief path, issue number/URL] [range, for multiple tickets]` · [SKILL.md](skills/in-progress/run-ticket/SKILL.md)
 
 ### Model-invoked
 
@@ -124,7 +124,7 @@ Skills chain together as follows.
 - **Building a prompt**: Frame the task first with `/gongbang:framing-problems`, then pass the confirmed framing record to `/gongbang:prompt-builder` as a draft. You can make an agent prompt that talks to people, or a reusable template, call framing-problems every time it runs.
 - **Building a skill**: Create a SKILL.md draft with `/gongbang:prompt-builder`, then pass the result to `/gongbang:building-skills` to test and refine it.
 - **Code rules**: Create rules with `/gongbang:set-guidelines`, then check code with `/gongbang:check-guidelines`.
-- **Handing off large work**: Save the result framed with framing-problems using `/gongbang:set-brief`. If it is large, split it with `/gongbang:set-ticket`, then run the tickets one at a time with `/gongbang:run-ticket` in a new session.
+- **Handing off large work**: Save the result framed with framing-problems using `/gongbang:set-brief`. If it is large, split it with `/gongbang:set-ticket`, then run the tickets one at a time with `/gongbang:run-ticket` in a new session. With Orca, ask for "all remaining tickets" to run them in parallel.
 
 ## Customize
 

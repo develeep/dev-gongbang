@@ -28,7 +28,7 @@ dev-gongbang의 모든 사용 문서 목록입니다. 스킬 페이지에는 언
 
 - [set-brief](skills/set-brief.md): 대화에서 확정한 내용을 작업 지시서(brief)로 남깁니다.
 - [set-ticket](skills/set-ticket.md): 큰 brief를 티켓으로 나눕니다.
-- [run-ticket](skills/run-ticket.md): 티켓 하나를 새 세션에서 구현하고 리뷰합니다.
+- [run-ticket](skills/run-ticket.md): 티켓 하나를 새 세션에서 구현하고 리뷰합니다. 여러 티켓은 Orca로 병렬 실행합니다.
 
 ### Model-invoked
 

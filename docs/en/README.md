@@ -28,7 +28,7 @@ Install `gongbang-dev` to use these.
 
 - [set-brief](skills/set-brief.md): Records what was decided in the conversation as a brief.
 - [set-ticket](skills/set-ticket.md): Splits a large brief into tickets.
-- [run-ticket](skills/run-ticket.md): Implements and reviews one ticket in a new session.
+- [run-ticket](skills/run-ticket.md): Implements and reviews one ticket in a new session. Runs several tickets in parallel with Orca.
 
 ### Model-invoked
 
