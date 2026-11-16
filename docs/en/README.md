@@ -41,4 +41,5 @@ Install `gongbang-dev` to use these.
 ## Guides
 
 - [Customizing skills](customization.md): How to copy, edit, check, and test a skill
+- [omp multi-agent setup](omp-orchestration.md): How to install omp roles, agents, and delegation rules that use a different model at each stage
 - [Choosing a skill](../../README.en.md#choosing-a-skill): Which skill fits which situation, and how skills chain together
