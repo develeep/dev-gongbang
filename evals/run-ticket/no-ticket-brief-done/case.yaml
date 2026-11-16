@@ -9,23 +9,23 @@ execution:
 context:
   scaffold_script: fixture.sh
 graders:
-  # 근거: skills/in-progress/run-ticket/SKILL.md:56
-  # 근거: skills/in-progress/run-ticket/SKILL.md:126
+  # 근거: skills/in-progress/run-ticket/SKILL.md:64
+  # 근거: skills/in-progress/run-ticket/SKILL.md:134
   - name: remaining-checked
     type: regex
     target: {source: file, path: docs/context/2026-10-23-slug-hyphen.md}
     pattern: '- \[x\] 공백을 하이픈으로 바꾼다'
     match: contains
-  # 근거: skills/in-progress/run-ticket/SKILL.md:126
-  # 근거: skills/in-progress/run-ticket/SKILL.md:128-132
+  # 근거: skills/in-progress/run-ticket/SKILL.md:134
+  # 근거: skills/in-progress/run-ticket/SKILL.md:136-140
   # 근거: skills/in-progress/run-ticket/SKILL.md:15
   - name: record-appended
     type: llm
     criteria: |
       PASS: brief 파일 끝에 `## 완료 기록`을 붙이고, 완료일, 커밋하지 않았다는 사실, 바꾼 파일(`src/slug.py` 포함)을 적는다.
       FAIL: 완료 기록이 없거나, brief가 아닌 다른 새 파일에만 적거나, 커밋 여부나 바꾼 파일이 빠졌다.
-  # 근거: skills/in-progress/run-ticket/SKILL.md:126
-  # 근거: skills/in-progress/run-ticket/SKILL.md:146
+  # 근거: skills/in-progress/run-ticket/SKILL.md:134
+  # 근거: skills/in-progress/run-ticket/SKILL.md:154
   - name: brief-body-unchanged
     type: llm
     criteria: |

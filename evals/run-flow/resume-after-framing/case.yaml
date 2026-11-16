@@ -12,26 +12,26 @@ execution:
 context:
   scaffold_script: fixture.sh
 graders:
-  # 근거: skills/in-progress/run-flow/SKILL.md:118, skills/in-progress/run-flow/SKILL.md:121
+  # 근거: skills/in-progress/run-flow/SKILL.md:79, skills/in-progress/run-flow/SKILL.md:82
   - name: set-brief-loaded
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?set-brief"'
     min: 1
-  # 근거: skills/in-progress/run-flow/SKILL.md:121
+  # 근거: skills/in-progress/run-flow/SKILL.md:82
   - name: earlier-stages-not-fired
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?(?:analyzing-requirements|framing-problems)"'
     min: 0
     max: 0
-  # 근거: skills/in-progress/run-flow/SKILL.md:121
+  # 근거: skills/in-progress/run-flow/SKILL.md:82
   - name: framing-record-reused
     type: llm
     criteria: |
       PASS: set-brief에 넘긴 내용이나 brief 초안이 상태 파일 `## 구체화 기록`의 최종 목적(`shipped`로 바뀌면 이메일 한 번)과 해법(`send_email` 호출)을 그대로 쓰고, 구체화 질문을 다시 하지 않는다.
       FAIL: 구체화 기록을 쓰지 않고 요청을 다시 묻거나, 기록과 다른 목적·해법으로 brief를 쓴다.
-  # 근거: skills/in-progress/run-flow/SKILL.md:24
+  # 근거: skills/in-progress/run-flow/SKILL.md:32
   - name: state-advanced
     type: llm
     criteria: |

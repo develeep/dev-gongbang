@@ -12,7 +12,7 @@ execution:
 context:
   scaffold_script: fixture.sh
 graders:
-  # 근거: skills/in-progress/analyzing-requirements/SKILL.md:88
+  # 근거: skills/in-progress/analyzing-requirements/SKILL.md:90
   - name: saved-with-gap-list
     type: regex
     target: {source: file, path: docs/requirements/order-cancel.md}

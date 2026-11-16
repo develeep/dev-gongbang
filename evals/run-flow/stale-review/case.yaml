@@ -1,0 +1,30 @@
+schema_version: "1.1"
+name: stale-review
+description: 통합 리뷰 뒤에 코드가 바뀐 흐름을 6단계에서 이어 가면, 코드 지문을 비교해 리뷰가 지금 코드에 맞지 않는다고 알리고 PR 선택보다 재리뷰를 먼저 하는지
+tags: [resume, review-validity, merge-decision]
+execution:
+  prompt: /run-flow docs/context/run-flow/2026-10-22-greeting.md
+  max_turns: 12
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/in-progress/run-flow/SKILL.md:41-45
+  - name: fingerprint-computed
+    type: tool_used
+    tool: Bash
+    input_match: 'code_fingerprint\.sh'
+    min: 1
+  # 근거: skills/in-progress/run-flow/SKILL.md:139
+  - name: stale-review-reported
+    type: llm
+    criteria: |
+      PASS: 상태 파일에 적힌 코드 지문과 지금 값이 달라 리뷰한 뒤에 코드가 바뀌었다고 사용자에게 알리고, PR 만들기·고치기·멈추기 선택을 받기 전에 리뷰를 다시 하거나 다시 하겠다고 밝힌다.
+      FAIL: 지문을 비교하지 않거나, 코드가 바뀐 것을 알리지 않거나, 예전 리뷰 기록을 그대로 통과로 보여 주고 세 선택지만 묻는다.
+  # 근거: skills/in-progress/run-flow/SKILL.md:17
+  - name: no-push-or-pr
+    type: tool_used
+    tool: Bash
+    input_match: 'git\s+push|gh\s+pr\s+create'
+    min: 0
+    max: 0
