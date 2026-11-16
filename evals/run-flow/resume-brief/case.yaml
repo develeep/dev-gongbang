@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: resume-brief
-description: 인자 없이 실행하면 끝나지 않은 brief 하나를 찾아 5단계(구현과 리뷰)부터 이어 가며 run-ticket을 불러오는지
+description: 인자 없이 실행하면 끝나지 않은 brief 하나를 찾아 5단계(구현과 리뷰)부터 이어 가고, 기본 브랜치에 있으면 run-ticket을 부르기 전에 작업 브랜치부터 묻는지
 tags: [start-stage, resume]
 execution:
   prompt: /run-flow
@@ -9,14 +9,15 @@ execution:
 context:
   scaffold_script: fixture.sh
 graders:
-  # 근거: skills/in-progress/run-flow/SKILL.md:47
-  # 근거: skills/in-progress/run-flow/SKILL.md:71-73
-  - name: run-ticket-loaded
-    type: tool_used
-    tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?run-ticket"'
-    min: 1
-  # 근거: skills/in-progress/run-flow/SKILL.md:47
+  # 근거: skills/in-progress/run-flow/SKILL.md:45
+  # 근거: skills/in-progress/run-flow/SKILL.md:49
+  # 근거: skills/in-progress/run-flow/SKILL.md:73
+  - name: branch-before-run-ticket
+    type: llm
+    criteria: |
+      PASS: brief(2026-10-22-greeting)를 스스로 골라 5단계부터 진행하고, 현재 브랜치(master)가 기본 브랜치라서 run-ticket을 부르기 전에 작업 브랜치 이름을 묻거나, 받은 이름으로 작업 브랜치를 만든 뒤 run-ticket을 부른다.
+      FAIL: 작업 브랜치를 묻거나 만들지 않고 master에서 run-ticket을 부르거나, brief가 하나뿐인데 어느 brief인지 묻거나, 1~4단계를 시작한다.
+  # 근거: skills/in-progress/run-flow/SKILL.md:45
   # 근거: skills/in-progress/run-flow/SKILL.md:49
   - name: earlier-stages-not-fired
     type: tool_used
