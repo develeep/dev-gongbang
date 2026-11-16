@@ -67,8 +67,12 @@ Paths are relative to the skill folder. Details are in the "Customize" section o
 | [analyzing-requirements](skills/analyzing-requirements.md) | `SKILL.md` | Document template |
 | [set-brief](skills/set-brief.md) | `SKILL.md` | Brief template, save path |
 | [set-ticket](skills/set-ticket.md) | `SKILL.md` | Ticket template, splitting criteria |
-| [run-ticket](skills/run-ticket.md) | `SKILL.md` | Ticket selection rules, review order, completion record, Orca parallel run |
-| [run-flow](skills/run-flow.md) | `SKILL.md` | Starting stage per argument, state file and ADRs, opening the PR |
+| [run-ticket](skills/run-ticket.md) | `SKILL.md` | Ticket selection rules, review order, completion record |
+| | `references/multi-ticket.md` | Running multiple tickets: Orca parallel run, sequential run |
+| [run-flow](skills/run-flow.md) | `SKILL.md` | Starting stage per argument, state file rules, links between stages |
+| | `assets/state-file.md` | State file format |
+| | `references/adr.md`, `references/brief-stage.md`, `references/pr-stage.md` | ADR criteria, procedures for stages 3 and 7 |
+| | `scripts/code_fingerprint.sh` | Fingerprint used to compare the reviewed code with the current code |
 
 set-brief, set-ticket, and run-ticket exchange the same format. If you change the brief section names, the `- 작성일:` (Date written) line, or the ticket's `- 상태:` (Status) line, edit all three skills together.
 

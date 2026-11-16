@@ -34,7 +34,7 @@ If you hand over a planning document and ask something like "organize the requir
 1. It reads the whole planning document and identifies the section structure, services, and development areas.
 2. It asks about all ambiguous parts at once, as a numbered list. Each question says what is ambiguous and why.
 3. It writes the document from the template.
-4. It checks that every item has grounds in the planning document or your answers. Items without grounds are removed or changed to `확인 필요` (needs confirmation).
+4. It checks that every item has grounds in the planning document or your answers. Items without grounds are removed or changed to `확인 필요` (needs confirmation). It also goes the other way: for each section of the planning document, it checks whether the document reflects it, leaves it out, or marks it `확인 필요`, to find sections that were dropped.
 5. It asks where to save and saves a markdown file.
 
 ## Output

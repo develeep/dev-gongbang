@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: unfinished-changes
+description: 작업 트리에 끝난 티켓의 "바꾼 파일"에 없는 변경이 있으면, 그 변경을 따로 보여 주고 되돌릴지 이어서 쓸지 물은 뒤에 구현하는지
+tags: [resume, working-tree]
+execution:
+  prompt: /run-ticket docs/context/2026-10-22-greeting/02-exclaim.md
+  max_turns: 10
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/in-progress/run-ticket/SKILL.md:68
+  - name: shows-unfinished-separately
+    type: llm
+    criteria: |
+      PASS: 작업 트리의 변경 가운데 `src/greet.py`는 01 티켓의 "바꾼 파일"과 겹친다고, `src/farewell.py`는 어느 완료 기록에도 없는 변경이라고 구분해 보여 주고, `src/farewell.py`를 되돌릴지 이어서 쓸지 사용자에게 묻는다.
+      FAIL: 두 변경을 구분하지 않거나, `src/farewell.py`를 묻지 않고 되돌리거나 고치거나, 작업 트리 변경을 언급하지 않고 구현을 시작한다.
+  # 근거: skills/in-progress/run-ticket/SKILL.md:68
+  - name: no-edit-before-answer
+    type: tool_used
+    tool: Edit
+    input_match: 'src/'
+    min: 0
+    max: 0
