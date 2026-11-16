@@ -20,7 +20,7 @@ Takes a planning document, a request, or a brief and runs the development stages
 ## When to use
 
 - You want to go from a planning document or a request to a PR, answering only confirmations and questions along the way.
-- You want to finish a brief that stopped partway. Run it without an argument and it finds an unfinished brief and continues.
+- You want to finish a brief that stopped partway. Run it without an argument and it finds an unfinished brief and continues. The framing record lives only in the conversation, so if it stopped before the brief was published, start again with the original argument.
 - You run several features at once. Create one Orca workspace per feature and run run-flow in each.
 
 ## Prerequisites
@@ -32,13 +32,13 @@ Takes a planning document, a request, or a brief and runs the development stages
 
 ## How it works
 
-0. It picks the starting stage from the argument. A planning document starts at stage 1, a requirements document or a request sentence at stage 2, and a brief at stage 4 to 6 depending on its ticket status. Without an argument it looks for unfinished briefs and, if there are several, lists them for you to choose.
+0. It picks the starting stage from the argument. A brief starts at stage 4 to 6 depending on its ticket status, a requirements document or a request sentence at stage 2, and a planning document at stage 1. A brief is also a Markdown document, so it is checked before the planning-document rule. Without an argument it looks for unfinished briefs and, if there are several, lists them for you to choose.
 1. **Requirements**: analyzing-requirements turns the planning document into a requirements document.
 2. **Framing**: if there are several development scopes, you pick one for this run; then framing-problems confirms a framing record.
 3. **Brief**: set-brief records the brief. If the remaining work will not fit in one session, it goes to stage 4; otherwise to stage 5.
 4. **Tickets**: set-ticket splits the brief into tickets and publishes them.
-5. **Implementation and review**: run-ticket runs all remaining tickets. With Orca, it starts one worker per ticket and runs them in parallel. Even a single ticket goes to a worker or subagent with a fresh context, so the implementer works from the brief and ticket alone, without this conversation. If a ticket fails its done criteria, it stops and asks whether to split the ticket again.
-6. **Merge and PR decision**: it collects done criteria results, review findings, changed files, and commits, and asks you to choose: open a PR, fix something, or stop.
+5. **Implementation and review**: if the current branch is the default branch, it first asks for a work branch name and creates it. Then run-ticket runs all remaining tickets. With Orca, it starts one worker per ticket and runs them in parallel. Even a single ticket goes to a worker or subagent with a fresh context, so the implementer works from the brief and ticket alone, without this conversation. If a ticket fails its done criteria, it stops and asks whether to split the ticket again.
+6. **Merge and PR decision**: it collects done criteria results, review findings, changed files, and commits, and asks you to choose: open a PR, fix something, or stop. When it starts at stage 6 without a run-ticket report, it collects them from the tickets' completion records and the git history.
 7. **Open the PR**: if needed, it creates a work branch and commits, then writes the PR description, pushes, and opens the PR.
 
 Every confirmation a stage skill asks (confirming the framing record, where to save the requirements document, the brief draft and where to publish it, the ticket split, the Orca run plan) is still asked. What run-flow removes is running the next skill yourself each time a stage ends.
