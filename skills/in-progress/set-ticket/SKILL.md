@@ -39,7 +39,9 @@ set-brief 기록 하나를 티켓 여러 개로 나눈다. 티켓을 읽는 사�
 - 인자가 경로면 그 문서를 끝까지 읽는다.
 - 인자가 없으면 다음 순서로 찾는다.
   1. 이 대화가 set-brief 게시로 끝났으면 그때 만든 이슈나 문서
-  2. `gh issue list --label context --json number,title,createdAt,body`의 이슈 중 가장 최근 것과, `- 작성일:` 줄이 있는 문서 중 작성일이 가장 늦은 것을 비교해 더 최근 것. 본문에 `## 티켓` 섹션이 이미 있거나 "남은 일"에 빈 체크박스가 없는 brief는 이미 나눴거나 끝난 것이므로 건너뛴다. 문서는 `command grep -rlE --include='*.md' --exclude-dir=.git --exclude-dir=node_modules '^- 작성일: [0-9]{4}-[0-9]{2}-[0-9]{2}' .`로 찾는다. brief가 `docs/context/` 밖에 저장됐을 수 있고, Grep 도구와 셸 함수(ugrep 등)로 바뀐 Bash `grep`은 `.gitignore`에 걸린 폴더를 건너뛰므로 `command grep`으로 찾는다.
+  2. `gh issue list --label context --json number,title,createdAt,body`의 이슈 중 가장 최근 것과, `- 작성일:` 줄이 있는 문서 중 작성일이 가장 늦은 것을 비교해 더 최근 것. 본문에 `## 티켓` 섹션이 이미 있거나 "남은 일"에 빈 체크박스가 없는 brief는 이미 나눴거나 끝난 것이므로 건너뛴다.
+
+     문서는 `command grep -rlE --include='*.md' --exclude-dir=.git --exclude-dir=node_modules '^- 작성일: [0-9]{4}-[0-9]{2}-[0-9]{2}' .`로 찾는다. brief가 `docs/context/` 밖에 저장됐을 수 있고, Grep 도구와 셸 함수(ugrep 등)로 바뀐 Bash `grep`은 `.gitignore`에 걸린 폴더를 건너뛰므로 `command grep`으로 찾는다.
 
   찾은 brief로 바로 진행하고, 어떤 brief를 골랐는지 한 줄로 알린다. 하나도 없으면 그렇다고 알리고 멈춘다.
 
@@ -88,6 +90,8 @@ brief가 있는 곳에 게시한다. 막는 티켓을 먼저 만들어야 막힘
 
 **GitHub 이슈**
 
+게시하기 전에 `gh api repos/{owner}/{repo}/issues/<brief 번호>/sub_issues`와 brief 본문의 `## 티켓`으로 이미 만든 티켓을 확인한다. 분할안과 제목이 같은 티켓은 다시 만들지 않고 빠진 연결만 한다. 게시 도중 끊긴 뒤 다시 실행하면 같은 티켓이 두 번 생긴다.
+
 1. `gh label list --search ready-for-agent`에 `ready-for-agent`가 없으면 `gh label create ready-for-agent`로 만든다.
 2. 티켓마다:
    1. "이슈 티켓 템플릿"으로 쓴 본문을 임시 파일에 저장하고 `gh issue create --title "<제목>" --body-file <임시 파일> --label ready-for-agent`로 만든다.
@@ -114,7 +118,7 @@ brief가 있는 곳에 게시한다. 막는 티켓을 먼저 만들어야 막힘
 
 **실행 안내**
 
-게시를 마친 뒤 새 세션에서 `/run-ticket`으로 티켓을 하나씩 실행하라고 안내한다. 다른 스킬이 이 스킬을 불렀으면 안내하지 않고 그 스킬로 돌아간다.
+게시를 마친 뒤 새 세션에서 run-ticket 스킬로 티켓을 하나씩 실행하라고 안내한다. 다른 스킬이 이 스킬을 불렀으면 안내하지 않고 그 스킬로 돌아간다.
 
 ## 이슈 티켓 템플릿
 
