@@ -1,0 +1,52 @@
+# ~/.omp/agent/config.yml에 병합할 항목
+# 멀티에이전트 개발 단계별 모델·Effort (2026-11 기준). 설치 방법은 docs/omp-orchestration.md에 있다.
+# GPT는 ChatGPT 구독(openai-codex) 기준이다. OpenAI API 키를 쓰면 `openai-codex/`를 `openai/`로 바꾼다.
+
+modelRoles:
+  # 메인 세션 = 오케스트레이터·설계, 계획 모드
+  default: anthropic/claude-opus-5-5:high
+  plan: anthropic/claude-opus-5-5:high
+
+  # 어려운 구현·대규모 리팩터링 (hard-implementer)
+  slow: anthropic/claude-opus-5-5:xhigh
+
+  # 일반 구현·테스트 (bundled task, implementer, test-writer)
+  task: anthropic/claude-sonnet-5-5:medium
+
+  # 코드 탐색 (bundled scout, sonic), PR 설명 (doc-writer), 세션 제목 등 가벼운 작업
+  smol: anthropic/claude-haiku-5-5:medium
+  tiny: anthropic/claude-haiku-5-5:low
+
+  # 커밋 메시지
+  commit: anthropic/claude-haiku-5-5:medium
+
+  # UI·화면 검증 (ui-checker)
+  vision: openai-codex/gpt-6.1-terra:medium
+
+  # 교차 리뷰 (사용자 정의 역할, bundled reviewer가 쓴다)
+  review: openai-codex/gpt-6.1-sol:high
+
+  # 막혔을 때 자문 (hard-implementer에만 붙인다)
+  advisor: anthropic/claude-fable-5-2:high
+
+# advisor는 붙은 세션의 모든 턴을 읽는다. 메인 세션에서는 끄고 hard-implementer 파일의 `advisor: true`로만 켠다.
+advisor:
+  enabled: false
+
+task:
+  agentModelOverrides:
+    # bundled reviewer를 다른 회사 모델(GPT-6.1 Sol) 교차 리뷰로 바꾼다.
+    reviewer: "@review"
+    # bundled security-reviewer는 세션 모델을 따르므로 Opus high로 고정한다.
+    security-reviewer: anthropic/claude-opus-5-5:high
+
+retry:
+  fallbackChains:
+    # 모델을 쓸 수 없을 때(한도 초과 등) 남은 턴을 이어 갈 모델. 체인이 없는 역할도 이것을 쓴다.
+    default:
+      - openai-codex/gpt-6.1-sol:high
+    # GPT를 쓸 수 없으면 리뷰와 화면 검증은 Opus로 넘긴다.
+    review:
+      - anthropic/claude-opus-5-5:high
+    vision:
+      - anthropic/claude-opus-5-5:medium
