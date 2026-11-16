@@ -34,7 +34,7 @@ Splits one brief recorded with set-brief into several tickets. Each ticket is wr
    - Each ticket is a vertical slice that cuts narrowly through every layer it needs (schema, API, UI, tests).
    - Each ticket gets done criteria and a blocked-by relation (tickets that must finish first).
    - When one ticket uses another ticket's result, it points to it as "NN 티켓의 산출물" (output artifact of ticket NN).
-   - A broad refactor where no slice can go green on its own is split in expand → migrate → contract order.
+   - A broad refactor where no slice can go green on its own is split in expand → migrate → contract order. If groups also cannot go green on their own and share an integration branch, write `(통합 브랜치 공유)` (shared integration branch) on the blocked-by line. run-ticket runs the tickets with this marker one after another in a single working tree.
 4. It shows the split plan as a numbered list and asks about size, blocked-by relations, and tickets to merge or split. It revises until you approve.
 5. It publishes in blocked-by order and appends a "티켓" (Tickets) section to the brief.
 
