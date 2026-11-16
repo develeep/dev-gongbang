@@ -9,21 +9,21 @@ execution:
 context:
   scaffold_script: fixture.sh
 graders:
-  # 근거: skills/in-progress/run-flow/SKILL.md:37
-  # 근거: skills/in-progress/run-flow/SKILL.md:46
+  # 근거: skills/in-progress/run-flow/SKILL.md:92
+  # 근거: skills/in-progress/run-flow/SKILL.md:103
   - name: no-stage-skill-fired
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?(?:analyzing-requirements|framing-problems|set-brief|set-ticket|run-ticket)"'
     min: 0
     max: 0
-  # 근거: skills/in-progress/run-flow/SKILL.md:82
+  # 근거: skills/in-progress/run-flow/SKILL.md:148
   - name: report-from-records
     type: llm
     criteria: |
       PASS: 티켓 01·02가 끝났다는 것과 각 티켓의 완료 기준 결과를 티켓의 `## 완료 기록`·완료 기준에서 가져와 보여 주고, 두 기능 커밋(인사말 대문자 변환, 느낌표 추가)이나 바뀐 파일 `src/greet.py`를 git 기록에서 가져와 보여 준다.
       FAIL: 티켓별 결과나 커밋·바뀐 파일 중 하나가 빠지거나, 보고할 근거가 없다며 멈추거나, 티켓을 다시 구현한다.
-  # 근거: skills/in-progress/run-flow/SKILL.md:82-86
+  # 근거: skills/in-progress/run-flow/SKILL.md:148-152
   - name: asks-three-choices
     type: llm
     criteria: |

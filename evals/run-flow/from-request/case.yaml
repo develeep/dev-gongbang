@@ -9,15 +9,15 @@ execution:
 context:
   scaffold_script: fixture.sh
 graders:
-  # 근거: skills/in-progress/run-flow/SKILL.md:47
-  # 근거: skills/in-progress/run-flow/SKILL.md:57-61
+  # 근거: skills/in-progress/run-flow/SKILL.md:104
+  # 근거: skills/in-progress/run-flow/SKILL.md:117-121
   - name: framing-problems-loaded
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?framing-problems"'
     min: 1
-  # 근거: skills/in-progress/run-flow/SKILL.md:37
-  # 근거: skills/in-progress/run-flow/SKILL.md:47-48
+  # 근거: skills/in-progress/run-flow/SKILL.md:92
+  # 근거: skills/in-progress/run-flow/SKILL.md:104-105
   - name: analyzing-requirements-not-fired
     type: tool_used
     tool: Skill
