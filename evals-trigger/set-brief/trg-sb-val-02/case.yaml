@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: trg-sb-val-02
+description: "트리거해야 함 / val"
+tags: [trigger, val, positive]
+execution:
+  prompt: "우리가 합의한 내용을 다른 에이전트가 바로 이어받도록 작업 지시서로 정리해서 남겨줘"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?set-brief"'

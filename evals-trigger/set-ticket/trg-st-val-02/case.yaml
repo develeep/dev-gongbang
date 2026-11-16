@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: trg-st-val-02
+description: "트리거해야 함 / val"
+tags: [trigger, val, positive]
+execution:
+  prompt: "저 brief는 한 번에 못 끝낼 크기야. 혼자 검증 가능한 단위로 티켓을 나눠줘"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?set-ticket"'

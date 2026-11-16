@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: trg-sb-val-01
+description: "트리거해야 함 / val"
+tags: [trigger, val, positive]
+execution:
+  prompt: "로그인 실패 횟수 제한 작업, 지금까지 정한 걸 brief 문서로 정리해서 남겨줘"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?set-brief"'

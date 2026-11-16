@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: trg-sb-train-01
+description: "트리거해야 함 / train"
+tags: [trigger, train, positive]
+execution:
+  prompt: "방금 정한 해법 그대로 brief로 남겨줘. 맥락 모르는 사람이 읽어도 작업할 수 있게"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?set-brief"'

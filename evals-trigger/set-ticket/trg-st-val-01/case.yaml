@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: trg-st-val-01
+description: "트리거해야 함 / val"
+tags: [trigger, val, positive]
+execution:
+  prompt: "docs/context/2026-10-05-search-filter.md brief를 티켓 단위로 쪼개서 docs 파일로 남겨줘"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?set-ticket"'

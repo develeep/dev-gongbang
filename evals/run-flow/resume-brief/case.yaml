@@ -1,0 +1,26 @@
+schema_version: "1.1"
+name: resume-brief
+description: 인자 없이 실행하면 끝나지 않은 brief 하나를 찾아 5단계(구현과 리뷰)부터 이어 가며 run-ticket을 불러오는지
+tags: [start-stage, resume]
+execution:
+  prompt: /run-flow
+  max_turns: 8
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/in-progress/run-flow/SKILL.md:47
+  # 근거: skills/in-progress/run-flow/SKILL.md:71-73
+  - name: run-ticket-loaded
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?run-ticket"'
+    min: 1
+  # 근거: skills/in-progress/run-flow/SKILL.md:47
+  # 근거: skills/in-progress/run-flow/SKILL.md:49
+  - name: earlier-stages-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?(?:analyzing-requirements|framing-problems|set-brief|set-ticket)"'
+    min: 0
+    max: 0

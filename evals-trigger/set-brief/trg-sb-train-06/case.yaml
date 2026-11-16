@@ -1,0 +1,15 @@
+schema_version: "1.1"
+name: trg-sb-train-06
+description: "트리거하면 안 됨 (near-miss) / train"
+tags: [trigger, train, negative]
+execution:
+  prompt: "회의 내용 정리해서 슬랙에 올릴 공지 문장으로 써줘"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?set-brief"'
+    min: 0
+    max: 0

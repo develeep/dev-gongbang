@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: trg-sb-train-02
+description: "트리거해야 함 / train"
+tags: [trigger, train, positive]
+execution:
+  prompt: "이 논의 작업 지시서로 만들어서 docs/context에 저장해줘"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?set-brief"'
