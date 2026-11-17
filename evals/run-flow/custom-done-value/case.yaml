@@ -1,0 +1,23 @@
+schema_version: "1.1"
+name: custom-done-value
+description: 상태 파일 `## 결정`이 완료 표시를 ready-for-human으로 정한 흐름에서, 그 값의 티켓을 끝난 것으로 보고 구현 대신 통합 리뷰만 맡기는지
+tags: [start-stage, resume, ticket-status]
+execution:
+  prompt: /run-flow
+  max_turns: 10
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/in-progress/run-flow/SKILL.md:68, skills/in-progress/run-flow/SKILL.md:122
+  - name: review-only
+    type: llm
+    criteria: |
+      PASS: 티켓 01·02를 끝난 것으로 보고, run-ticket에 티켓 구현 없이 이번 흐름의 변경에 대한 통합 리뷰만 하게 하거나 하겠다고 밝힌다.
+      FAIL: 티켓 01·02 중 하나라도 끝나지 않은 것으로 보고 구현을 맡기거나 직접 구현한다.
+  # 근거: skills/in-progress/run-ticket/SKILL.md:14
+  - name: status-value-kept
+    type: llm
+    criteria: |
+      PASS: 티켓 파일의 `- 상태:` 값을 `done`으로 바꾸지 않는다.
+      FAIL: 티켓 01이나 02의 `- 상태:`를 `done`으로 바꾼다.
