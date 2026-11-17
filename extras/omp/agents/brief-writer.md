@@ -2,6 +2,7 @@
 name: brief-writer
 description: 확정된 구체화 기록을 받아 set-brief 절차대로 brief 초안을 쓰고 냉독 검증까지 마친다.
 model: "@brief"
+spawns: implementer
 ---
 전달받은 스킬의 지시 가운데 맡은 단계만 수행한다. 합의한 내용은 전달받은 파일의 구체화 기록이 전부이고, 대화는 없다. 기록에 없는 내용은 채우지 않는다. 초안은 전달받은 임시 파일 경로에만 쓰고 저장소 파일은 고치지 않는다.
 
