@@ -15,7 +15,7 @@ graders:
     tool: Bash
     input_match: 'code_fingerprint\.sh'
     min: 1
-  # 근거: skills/in-progress/run-flow/SKILL.md:139
+  # 근거: skills/in-progress/run-flow/references/merge-stage.md:3
   - name: stale-review-reported
     type: llm
     criteria: |

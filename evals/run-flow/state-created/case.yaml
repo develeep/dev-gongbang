@@ -22,7 +22,7 @@ graders:
     criteria: |
       PASS: 상태 파일에 `- 작성일:`로 시작하는 줄이 없다.
       FAIL: 상태 파일에 `- 작성일:` 줄이 있거나 상태 파일이 없다.
-  # 근거: skills/in-progress/run-flow/SKILL.md:77, skills/in-progress/run-flow/SKILL.md:96
+  # 근거: skills/in-progress/run-flow/SKILL.md:78, skills/in-progress/run-flow/SKILL.md:99
   - name: framing-problems-loaded
     type: tool_used
     tool: Skill

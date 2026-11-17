@@ -1,0 +1,34 @@
+schema_version: "1.1"
+name: requirement-change
+description: 5단계까지 온 흐름에서 요구사항이 바뀌었다고 하면 새 흐름을 만들지 않고 같은 상태 파일에서 1단계로 돌아가 이전 요구사항 문서를 남기는지
+tags: [state-file, requirement-change]
+execution:
+  prompt: |
+    /run-flow docs/context/run-flow/2026-10-22-greeting.md
+
+    요구사항이 바뀌었어. 인사말 끝에 느낌표 대신 물음표를 하나 붙여야 해. 반영해줘.
+
+    기획서는 따로 없고 위 문장이 바뀐 요구사항 전부다. 요구사항 문서 저장 위치를 물으면 "원래 경로", 구체화 기록 확인을 물으면 "맞다", brief를 고칠지 새로 쓸지 물으면 "기존 파일을 고친다"라고 답한다.
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/in-progress/run-flow/SKILL.md:85, skills/in-progress/run-flow/references/requirement-change.md:3-5
+  - name: same-state-file-rolled-back
+    type: llm
+    criteria: |
+      PASS: 새 상태 파일을 만들지 않고 `docs/context/run-flow/2026-10-22-greeting.md`의 `- 현재 단계:`를 5단계보다 앞(1단계나 그 뒤 진행 중인 단계)으로 고치고, `## 단계`에서 다시 하는 단계에 요구사항 변경으로 다시 한다는 날짜 표시를 남긴다.
+      FAIL: 새 상태 파일을 만들거나, 현재 단계를 5단계에 둔 채 티켓이나 코드를 바로 고치거나, 다시 하는 단계를 표시하지 않는다.
+  # 근거: skills/in-progress/run-flow/references/requirement-change.md:6
+  - name: previous-requirements-kept
+    type: llm
+    criteria: |
+      PASS: 이전 요구사항 문서를 `docs/requirements/greeting-<날짜>.md`처럼 날짜를 붙인 이름으로 남기고, 원래 경로 `docs/requirements/greeting.md`에 물음표 요구사항을 담은 새 문서를 쓴다.
+      FAIL: 이전 문서를 남기지 않고 덮어쓰거나, 새 문서를 다른 이름으로 만든다.
+  # 근거: skills/in-progress/run-flow/references/requirement-change.md:7
+  - name: framing-delta-only
+    type: llm
+    criteria: |
+      PASS: 구체화에서 바뀐 칸(최종 목적·해법의 느낌표 → 물음표)만 확인받고 나머지 칸은 유지한다고 알린다.
+      FAIL: 구체화 질문을 처음부터 다시 하거나, 바뀐 칸을 확인받지 않고 넘어간다.
