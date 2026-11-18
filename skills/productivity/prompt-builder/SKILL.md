@@ -42,7 +42,7 @@ disable-model-invocation: true
 
 ### 1. 세션 모델 감지
 
-시스템 프롬프트나 환경 정보에 적힌 자신의 모델 ID(예: "The exact model ID is claude-opus-5-5", OMP 등에서 GPT로 돌면 `gpt-6-astra` 같은 값)를 확인한다. Claude든 GPT든 이 값이 2단계 대상 모델 질문의 첫 선택지가 된다. 첫 응답에 한 줄로 알린다. 예: `감지된 세션 모델: gpt-6-astra`. 모델 ID를 찾지 못하면 `세션 모델: 확인 불가`라고 알리고, B1을 세션 모델 선택지 없이 묻는다.
+시스템 프롬프트나 환경 정보에 적힌 자신의 모델 ID(예: "The exact model ID is claude-opus-5-5", OMP 등에서 GPT로 돌면 `gpt-6.2-astra` 같은 값)를 확인한다. Claude든 GPT든 이 값이 2단계 대상 모델 질문의 첫 선택지가 된다. 첫 응답에 한 줄로 알린다. 예: `감지된 세션 모델: gpt-6.2-astra`. 모델 ID를 찾지 못하면 `세션 모델: 확인 불가`라고 알리고, B1을 세션 모델 선택지 없이 묻는다.
 
 ### 2. 기본 설정
 
@@ -69,6 +69,7 @@ B1(또는 K7)에서 고른 대상 모델로 아래 표를 위에서부터 맞춰
 | `claude-fable-5-1*`, `claude-mythos-5-1*` | [reference/models/fable-5-1.md](reference/models/fable-5-1.md) |
 | `claude-haiku-5-5*` | [reference/models/haiku-5-5.md](reference/models/haiku-5-5.md) |
 | `claude-haiku-4-5*` | [reference/models/haiku-4-5.md](reference/models/haiku-4-5.md) |
+| `gpt-6.2-astra*`, `gpt-6.2-sol*` | [reference/models/gpt-6-2.md](reference/models/gpt-6-2.md) |
 | `gpt-6-astra*` | [reference/models/gpt-6-astra.md](reference/models/gpt-6-astra.md) |
 | `gpt-6.1-sol*` | [reference/models/gpt-6-1-sol.md](reference/models/gpt-6-1-sol.md) (Astra 가이드도 함께 읽는다) |
 | 그 외 또는 확인 불가 | 모델 가이드 없이 공통 원칙만 적용 |

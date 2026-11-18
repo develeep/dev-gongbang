@@ -1,6 +1,6 @@
 # GPT-6.1 Sol 가이드
 
-출처: https://developers.openai.com/api/docs/guides/prompt-guidance ("Using GPT-6")
+출처: https://developers.openai.com/api/docs/guides/latest-model/gpt-6-astra ("Using GPT-6")
 모델·파라미터 출처:
 - https://developers.openai.com/api/docs/guides/latest-model?model=gpt-6.1-sol
 - https://developers.openai.com/api/docs/models
@@ -21,7 +21,7 @@ OpenAI 문서에 GPT-6.1 Sol에서만 관찰한 프롬프트 권고는 없다. G
 
 ## 특성 요약
 
-- 모델 ID는 `gpt-6.1-sol`이다. OpenAI는 Astra에 가까운 성능을 더 낮은 비용으로 내는, 지능과 비용의 균형용 모델로 소개한다. 가장 어려운 작업에는 GPT-6 Astra를 권한다. B1에서 Sol을 고른 사용자가 그런 작업을 설명하면 한 줄로 알린다.
+- 모델 ID는 `gpt-6.1-sol`이다. OpenAI는 Astra에 가까운 성능을 더 낮은 비용으로 내는, 지능과 비용의 균형용 모델로 소개한다. 가장 어려운 작업에는 GPT-6 Astra를 권한다. B1에서 Sol을 고른 사용자가 그런 작업을 설명하면 한 줄로 알린다. 2026-11-17에 같은 가격의 후속 GPT-6.2 Sol(`gpt-6.2-sol`)이 나왔다. 모델을 바꿀 수 있는 사용자면 6.2를 검토하라고 한 줄로 알린다.
 - 컨텍스트 1.05M 토큰, 최대 출력 128K 토큰, 지식 컷오프 2026-04-30 (모델 페이지 기준).
 - reasoning effort는 `low`, `medium`, `high`, `xhigh`, `max`를 받고, 생략하면 `medium`이다. `none`과 `minimal`은 지원하지 않는다.
 - reasoning effort가 `none`이 아니면 `temperature`, `top_p`, `top_logprobs`를 빼야 한다. Sol은 `none`을 받지 않으므로 항상 뺀다.

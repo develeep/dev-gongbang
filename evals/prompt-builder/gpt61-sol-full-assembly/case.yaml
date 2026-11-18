@@ -30,7 +30,7 @@ execution:
   max_turns: 25
   allowed_tools: [Read, Glob, Grep, Skill]
 graders:
-  # 근거: skills/productivity/prompt-builder/SKILL.md:73
+  # 근거: skills/productivity/prompt-builder/SKILL.md:74
   - name: loads-sol-guide
     type: tool_used
     arm: both
