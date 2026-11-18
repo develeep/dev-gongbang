@@ -1,0 +1,40 @@
+schema_version: "1.1"
+name: coined-names-buried-point
+description: 수정 범위 "문장만"으로 다듬을 때 단어를 이어 붙여 지은 어색한 말과 요점이 주절에 없는 문장을 고치고 사실을 지키는지
+tags: [polish]
+execution:
+  prompt: |
+    /write-docs docs/draft-deploy-notice.md 초안 다듬어줘.
+    - 분야: 설명
+    - 독자: 사내 고객 지원팀
+    - 목적: 금요일 배포로 무엇이 바뀌고 언제 결제가 멈추는지 알린다
+    - 톤: 지금 초안 그대로(합니다체)
+    - 자료: 초안에 있는 사실이 전부다. "결제 입구 지점"은 서버가 결제 요청을 받아 처리를 시작하는 곳을 말한다.
+    - 수정 범위: 문장만
+    결과는 채팅으로 보여 줘.
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/productivity/write-docs/reference/clear-writing.md:24
+  # 근거: skills/productivity/write-docs/SKILL.md:83
+  - name: coined-name-fixed
+    type: llm
+    criteria: |
+      PASS: 결과의 "바뀌는 점" 섹션에 "결제 입구 지점"이나 "~에 자리합니다" 같은 지어낸 말이 남지 않고, 서버가 결제 요청을 처리하기 전에(또는 결제 요청을 받으면 먼저) 카드 번호 형식을 확인한다는 것을 누가 무엇을 하는지 드러나는 흔한 말로 쓴다.
+      FAIL: "결제 입구 지점"이나 "자리합니다"를 그대로 두거나, "결제 진입 검증 단계"처럼 단어를 이어 붙인 다른 이름으로 바꾸기만 한다.
+  # 근거: skills/productivity/write-docs/reference/clear-writing.md:32
+  # 근거: skills/productivity/write-docs/SKILL.md:84
+  - name: point-in-main-clause
+    type: llm
+    criteria: |
+      PASS: 결과의 "일정" 섹션에서 배포가 금요일 오후 2시에 시작되고 약 30분 동안 결제가 멈춘다는 내용이 문장의 주절(주어와 서술어)로 나온다. "~라는 점이 핵심이라고 할 수 있습니다" 같은 빈 주절이 없고, "원활한 업무에 보탬이 되었으면 합니다"처럼 요점이 없는 문장을 지웠거나 독자가 할 일을 담은 문장으로 바꿨다.
+      FAIL: 배포 시각과 결제 중단이 "~라는 점", "~라는 사실" 같은 명사절에 묻힌 채 주절이 "핵심이다", "알아 두시기 바랍니다"처럼 비어 있거나, 요점 없는 문장을 그대로 둔다.
+  # 근거: skills/productivity/write-docs/SKILL.md:48
+  # 근거: skills/productivity/write-docs/SKILL.md:12
+  - name: facts-and-structure-kept
+    type: llm
+    criteria: |
+      PASS: 제목과 섹션("금요일 결제 서버 배포 안내", "바뀌는 점", "일정", "문의")이 같은 순서와 문구로 남는다. 원본의 사실(카드 번호 형식 확인, 형식이 틀린 카드 번호는 결제 대행사로 넘어가지 않음, 금요일 오후 2시 시작, 약 30분 결제 중단, #payments 채널)이 그대로 있고, 원본에 없는 사실·수치·절차를 더하지 않는다. 요점 없는 문장을 지운 것은 사실을 뺀 것으로 치지 않는다. "배포는 금요일 오후 2시에 시작하고, 약 30분 동안 결제가 멈춥니다"처럼 배포 시작 시각과 결제 중단 시간을 원본처럼 나란히 쓰면 PASS다.
+      FAIL: 섹션 순서나 제목을 바꾸거나, 위 사실 중 하나라도 빠지거나 바뀌거나(예: 30분 → 1시간), 원본에 없는 사실·수치·절차를 더한다. 원본은 결제가 언제부터 멈추는지 밝히지 않으므로, 결제 중단의 시작이나 끝을 특정하는 말(예: "오후 2시부터", "2시 30분까지", "배포가 시작되면", "배포 시작과 동시에")을 본문에 더해도 FAIL이다. 본문 밖의 확인 요청에서 이 시점을 묻는 것은 더한 것으로 치지 않는다.
