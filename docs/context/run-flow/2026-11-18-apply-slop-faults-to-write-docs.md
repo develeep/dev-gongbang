@@ -1,7 +1,7 @@
 # write-docs의 원칙과 검토 항목이 어색한 단어 조합과 빈 문장·엇나간 강조를 다룬다
 
 - 시작일: 2026-11-18
-- 현재 단계: 7. PR 만들기
+- 현재 단계: 완료
 - 멈춘 이유: 없음
 
 ## 단계
@@ -12,7 +12,7 @@
 - [-] 4. 티켓 분할
 - [x] 5. 구현과 리뷰
 - [x] 6. 머지·PR 결정
-- [ ] 7. PR 만들기
+- [x] 7. PR 만들기
 
 ## 결과물
 - 요구사항 문서: 없음 (요청 문장으로 시작)
@@ -24,7 +24,7 @@
 - 브랜치: feature/write-docs-slop-faults (worktree /root/dev-gongbang-write-docs-slop)
 - 시작 HEAD: a7d2645
 - Orca Run:
-- PR:
+- PR: https://github.com/develeep/dev-gongbang/pull/26
 
 ## 결정
 - 0단계: 인자가 요청 문장이라 2단계부터 시작. 참고 글(웹 글)은 기획서가 아니라서 1단계를 건너뜀
