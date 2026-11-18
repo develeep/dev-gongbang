@@ -37,7 +37,7 @@ Writes a new draft, refines a draft you bring, or revises an existing document. 
    - Items that need a long answer, such as material, are asked separately after the choice questions.
 3. Reads the principles for the field. For a technical document, it uses the recommended structure of the chosen type as the skeleton. If the revision scope is "문장만" (sentences only), it keeps the original structure as is.
 4. Writes only from the material given.
-5. Finds and fixes common patterns: the "X가 아니라 Y다" ("not X, but Y") frame, invented specificity, demonstratives with no referent, compressed noun strings, and so on.
+5. Finds and fixes common patterns: the "X가 아니라 Y다" ("not X, but Y") frame, invented specificity, demonstratives with no referent, compressed noun strings, awkward coined word combinations used in place of the usual name, sentences whose point is not in the main clause, and so on.
 6. Shows the result in the chat. Even when revising an existing file, it applies changes to the file only after approval.
 7. When you give feedback, it repeats steps 4–6.
 
