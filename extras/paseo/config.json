@@ -11,7 +11,7 @@
         "model": "anthropic/claude-haiku-5-5",
         "modeId": "full",
         "thinkingOptionId": "medium",
-        "notes": "기존 로직이 어느 파일의 어디에 있는지 찾아 경로와 줄로 보고한다. 찾을 범위를 좁혀서 준다(컨텍스트 100K). 파일을 고치지 않는다."
+        "notes": "기존 로직이 어느 파일의 어디에 있는지 찾아 경로와 줄로 보고한다. 컨텍스트가 100K라 범위를 좁혀서 주고, 범위가 넓으면 나눠서 여러 번 맡긴다. 파일을 고치지 않는다."
       },
       {
         "id": "behavior-checklist",
@@ -20,7 +20,7 @@
         "model": "anthropic/claude-haiku-5-5",
         "modeId": "full",
         "thinkingOptionId": "medium",
-        "notes": "고치기 전 코드가 지금 어떻게 동작하는지 항목별 체크리스트로 적는다. 대상 파일과 함수를 정해서 준다. 파일을 고치지 않는다."
+        "notes": "고치기 전 코드가 지금 어떻게 동작하는지 항목별 체크리스트로 적는다. 대상 파일과 함수를 정해서 주고, 범위가 넓으면 나눠서 여러 번 맡긴다(컨텍스트 100K). 파일을 고치지 않는다."
       },
       {
         "id": "root-cause",
@@ -92,7 +92,7 @@
         "model": "anthropic/claude-opus-5-5",
         "modeId": "full",
         "thinkingOptionId": "xhigh",
-        "notes": "티켓 구현 워커가 두 번 실패했거나, 여러 파일에 걸친 리팩터링이거나, 원인을 모르는 실패를 고쳐야 하는 티켓 하나를 원인 정리부터 구현까지 맡는다. 앞선 실패 보고를 모두 넘긴다."
+        "notes": "앞선 구현이 실패해 올라온 티켓(서브에이전트 구현 두 번 실패, 구현 워커 한 번 실패), 여러 파일에 걸친 리팩터링 티켓, 원인을 모르는 실패를 고쳐야 하는 티켓 하나를 원인 정리부터 구현까지 맡는다. 앞선 실패 보고를 모두 넘긴다."
       },
       {
         "id": "cross-review",
@@ -101,7 +101,7 @@
         "model": "openai-codex/gpt-6.2-sol",
         "modeId": "full",
         "thinkingOptionId": "high",
-        "notes": "Claude가 구현한 diff에서 버그를 찾아 보고한다. 다른 회사 모델의 눈으로 보는 것이 목적이다. 파일을 고치지 않는다."
+        "notes": "Claude가 구현한 diff에서 버그를 찾아 보고한다. 구현한 모델과 다른 회사 모델의 눈으로 보는 것이 목적이라, 구현한 모델이 Claude가 아니면 이 프로필을 쓰지 않는다. 파일을 고치지 않는다."
       },
       {
         "id": "skill-review",

@@ -16,7 +16,7 @@ modelRoles:
   # 어려운 구현·대규모 리팩터링 (hard-implementer)
   slow: anthropic/claude-opus-5-5:xhigh
 
-  # 일반 구현·테스트, 코드 리뷰 스킬의 하위 리뷰 (bundled task, implementer, test-writer)
+  # 일반 구현·테스트, brief 냉독 읽기, 코드 리뷰 스킬의 하위 리뷰 (bundled task, implementer, test-writer, cold-reader)
   # Sonnet 5.5는 토큰을 더 써서 작업당 비용이 Opus 5.5와 비슷하고 점수는 max에서만 앞선다.
   task: anthropic/claude-opus-5-5:medium
 

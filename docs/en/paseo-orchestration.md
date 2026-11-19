@@ -45,9 +45,9 @@ This guide sets up Paseo tools, agent profiles, a workspace script, and optional
 
 ## Profiles
 
-**One profile has one purpose.** One purpose means one deliverable and all the work needed to finish it. When a single agent carries different deliverables at once, such as an implementation and an independent review, or two review skills, the main session that receives the result cannot tell which part to check against what, so review, bug hunting, and spotting AI slop get harder. For two deliverables, start two agents.
+**One profile has one purpose.** A purpose is defined by the standard used to check its result. One standard means one purpose. When the standards differ, such as an implementation and an independent review, or two review skills, start two agents. When one agent's result mixes work checked against different standards, the main session that receives it has a hard time reviewing it and finding bugs and AI slop.
 
-**Quality of the result comes first, so do not split where context is lost.** Work that finishes and verifies an agent's own deliverable stays with that agent: the cold read of a draft, checking the done criteria of an implementation, working out the cause before fixing a failed ticket. Splitting these makes the second agent rebuild the first agent's context. When you add a profile, check both that it has one purpose and that splitting it off loses no context.
+**Quality of the result comes first, so do not split where context is lost.** The agent that writes or implements something is responsible for verifying its own output and applying the results to finish it. The cold read of a draft, checking the done criteria of an implementation, and working out the cause of a failed ticket are not split off so that another agent finishes the work. Splitting these makes the second agent rebuild the first agent's context. Checks that need a fresh context, such as a cold read or a screen check, are done by a separate agent, but the agent that made the output takes the results and applies them. When you add a profile, check both that it has one purpose and that splitting it off loses no context.
 
 The session that starts an agent reads each profile's notes and picks the one that fits the purpose of the job. If no profile fits, it looks up the available providers and models, picks one, and tells you what it used.
 
@@ -62,8 +62,8 @@ The session that starts an agent reads each profile's notes and picks the one th
 | `change-doc` | Write a document that explains a finished change | Document only | Opus 5.5 · xhigh |
 | `ticket-worker` | Implement and commit one ticket | Yes | Opus 5.5 · medium |
 | `proposal-diff` | Write a proposed diff for one ticket | Diff only | Opus 5.5 · medium |
-| `hard-implementer` | Implement one ticket that failed twice, is a large refactor, or fixes a failure with an unknown cause, starting from the cause | Yes | Opus 5.5 · xhigh |
-| `cross-review` | Find bugs in a diff with another company's model | No | GPT-6.2 Sol · high |
+| `hard-implementer` | Implement one ticket that came up after earlier implementation failed (a subagent failed twice, or an implementation worker failed once), is a large refactor, or fixes a failure with an unknown cause, starting from the cause | Yes | Opus 5.5 · xhigh |
+| `cross-review` | Find bugs in a diff implemented by Claude with another company's model. Not used when the implementing model is not Claude | No | GPT-6.2 Sol · high |
 | `skill-review` | Run one review skill | No | GPT-6.2 Sol · high |
 | `security-review` | Find security defects | No | Opus 5.5 · high |
 | `ui-check` | Check done criteria in a browser | No | GPT-6.1 Terra · medium |
@@ -74,7 +74,7 @@ The session that starts an agent reads each profile's notes and picks the one th
 
 The models match the per-role models in the [omp multi-agent setup](omp-orchestration.md). Only `connector` uses the `claude` provider, with the `auto` mode. If you have not connected any connector to Claude Code, delete this profile.
 
-- `locate` and `behavior-checklist` have a 100K context, so give them a narrow scope. If the whole repo must be searched, use `root-cause` or `impact`.
+- `locate` and `behavior-checklist` have a 100K context, so give them a narrow scope. If the scope is wide, split it and hand it over in several runs. Use `root-cause` or `impact` only when the purpose is finding a cause or assessing impact.
 - With several review skills, start one `skill-review` per skill. If one agent runs two skills, you cannot tell which finding came from which standard.
 - `brief-draft` writes the draft, starts `cold-read` agents to verify its own draft, and then returns it. The draft and its check are one job, so they are not split.
 - There is no commit message profile. The session that made the change writes the commit message while it still has the context.
@@ -100,7 +100,7 @@ The two modes differ as follows. Merging, integration checks, completion records
 | Resuming | The recorded Run ID | The recorded workspace ID, agent ID, and branch per ticket |
 | Cleanup | Release the worker, delete the worktree and branch | Archive the workspace (Paseo removes the worktree), then delete the branch |
 
-For the cross review, it uses the first method that works in this order: the agent set by the agent rules, an agent on another company's model started with Paseo, then an Orca worker. If none works, it skips the cross review. When starting it with Paseo, it uses the `cross-review` profile.
+The cross review is done by a model from a different company than the model that implemented the change. It uses the first method that works in this order: the agent set by the agent rules, an agent on another company's model started with Paseo, then an Orca worker. If none works, it skips the cross review. When starting it with Paseo, it uses the `cross-review` profile if the implementing model is Claude, and otherwise picks a model from a different company than the implementing model.
 
 The detailed steps are in [run-ticket](skills/run-ticket.md#running-multiple-tickets).
 

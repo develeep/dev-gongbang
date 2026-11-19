@@ -20,19 +20,22 @@
 
 ## 위임
 
-에이전트 하나에는 목적 하나만 맡깁니다. 서브에이전트, Paseo 워커, Orca 워커 모두 같습니다. 목적 하나는 산출물 하나와 그 산출물을 완성하는 데 필요한 일 전부입니다. 초안의 냉독 검증, 구현의 완료 기준 확인, 실패한 티켓의 원인 정리처럼 자기 작업을 완성하고 검증하는 일은 같은 에이전트에 둡니다. 나누면 맥락을 잃어 완성도가 떨어집니다. 구현과 독립 리뷰, 리뷰 스킬 둘처럼 산출물이 다르면 에이전트를 둘 띄웁니다. 한 에이전트의 결과에 여러 산출물이 섞이면 메인 세션이 그 결과를 리뷰하거나 버그와 AI slop을 찾기 어렵습니다.
+에이전트 하나에는 목적 하나만 맡깁니다. 서브에이전트, Paseo 워커, Orca 워커 모두 같습니다. 목적은 받은 결과를 확인할 기준으로 가릅니다. 확인할 기준이 하나면 목적이 하나입니다. 구현과 독립 리뷰, 리뷰 스킬 둘처럼 확인할 기준이 다르면 에이전트를 둘 띄웁니다. 한 에이전트의 결과에 기준이 다른 것이 섞이면 메인 세션이 그 결과를 리뷰하거나 버그와 AI slop을 찾기 어렵습니다.
+
+완성도가 먼저이므로 맥락을 잃는 분리는 하지 않습니다. 작성이나 구현을 맡은 에이전트는 자기 산출물을 검증하고 그 결과를 반영해 완성하는 것까지 책임집니다. 초안의 냉독 검증, 구현의 완료 기준 확인, 실패한 티켓의 원인 정리를 떼어 다른 에이전트에 완성을 넘기지 않습니다. 냉독 읽기나 화면 확인처럼 새 컨텍스트가 있어야 하는 검증은 별도 에이전트가 하되, 그 결과는 산출물을 만든 쪽이 받아 반영합니다.
 
 | 작업 | 에이전트 |
 |---|---|
-| 코드 탐색·검색 | scout |
+| 범위가 정해진 코드 위치 찾기·동작 조사 | scout |
 | brief 초안 작성 (set-brief의 입력 수집, 초안, 냉독 검증) | brief-writer |
-| brief 냉독 검증 | implementer |
+| brief 냉독 읽기 (brief-writer가 띄움) | cold-reader |
 | 명세가 분명한 티켓 구현 | implementer |
 | implementer가 2회 실패한 티켓, 대규모 리팩터링, 원인을 모르는 실패의 디버깅 | hard-implementer |
+| 고치지 않고 원인 보고만 받는 실패 조사 | root-cause |
 | 테스트 작성·실행 | test-writer |
 | UI·화면 검증 | ui-checker |
 | 교차 리뷰 | reviewer |
-| 코드 리뷰 스킬이 띄우는 하위 리뷰 | task |
+| 코드 리뷰 스킬이 띄우는 하위 리뷰 (호출 하나에 스킬 하나) | task |
 | 보안·인증·결제 등 핵심 로직 리뷰 | security-reviewer |
 | PR 설명 | doc-writer |
 
@@ -45,7 +48,7 @@ reviewer는 다른 회사 모델이므로 교차 리뷰에만 씁니다. 코드 
 ## 넘기는 것
 
 - 구현·테스트·UI 에이전트에는 대화 기록 대신 brief와 티켓 하나의 전문, 레포 규칙 파일 경로, 검증 명령, 같은 brief의 done 티켓 `## 산출물`을 넘깁니다. 서브에이전트는 `AGENTS.md`를 받지 않으므로 넘기지 않은 규칙은 모릅니다. brief를 프롬프트 맨 앞에 두면 같은 brief로 여러 티켓을 맡길 때 캐시를 다시 씁니다.
-- brief-writer에는 냉독 검증을 implementer로 띄우라고 함께 알립니다.
+- brief-writer에는 냉독 읽기를 cold-reader로 띄우라고 함께 알립니다.
 - 커밋 메시지는 메인 세션이 레포 커밋 규칙대로 씁니다.
 - 리뷰 에이전트에는 리뷰할 diff 범위와 brief를 넘깁니다. diff가 272K 토큰(약 1MB)을 넘으면 디렉터리별로 나눠 맡깁니다. GPT는 입력이 272K 토큰을 넘으면 입력 단가가 2배, 출력 단가가 1.5배가 됩니다. 나눌 때는 디렉터리를 넘는 공유 타입, API, 설정을 리뷰마다 함께 넘기고, 디렉터리 경계를 넘는 결함은 메인 세션이 봅니다.
 - doc-writer에는 diff 전문 대신 brief, 변경 파일 목록(`git diff --stat`), 티켓 완료 기록, 리뷰 기록을 넘깁니다.
@@ -67,14 +70,14 @@ Paseo나 Orca 워커는 서브에이전트로 할 수 없는 일에만 씁니다
 - 다른 에이전트(Codex, Claude Code)에게 리뷰나 작업을 맡길 때
 - 사용자가 작업 과정을 Paseo나 Orca에서 보거나 워커에게 직접 말을 걸어야 할 때
 
-메인 세션이 Claude면 교차 리뷰는 reviewer가 맡고, reviewer가 같은 회사 모델로 넘어갔을 때만 워커에 맡깁니다.
+교차 리뷰는 변경을 구현한 모델과 다른 회사의 모델이 맡습니다. 이 설정에서 implementer, hard-implementer, 구현 워커는 모두 Claude이므로 메인 세션의 모델과 상관없이 reviewer(GPT)가 맡습니다. reviewer가 Claude로 넘어갔을 때만 워커에 맡깁니다.
 
 ### Paseo
 
 - 티켓 구현 워커는 `ticket-worker` 프로필로 띄웁니다. 프로필이 없으면 omp provider의 `anthropic/claude-opus-5-5`, thinking `medium`으로 띄웁니다.
-- 교차 리뷰 워커는 `cross-review` 프로필로 띄웁니다. 프로필이 없으면 omp provider의 `openai-codex/gpt-6.2-sol`, thinking `high`로 띄웁니다. 메인 세션이 Claude가 아니면 `anthropic/claude-opus-5-5`, thinking `medium`으로 띄웁니다.
+- 교차 리뷰 워커는 `cross-review` 프로필로 띄웁니다. 프로필이 없으면 omp provider의 `openai-codex/gpt-6.2-sol`, thinking `high`로 띄웁니다. 구현한 모델이 Claude가 아니면 `anthropic/claude-opus-5-5`, thinking `medium`으로 띄웁니다.
 
 ### Orca
 
 - 티켓 구현 워커는 `--model @worker`로 띄웁니다.
-- 교차 리뷰를 Claude Code 워커에 맡길 때는 `--model claude-opus-5-5 --effort medium`으로 띄웁니다. 메인 세션이 Claude가 아닐 때만 해당합니다. 메인 세션이 Claude면 Codex 워커를 `--model gpt-6.2-sol --effort high`로 띄워 맡깁니다. Opus 워커는 같은 회사 모델이라 교차 리뷰가 되지 않습니다.
+- 교차 리뷰 워커는 구현한 모델이 Claude면 Codex 워커를 `--model gpt-6.2-sol --effort high`로, Claude가 아니면 Claude Code 워커를 `--model claude-opus-5-5 --effort medium`으로 띄웁니다. 구현한 모델과 같은 회사의 워커는 교차 리뷰가 되지 않습니다.
