@@ -68,7 +68,7 @@ Paths are relative to the skill folder. Details are in the "Customize" section o
 | [set-brief](skills/set-brief.md) | `SKILL.md` | Brief template, save path |
 | [set-ticket](skills/set-ticket.md) | `SKILL.md` | Ticket template, splitting criteria |
 | [run-ticket](skills/run-ticket.md) | `SKILL.md` | Ticket selection rules, review order, completion record |
-| | `references/multi-ticket.md` | Running multiple tickets: Orca parallel run, sequential run |
+| | `references/multi-ticket.md` | Running multiple tickets: parallel run (Paseo, Orca), sequential run |
 | [run-flow](skills/run-flow.md) | `SKILL.md` | Starting stage per argument, state file rules, links between stages |
 | | `assets/state-file.md` | State file format |
 | | `references/adr.md`, `references/brief-stage.md`, `references/pr-stage.md` | ADR criteria, procedures for stages 3 and 7 |

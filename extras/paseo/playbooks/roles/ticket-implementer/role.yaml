@@ -1,0 +1,3 @@
+title: 티켓 구현
+readonly: false
+agent: { provider: omp, model: anthropic/claude-opus-5-5, thinking: medium, mode: full }

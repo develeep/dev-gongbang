@@ -10,14 +10,15 @@ modelRoles:
   # brief 초안 (brief-writer). 문서 산출물은 high보다 xhigh에서 품질이 오른다.
   brief: anthropic/claude-opus-5-5:xhigh
 
-  # Orca 티켓 구현 워커. extras/omp/AGENTS.md가 `--model @worker`로 띄운다. task와 같은 값으로 둔다.
+  # 티켓 구현 워커. Orca는 extras/omp/AGENTS.md가 `--model @worker`로 띄운다. task와 같은 값으로 둔다.
+  # Paseo는 extras/paseo/config.json의 ticket-worker 프로필로 띄운다.
   worker: anthropic/claude-opus-5-5:xhigh
 
   # 어려운 구현·대규모 리팩터링 (hard-implementer). task가 Opus xhigh라 승격 단계로 Fable을 쓴다.
   # Fable 5.2 high는 Opus 5.5 xhigh보다 FrontierCode-AA 2.0이 49.1% 대 43.8%다.
   slow: anthropic/claude-fable-5-2:high
 
-  # 일반 구현·테스트 (bundled task, implementer, test-writer)
+  # 일반 구현·테스트, brief 냉독 읽기 (bundled task, implementer, test-writer, cold-reader)
   # Anthropic 한도가 넉넉하다고 보고 xhigh로 둔다. medium보다 FrontierCode-AA 2.0 33.1%→43.8%,
   # Terminal-Bench 4.0 52.5%→59.6%로 GPT-6.2 Sol medium(41.4%, 56.1%)도 넘는다. 느리면 high로 내린다.
   # Sonnet 5.5는 토큰을 더 써서 작업당 비용이 Opus 5.5와 비슷하고 점수는 max에서만 앞선다.

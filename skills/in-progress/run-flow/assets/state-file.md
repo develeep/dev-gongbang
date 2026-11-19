@@ -17,6 +17,7 @@
 - 브랜치:
 - 시작 HEAD:
 - Orca Run:
+- Paseo 워커:
 - PR:
 
 ## 결정
