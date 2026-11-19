@@ -30,7 +30,7 @@
 | 테스트 작성·실행 | test-writer |
 | UI·화면 검증 | ui-checker |
 | 교차 리뷰 | reviewer |
-| 코드 리뷰 스킬이 띄우는 하위 리뷰 | task |
+| 리뷰 스킬 실행(레포 규칙이 커밋마다 돌리라고 한 리뷰 포함)과 그 스킬이 띄우는 하위 리뷰 | code-reviewer |
 | 보안·인증·결제 등 핵심 로직 리뷰 | security-reviewer |
 | PR 설명·커밋 메시지 | doc-writer |
 
@@ -38,7 +38,7 @@
 
 Orca 구현 워커(run-ticket의 2, 3, 4단계를 지시받은 워커)는 구현과 테스트를 implementer와 test-writer에 맡기지 않고 직접 합니다. 워커와 implementer의 모델이 같아서, 맡기면 같은 문서를 두 번 읽고 넘기지 않은 규칙이 빠집니다. 화면 검증은 ui-checker에 맡깁니다.
 
-reviewer는 다른 회사 모델이므로 교차 리뷰에만 씁니다. 코드 리뷰 스킬의 하위 리뷰까지 맡기면 같은 모델이 같은 diff를 두 번 봅니다.
+reviewer와 code-reviewer는 다른 회사 모델(GPT)이라 구현한 모델과 다른 실수를 잡습니다. reviewer는 버그만 보고하는 형식이 고정돼 있어 리뷰 스킬의 지시(규칙 위반, 불필요한 코드, 테스트 케이스)를 따르지 못하므로, 리뷰 스킬은 code-reviewer에 맡깁니다.
 
 ## 넘기는 것
 
@@ -61,5 +61,5 @@ reviewer는 다른 회사 모델이므로 교차 리뷰에만 씁니다. 코드 
 Orca 워커는 서브에이전트로 할 수 없는 일에만 씁니다.
 
 - 여러 티켓을 worktree를 나눠 병렬로 실행할 때. run-ticket의 "Orca 병렬 실행"을 따릅니다. 티켓 구현 워커는 `--model @worker`로 띄웁니다. 워커는 티켓 하나를 직접 구현하므로 implementer와 같은 모델과 Effort를 씁니다.
-- 다른 에이전트(Codex, Claude Code)에게 리뷰나 작업을 맡길 때. 교차 리뷰를 Claude Code 워커에 맡길 때는 `--model claude-opus-5-5 --effort medium`으로 띄웁니다. 메인 세션이 Claude가 아닐 때만 해당합니다. 메인 세션이 Claude면 교차 리뷰는 reviewer가 맡고, reviewer가 같은 회사 모델로 넘어갔으면 Codex 워커를 `--model gpt-6.1-sol --effort high`로 띄워 맡깁니다. Opus 워커는 같은 회사 모델이라 교차 리뷰가 되지 않습니다.
+- 다른 에이전트(Codex, Claude Code)에게 리뷰나 작업을 맡길 때. 교차 리뷰를 Claude Code 워커에 맡길 때는 `--model claude-opus-5-5 --effort medium`으로 띄웁니다. 메인 세션이 Claude가 아닐 때만 해당합니다. 메인 세션이 Claude면 교차 리뷰는 reviewer가 맡고, reviewer가 같은 회사 모델로 넘어갔으면 Codex 워커를 `--model gpt-6.2-sol --effort high`로 띄워 맡깁니다. Opus 워커는 같은 회사 모델이라 교차 리뷰가 되지 않습니다.
 - 사용자가 작업 과정을 Orca에서 보거나 워커에게 직접 말을 걸어야 할 때

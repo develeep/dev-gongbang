@@ -4,7 +4,7 @@
 
 # omp multi-agent setup
 
-This guide sets up omp (oh-my-pi) to use a different model at each development stage, with per-role models, six subagents, and delegation rules. Design and orchestration use Opus 5.5 high, brief drafting uses Opus 5.5 xhigh, routine implementation uses Opus 5.5 medium, exploration and PR descriptions use Haiku 5.5, and cross review uses GPT-6.1 Sol high. Only problems that get stuck move up to Opus 5.5 xhigh with Fable 5.2 as an advisor. After reading it, you can install the files in `extras/omp/`, check that they work, and change models.
+This guide sets up omp (oh-my-pi) to use a different model at each development stage, with per-role models, seven subagents, and delegation rules. Design and orchestration use Opus 5.5 high, brief drafting uses Opus 5.5 xhigh, routine implementation also uses Opus 5.5 xhigh, exploration and PR descriptions use Haiku 5.5, and cross review uses GPT-6.2 Sol high. Only problems that get stuck move up to Fable 5.2 high with Opus 5.5 xhigh as an advisor. After reading it, you can install the files in `extras/omp/`, check that they work, and change models.
 
 ## Contents
 
@@ -21,7 +21,7 @@ This guide sets up omp (oh-my-pi) to use a different model at each development s
 | File | Install location | Role |
 |---|---|---|
 | [`extras/omp/config.yml`](../../extras/omp/config.yml) | Merge into `~/.omp/agent/config.yml` | Per-role models and effort, reviewer and security-reviewer models, fallback models |
-| [`extras/omp/agents/`](../../extras/omp/agents/) | `~/.omp/agent/agents/` | brief-writer, implementer, hard-implementer, test-writer, ui-checker, doc-writer |
+| [`extras/omp/agents/`](../../extras/omp/agents/) | `~/.omp/agent/agents/` | brief-writer, implementer, hard-implementer, test-writer, ui-checker, doc-writer, code-reviewer |
 | [`extras/omp/AGENTS.md`](../../extras/omp/AGENTS.md) | `~/.omp/agent/AGENTS.md` | Development stages, delegation targets, escalation on failure, when to use Orca |
 
 The agents and the delegation rules live at the user level, so every project and every Orca worker uses the same setup. If a project's `.omp/agents/` has an agent with the same name, the project's agent wins.
@@ -47,31 +47,39 @@ To keep your existing settings, copy the `modelRoles`, `advisor`, `task`, and `r
 |---|---|---|
 | Orchestrator, design | Main session `default`, plan mode `plan` | Opus 5.5 · high |
 | Brief drafting | brief-writer (`brief`) | Opus 5.5 · xhigh |
-| Ticket implementation worker (Orca parallel run) | Started by `AGENTS.md` with `--model @worker` (`worker`) | Opus 5.5 · medium |
+| Ticket implementation worker (Orca parallel run) | Started by `AGENTS.md` with `--model @worker` (`worker`) | Opus 5.5 · xhigh |
 | Code exploration | Bundled scout (`smol`) | Haiku 5.5 · medium |
-| Routine implementation, tests, brief cold-read check | implementer, test-writer (`task`) | Opus 5.5 · medium |
-| Sub-reviews of the code review skill | Bundled task (`task`) | Opus 5.5 · medium |
-| Hard implementation, debugging | hard-implementer (`slow`) + advisor (`advisor`) | Opus 5.5 · xhigh + Fable 5.2 · high |
-| Cross review | Bundled reviewer (`review`) | GPT-6.1 Sol · high |
+| Routine implementation, tests, brief cold-read check | implementer, test-writer (`task`) | Opus 5.5 · xhigh |
+| Review skills and their sub-reviews | code-reviewer (`review`) | GPT-6.2 Sol · high |
+| Hard implementation, debugging | hard-implementer (`slow`) + advisor (`advisor`) | Fable 5.2 · high + Opus 5.5 · xhigh |
+| Cross review | Bundled reviewer (`review`) | GPT-6.2 Sol · high |
 | Cross review worker (a Claude Code worker, when the main session is not Claude) | Set by `AGENTS.md` with `--model` | Opus 5.5 · medium |
-| Cross review worker (a Codex worker, when the main session is Claude and the reviewer fell back to Claude) | Set by `AGENTS.md` with `--model` | GPT-6.1 Sol · high |
+| Cross review worker (a Codex worker, when the main session is Claude and the reviewer fell back to Claude) | Set by `AGENTS.md` with `--model` | GPT-6.2 Sol · high |
 | Security and core-logic review | Bundled security-reviewer | Opus 5.5 · high |
 | UI and screen checks | ui-checker (`vision`) | GPT-6.1 Terra · medium |
 | Commit messages, PR descriptions | `commit`, doc-writer (`smol`) | Haiku 5.5 · medium |
 
-Effort follows the kind of work. Coding and code review scores stop rising at Opus 5.5 medium and GPT-6.1 Sol high, while document output keeps improving up to xhigh. Sonnet 5.5 costs half as much per token as Opus 5.5 but uses more tokens, so its cost per task is about the same, and it is not used for implementation.
+This setup assumes the Anthropic subscription has more usage than the GPT subscription, so it keeps Claude effort high and uses GPT only for cross review, UI checks, and fallback. The numbers come from Artificial Analysis's per-effort comparisons.
 
-When a model is unavailable (for example, over its usage limit), the rest of the turn continues on GPT-6.1 Sol high. Review and UI checks fall back the other way, to Opus 5.5.
+- **Implementation**: Opus 5.5 xhigh scores 43.8% on FrontierCode-AA 2.0 and 59.6% on Terminal-Bench 4.0, above medium (33.1%, 52.5%) and above GPT-6.2 Sol medium (41.4%, 56.1%). So implementation stays on Claude instead of moving to GPT, which also keeps implementation and review on models from different companies. If responses are too slow, lower `task` and `worker` to high.
+- **Hard implementation**: Implementation already runs on Opus 5.5 xhigh, so escalation goes to Fable 5.2 high, which scores 49.1% on FrontierCode-AA 2.0 against 43.8% for Opus 5.5 xhigh. The advisor is Opus 5.5 xhigh so it gives a view from a different model.
+- **Documents**: Briefs stay on Opus because Opus 5.5 xhigh scores 1760 on the document-quality metric (AA-Briefcase), above Fable 5.2 xhigh (1737). PR descriptions and commit messages are short tasks that move given records into a fixed format, so they stay on Haiku 5.5.
+- **Review**: Code review scores stopped rising at GPT-6.1 Sol high, and GPT-6.2 Sol also stays at high to save GPT usage.
+- Sonnet 5.5 costs half as much per token as Opus 5.5 but uses more tokens, so its cost per task is about the same, and it is not used for implementation.
+
+Why reviews use GPT-6.2 Sol instead of Astra: in OpenAI's announcement, Sol scores within 0.5 points of Astra on FrontierCode 2.0, which checks whether changes meet maintainers' merge bar, at about one fifth of the cost. On a ChatGPT subscription (`openai-codex`), Astra's context is 272K, smaller than Sol's 500K, which also hurts reviews of large diffs.
+
+When a model is unavailable (for example, over its usage limit), the rest of the turn continues on GPT-6.2 Sol high. Review and UI checks fall back the other way, to Opus 5.5.
 
 ## Delegation rules
 
 `AGENTS.md` is read only by the main session and by omp workers started by Orca. Task subagents do not read it. It covers:
 
 - **Development stages**: the seven stages from planning document to PR, the skill for each stage, and the points where you confirm. Running [run-flow](skills/run-flow.md) goes through them in order.
-- **Delegation**: which agent takes each kind of work. The reviewer (another company's model) is used only for the cross review, and sub-reviews of the code review skill go to task. Giving both to the reviewer makes the same model read the same diff twice.
+- **Delegation**: which agent takes each kind of work. The cross review goes to the bundled reviewer, and review skills with their sub-reviews go to code-reviewer. Both run another company's model (GPT), so they catch mistakes the implementing model misses. The reviewer has a fixed bug-only report format and cannot follow a review skill's instructions, so the two are kept separate.
 - **What to hand over**: implementation, test, and UI agents get the brief and one ticket, the repo rules file paths, the verification commands, and earlier tickets' output artifacts instead of the conversation. Review agents get the diff range and the brief. doc-writer gets the changed-file list, completion records, and review record instead of the full diff.
 - **On failure**: if implementer fails, it is handed the task once more along with the failure report; if it fails the same ticket twice, hard-implementer takes it. If that also fails, or the cause of failure is an ambiguous ticket, the session stops and suggests splitting the ticket again. A large refactor or a debugging task with an unknown cause from the start goes straight to hard-implementer. An Orca implementation worker that implements a ticket itself and fails hands it straight to hard-implementer.
-- **Orca**: Orca workers are used only to run tickets in parallel in separate worktrees when two or more tickets can start together, to hand work to another agent, or when you want to watch a worker directly. Ticket implementation workers start on Opus 5.5 medium and do the implementation and tests themselves instead of handing them to implementer. The worker and implementer run the same model, so handing over would only read the same documents twice. Only screen checks go to ui-checker. To change it, edit `modelRoles.worker`.
+- **Orca**: Orca workers are used only to run tickets in parallel in separate worktrees when two or more tickets can start together, to hand work to another agent, or when you want to watch a worker directly. Ticket implementation workers start on Opus 5.5 xhigh and do the implementation and tests themselves instead of handing them to implementer. The worker and implementer run the same model, so handing over would only read the same documents twice. Only screen checks go to ui-checker. To change it, edit `modelRoles.worker`.
 
 How several tickets run in parallel is described in [run-ticket](skills/run-ticket.md#running-multiple-tickets).
 
@@ -79,9 +87,9 @@ How several tickets run in parallel is described in [run-ticket](skills/run-tick
 
 Check in a new omp session:
 
-- `/agents` lists brief-writer, implementer, hard-implementer, test-writer, ui-checker, and doc-writer.
+- `/agents` lists brief-writer, implementer, hard-implementer, test-writer, ui-checker, doc-writer, and code-reviewer.
 - After running each agent once, its record in the session folder (`~/.omp/agent/sessions/<project>/<session>/`) shows the model from the table above.
-- After running hard-implementer, its agent folder has an `__advisor.jsonl`. This is the advisor model's (Fable 5.2) record.
+- After running hard-implementer, its agent folder has an `__advisor.jsonl`. This is the advisor model's (Opus 5.5) record.
 
 ## Change models
 
@@ -93,7 +101,8 @@ Check in a new omp session:
 ## Notes
 
 - **Escalation on failure is a rule, not a setting.** omp fallback models apply only when a model is unavailable. The main session, reading `AGENTS.md`, decides when to move from implementer to hard-implementer.
-- **Escalation has one step.** It goes straight from Opus 5.5 medium to Opus 5.5 xhigh with the Fable 5.2 advisor. To add an Opus 5.5 high step in between, create one more agent with `model: anthropic/claude-opus-5-5:high` and add it to "실패했을 때" (On failure) in `AGENTS.md`.
+- **Escalation has one step.** It goes straight from Opus 5.5 xhigh to Fable 5.2 high with the Opus 5.5 xhigh advisor. To add a step in between, create one more agent with that model in `model:` and add it to "실패했을 때" (On failure) in `AGENTS.md`.
+- **Fable 5.2 usage limit**: If your subscription tracks Fable usage separately from Opus, hard-implementer may hit its limit first. It then continues on Opus 5.5 xhigh through `retry.fallbackChains.slow`.
 - **No setting picks a model by input size.** GPT doubles its input price and raises its output price 1.5 times when input exceeds 272K tokens, so `AGENTS.md` has large diffs split by directory before review.
 - **Only hard-implementer has an advisor.** `advisor: true` in the agent file attaches an advisor to that agent alone, regardless of the global `advisor.enabled: false`. An advisor reads every turn of its session, so keep it off in the main session.
 - **Haiku 5.5 has a 100K context.** It is smaller than the other models (1M), so give scout a narrow search scope.
