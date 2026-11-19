@@ -35,7 +35,7 @@
 | 테스트 작성·실행 | test-writer |
 | UI·화면 검증 | ui-checker |
 | 교차 리뷰 | reviewer |
-| 코드 리뷰 스킬이 띄우는 하위 리뷰 (호출 하나에 스킬 하나) | task |
+| 리뷰 스킬 실행(레포 규칙이 커밋마다 돌리라고 한 리뷰 포함)과 그 스킬이 띄우는 하위 리뷰 | code-reviewer |
 | 보안·인증·결제 등 핵심 로직 리뷰 | security-reviewer |
 | PR 설명 | doc-writer |
 
@@ -43,7 +43,7 @@
 
 구현 워커(run-ticket의 2, 3, 4단계를 지시받은 Paseo나 Orca 워커)는 구현과 테스트를 implementer와 test-writer에 맡기지 않고 직접 합니다. 워커와 implementer의 모델이 같아서, 맡기면 같은 문서를 두 번 읽고 넘기지 않은 규칙이 빠집니다. 화면 검증은 ui-checker에 맡깁니다.
 
-reviewer는 다른 회사 모델이므로 교차 리뷰에만 씁니다. 코드 리뷰 스킬의 하위 리뷰까지 맡기면 같은 모델이 같은 diff를 두 번 봅니다.
+reviewer와 code-reviewer는 다른 회사 모델(GPT)이라 구현한 모델과 다른 실수를 잡습니다. reviewer는 버그만 보고하는 형식이 고정돼 있어 리뷰 스킬의 지시(규칙 위반, 불필요한 코드, 테스트 케이스)를 따르지 못하므로, 리뷰 스킬은 code-reviewer에 맡깁니다.
 
 ## 넘기는 것
 
