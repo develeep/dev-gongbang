@@ -1,6 +1,6 @@
 ---
 name: hard-implementer
-description: implementer가 2회 실패한 티켓이나 여러 파일에 걸친 대규모 리팩터링 티켓을 구현한다.
+description: implementer가 2회 실패한 티켓, 여러 파일에 걸친 대규모 리팩터링, 원인을 모르는 실패의 디버깅을 맡는다.
 model: "@slow"
 advisor: true
 ---

@@ -29,7 +29,7 @@
         "model": "anthropic/claude-opus-5-5",
         "modeId": "full",
         "thinkingOptionId": "high",
-        "notes": "버그나 실패의 원인을 가설로 세우고 코드와 데이터로 검증해 근거와 함께 보고한다. 고치지 않는다."
+        "notes": "버그나 실패의 원인을 가설로 세우고 코드와 데이터로 검증해 근거와 함께 보고한다. 원인 보고만 필요할 때 쓴다. 고치는 것까지 맡길 일이면 구현 프로필에 원인 정리부터 맡긴다."
       },
       {
         "id": "impact",
@@ -47,7 +47,7 @@
         "model": "anthropic/claude-opus-5-5",
         "modeId": "full",
         "thinkingOptionId": "xhigh",
-        "notes": "작업 지시서(brief) 초안을 쓰고 돌려준다. 검증이나 게시는 하지 않고 하위 에이전트도 띄우지 않는다."
+        "notes": "작업 지시서(brief) 초안을 쓰고, 그 초안의 냉독 검증까지 마쳐 돌려준다. 냉독 검증은 자기 초안을 완성하는 일이므로 나누지 않는다. 게시는 하지 않는다."
       },
       {
         "id": "cold-read",
@@ -56,7 +56,7 @@
         "model": "anthropic/claude-opus-5-5",
         "modeId": "full",
         "thinkingOptionId": "medium",
-        "notes": "대화 없이 brief 초안만 읽고 해석이 갈리는 문장과 빠진 정보를 보고한다. 구현 워커와 같은 모델로 읽는다. 초안을 고치지 않는다."
+        "notes": "대화 없이 brief 초안만 읽고 해석이 갈리는 문장과 빠진 정보를 보고한다. 초안을 쓴 쪽이 검증하려고 띄운다. 구현 워커와 같은 모델로 읽는다. 초안을 고치지 않는다."
       },
       {
         "id": "change-doc",
@@ -92,7 +92,7 @@
         "model": "anthropic/claude-opus-5-5",
         "modeId": "full",
         "thinkingOptionId": "xhigh",
-        "notes": "티켓 구현 워커가 두 번 실패했거나 여러 파일에 걸친 리팩터링인 티켓 하나를 구현한다. 앞선 실패 보고를 모두 넘긴다."
+        "notes": "티켓 구현 워커가 두 번 실패했거나, 여러 파일에 걸친 리팩터링이거나, 원인을 모르는 실패를 고쳐야 하는 티켓 하나를 원인 정리부터 구현까지 맡는다. 앞선 실패 보고를 모두 넘긴다."
       },
       {
         "id": "cross-review",
@@ -131,22 +131,13 @@
         "notes": "브라우저로 화면을 열어 주어진 완료 기준을 항목별로 통과, 실패, 확인 불가로 보고한다. 로그인은 사용자가 직접 한다. 파일을 고치지 않는다."
       },
       {
-        "id": "commit-message",
-        "name": "커밋 메시지",
-        "provider": "omp",
-        "model": "anthropic/claude-haiku-5-5",
-        "modeId": "full",
-        "thinkingOptionId": "medium",
-        "notes": "정해진 변경의 커밋 메시지를 레포 커밋 규칙대로 쓴다. 규칙 파일 경로와 변경 파일 목록을 준다. 커밋은 하지 않는다."
-      },
-      {
         "id": "pr-body",
         "name": "PR 본문",
         "provider": "omp",
         "model": "anthropic/claude-haiku-5-5",
         "modeId": "full",
         "thinkingOptionId": "medium",
-        "notes": "PR 본문을 쓴다. diff 전문 대신 brief, 변경 파일 목록, 완료 기록, 리뷰 기록을 준다. PR을 만들거나 push하지 않는다."
+        "notes": "PR 본문을 쓴다. diff 전문 대신 brief, 변경 파일 목록, 완료 기록, 리뷰 기록을 준다. PR을 만들거나 push하지 않는다. 커밋 메시지는 변경을 만든 세션이 직접 쓴다."
       },
       {
         "id": "advisor",

@@ -21,7 +21,7 @@ This guide sets up Paseo tools, agent profiles, a workspace script, and optional
 
 | File | Install location | Role |
 |---|---|---|
-| [`extras/paseo/config.json`](../../extras/paseo/config.json) | Merge into `~/.paseo/config.json` | The setting that gives Paseo tools to agents (`daemon.mcp.injectIntoAgents`) and 19 agent profiles, one per purpose |
+| [`extras/paseo/config.json`](../../extras/paseo/config.json) | Merge into `~/.paseo/config.json` | The setting that gives Paseo tools to agents (`daemon.mcp.injectIntoAgents`) and 18 agent profiles, one per purpose |
 | [`extras/paseo/playbooks/`](../../extras/paseo/playbooks/) | `.paseo/plugins/playbooks/` in the repo where you use it | The `run-ticket` playbook that runs one ticket, and two roles (`ticket-implementer`, `ticket-reviewer`). Optional, and needs the Playbooks plugin |
 | [`paseo.json`](../../paseo.json) at the repo root | Already in this repo | This repo's workspace script `check` (`python3 scripts/check.py`). For your own repo, create one in the same format |
 
@@ -45,7 +45,9 @@ This guide sets up Paseo tools, agent profiles, a workspace script, and optional
 
 ## Profiles
 
-**One profile has one purpose.** When a single agent carries several purposes at once, such as implementing and reviewing, or drafting and verifying, the main session that receives the result cannot tell which part to check against what, so review, bug hunting, and spotting AI slop get harder. For two jobs, start two agents. When you add a profile, check first that it has one purpose.
+**One profile has one purpose.** One purpose means one deliverable and all the work needed to finish it. When a single agent carries different deliverables at once, such as an implementation and an independent review, or two review skills, the main session that receives the result cannot tell which part to check against what, so review, bug hunting, and spotting AI slop get harder. For two deliverables, start two agents.
+
+**Quality of the result comes first, so do not split where context is lost.** Work that finishes and verifies an agent's own deliverable stays with that agent: the cold read of a draft, checking the done criteria of an implementation, working out the cause before fixing a failed ticket. Splitting these makes the second agent rebuild the first agent's context. When you add a profile, check both that it has one purpose and that splitting it off loses no context.
 
 The session that starts an agent reads each profile's notes and picks the one that fits the purpose of the job. If no profile fits, it looks up the available providers and models, picks one, and tells you what it used.
 
@@ -53,19 +55,18 @@ The session that starts an agent reads each profile's notes and picks the one th
 |---|---|---|---|
 | `locate` | Find where existing logic lives | No | Haiku 5.5 · medium |
 | `behavior-checklist` | Write a checklist of behavior before a change | No | Haiku 5.5 · medium |
-| `root-cause` | Trace the cause of a bug or failure | No | Opus 5.5 · high |
+| `root-cause` | Report the cause of a bug or failure | No | Opus 5.5 · high |
 | `impact` | Assess the impact and risk of one given change | No | Opus 5.5 · high |
-| `brief-draft` | Draft a brief | Draft only | Opus 5.5 · xhigh |
-| `cold-read` | Cold-read a brief draft | No | Opus 5.5 · medium |
+| `brief-draft` | Draft a brief and cold-read that draft | Draft only | Opus 5.5 · xhigh |
+| `cold-read` | The cold reader that the drafting side starts | No | Opus 5.5 · medium |
 | `change-doc` | Write a document that explains a finished change | Document only | Opus 5.5 · xhigh |
 | `ticket-worker` | Implement and commit one ticket | Yes | Opus 5.5 · medium |
 | `proposal-diff` | Write a proposed diff for one ticket | Diff only | Opus 5.5 · medium |
-| `hard-implementer` | Implement one ticket that failed twice or is a large refactor | Yes | Opus 5.5 · xhigh |
+| `hard-implementer` | Implement one ticket that failed twice, is a large refactor, or fixes a failure with an unknown cause, starting from the cause | Yes | Opus 5.5 · xhigh |
 | `cross-review` | Find bugs in a diff with another company's model | No | GPT-6.1 Sol · high |
 | `skill-review` | Run one review skill | No | GPT-6.1 Sol · high |
 | `security-review` | Find security defects | No | Opus 5.5 · high |
 | `ui-check` | Check done criteria in a browser | No | GPT-6.1 Terra · medium |
-| `commit-message` | Write a commit message | No | Haiku 5.5 · medium |
 | `pr-body` | Write a PR description | No | Haiku 5.5 · medium |
 | `advisor` | Assess one plan or design | No | Fable 5.2 · high |
 | `env-setup` | Fix one tool or environment setup problem | Settings only | Opus 5.5 · medium |
@@ -75,7 +76,9 @@ The models match the per-role models in the [omp multi-agent setup](omp-orchestr
 
 - `locate` and `behavior-checklist` have a 100K context, so give them a narrow scope. If the whole repo must be searched, use `root-cause` or `impact`.
 - With several review skills, start one `skill-review` per skill. If one agent runs two skills, you cannot tell which finding came from which standard.
-- `brief-draft` only writes the draft and returns it. The session that receives the draft starts `cold-read` itself. When an agent starts agents inside itself, a stall is hard to notice.
+- `brief-draft` writes the draft, starts `cold-read` agents to verify its own draft, and then returns it. The draft and its check are one job, so they are not split.
+- There is no commit message profile. The session that made the change writes the commit message while it still has the context.
+- If you only need a cause report, use `root-cause`. If the job is to find the cause and fix it, use `hard-implementer`. Splitting the agent that finds the cause from the agent that fixes it makes the second one find the cause again.
 
 ## How Paseo orchestration works
 
@@ -119,7 +122,7 @@ The playbook does not merge; you do. Running several tickets in parallel is done
 
 ## Check the setup
 
-- In a Paseo session, the profile list shows the 19 profiles in the [Profiles](#profiles) table. Ask an agent "show me the Paseo profiles" or check in Settings.
+- In a Paseo session, the profile list shows the 18 profiles in the [Profiles](#profiles) table. Ask an agent "show me the Paseo profiles" or check in Settings.
 - `paseo script ls` shows `check`.
 - The Playbooks panel shows "티켓 실행" (Run ticket) without errors.
 

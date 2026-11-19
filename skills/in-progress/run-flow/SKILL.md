@@ -100,7 +100,7 @@ bash scripts/code_fingerprint.sh <흐름 문서 경로들>
 
 ### 3. 작업 지시서
 
-`set-brief` 스킬을 불러와 brief를 남긴다. 이 단계에 들어오면 [references/brief-stage.md](references/brief-stage.md)를 읽고 그 절차를 따른다. 초안 작성은 서브에이전트 하나에 맡기고, 냉독 검증의 서브에이전트는 이 세션이 직접 띄운다. 초안 작성은 출력이 길어, 메인 세션이 하면 이후 모든 턴이 그 내용을 다시 읽는다.
+`set-brief` 스킬을 불러와 brief를 남긴다. 이 단계에 들어오면 [references/brief-stage.md](references/brief-stage.md)를 읽고 그 절차를 따른다. 초안 작성과 냉독 검증은 서브에이전트에 맡긴다. 이 단계는 출력이 길고 검증 결과가 쌓여, 메인 세션이 하면 이후 모든 턴이 그 내용을 다시 읽는다.
 
 게시가 끝나면 brief의 경로나 이슈 번호를 받는다. set-brief의 "티켓 분할 안내"에 쓰인 크기 기준으로, "남은 일"이 새 컨텍스트 창 하나로 끝나지 않을 크기면 4단계로, 아니면 5단계로 간다.
 

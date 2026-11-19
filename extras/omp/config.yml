@@ -13,7 +13,7 @@ modelRoles:
   # 티켓 구현 워커. Orca는 extras/omp/AGENTS.md가 `--model @worker`로 띄우고, Paseo는 extras/paseo/config.json의 ticket-worker 프로필이 같은 모델을 쓴다.
   worker: anthropic/claude-opus-5-5:medium
 
-  # 어려운 티켓 구현 (hard-implementer), 원인을 모르는 실패의 원인 추적 (debugger)
+  # 어려운 구현·대규모 리팩터링 (hard-implementer)
   slow: anthropic/claude-opus-5-5:xhigh
 
   # 일반 구현·테스트, 코드 리뷰 스킬의 하위 리뷰 (bundled task, implementer, test-writer)

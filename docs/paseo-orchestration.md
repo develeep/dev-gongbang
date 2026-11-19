@@ -21,7 +21,7 @@
 
 | 파일 | 설치 위치 | 역할 |
 |---|---|---|
-| [`extras/paseo/config.json`](../extras/paseo/config.json) | `~/.paseo/config.json`에 합침 | Paseo 도구를 에이전트에 주는 설정(`daemon.mcp.injectIntoAgents`)과 목적별 에이전트 프로필 19개 |
+| [`extras/paseo/config.json`](../extras/paseo/config.json) | `~/.paseo/config.json`에 합침 | Paseo 도구를 에이전트에 주는 설정(`daemon.mcp.injectIntoAgents`)과 목적별 에이전트 프로필 18개 |
 | [`extras/paseo/playbooks/`](../extras/paseo/playbooks/) | 쓰려는 레포의 `.paseo/plugins/playbooks/` | 티켓 하나를 실행하는 플레이북 `run-ticket`과 역할 2개(`ticket-implementer`, `ticket-reviewer`). 선택 사항이고 Playbooks 플러그인이 필요합니다 |
 | 레포 루트 [`paseo.json`](../paseo.json) | 이 레포에 있음 | 이 레포의 워크스페이스 스크립트 `check`(`python3 scripts/check.py`). 자기 레포에는 같은 형식으로 직접 만듭니다 |
 
@@ -45,7 +45,9 @@
 
 ## 프로필
 
-**프로필 하나에는 목적 하나만 둡니다.** 에이전트 하나가 구현과 리뷰, 초안과 검증처럼 여러 목적을 함께 맡으면, 결과를 받는 메인 세션이 어느 부분을 무엇으로 확인해야 하는지 가릴 수 없어 리뷰, 버그 찾기, AI slop 찾기가 어려워집니다. 일이 둘이면 에이전트를 둘 띄웁니다. 프로필을 더할 때도 목적이 하나인지 먼저 봅니다.
+**프로필 하나에는 목적 하나만 둡니다.** 목적 하나는 산출물 하나와 그 산출물을 완성하는 데 필요한 일 전부입니다. 에이전트 하나가 구현과 독립 리뷰, 리뷰 스킬 둘처럼 서로 다른 산출물을 함께 맡으면, 결과를 받는 메인 세션이 어느 부분을 무엇으로 확인해야 하는지 가릴 수 없어 리뷰, 버그 찾기, AI slop 찾기가 어려워집니다. 산출물이 둘이면 에이전트를 둘 띄웁니다.
+
+**완성도가 먼저이므로 맥락을 잃는 분리는 하지 않습니다.** 초안의 냉독 검증, 구현의 완료 기준 확인, 실패한 티켓의 원인 정리처럼 자기 작업을 완성하고 검증하는 일은 같은 에이전트에 둡니다. 이것을 나누면 뒤 에이전트가 앞 에이전트의 맥락을 다시 쌓아야 합니다. 프로필을 더할 때는 목적이 하나인지, 나눠서 맥락을 잃지 않는지를 함께 봅니다.
 
 에이전트를 띄우는 세션은 프로필마다 설명을 읽고 맡길 일의 목적에 맞는 것을 고릅니다. 맞는 프로필이 없으면 쓸 수 있는 provider와 모델을 조회해 고르고, 무엇으로 띄웠는지 알립니다.
 
@@ -53,19 +55,18 @@
 |---|---|---|---|
 | `locate` | 기존 로직의 위치 찾기 | 아니오 | Haiku 5.5 · medium |
 | `behavior-checklist` | 수정 전 동작 체크리스트 작성 | 아니오 | Haiku 5.5 · medium |
-| `root-cause` | 버그나 실패의 원인 추적 | 아니오 | Opus 5.5 · high |
+| `root-cause` | 버그나 실패의 원인 보고 | 아니오 | Opus 5.5 · high |
 | `impact` | 정해진 변경 하나의 영향과 위험 산정 | 아니오 | Opus 5.5 · high |
-| `brief-draft` | 작업 지시서(brief) 초안 작성 | 초안만 | Opus 5.5 · xhigh |
-| `cold-read` | brief 초안 냉독 검증 | 아니오 | Opus 5.5 · medium |
+| `brief-draft` | 작업 지시서(brief) 초안 작성과 그 초안의 냉독 검증 | 초안만 | Opus 5.5 · xhigh |
+| `cold-read` | 초안을 쓴 쪽이 띄우는 냉독 읽기 | 아니오 | Opus 5.5 · medium |
 | `change-doc` | 끝난 변경의 설명 문서 작성 | 문서만 | Opus 5.5 · xhigh |
 | `ticket-worker` | 티켓 하나 구현과 커밋 | 예 | Opus 5.5 · medium |
 | `proposal-diff` | 티켓 하나의 제안 diff 작성 | diff만 | Opus 5.5 · medium |
-| `hard-implementer` | 두 번 실패했거나 큰 리팩터링인 티켓 하나 구현 | 예 | Opus 5.5 · xhigh |
+| `hard-implementer` | 두 번 실패했거나, 큰 리팩터링이거나, 원인을 모르는 실패를 고치는 티켓 하나를 원인 정리부터 구현 | 예 | Opus 5.5 · xhigh |
 | `cross-review` | 다른 회사 모델로 diff의 버그 찾기 | 아니오 | GPT-6.1 Sol · high |
 | `skill-review` | 리뷰 스킬 하나 실행 | 아니오 | GPT-6.1 Sol · high |
 | `security-review` | 보안 결함 찾기 | 아니오 | Opus 5.5 · high |
 | `ui-check` | 브라우저로 완료 기준 확인 | 아니오 | GPT-6.1 Terra · medium |
-| `commit-message` | 커밋 메시지 작성 | 아니오 | Haiku 5.5 · medium |
 | `pr-body` | PR 본문 작성 | 아니오 | Haiku 5.5 · medium |
 | `advisor` | 계획이나 설계 하나 평가 | 아니오 | Fable 5.2 · high |
 | `env-setup` | 도구·환경 설정 문제 하나 해결 | 설정만 | Opus 5.5 · medium |
@@ -75,7 +76,9 @@
 
 - `locate`와 `behavior-checklist`는 컨텍스트가 100K라 범위를 좁혀 맡깁니다. 저장소 전체를 훑어야 하면 `root-cause`나 `impact`에 맡깁니다.
 - 리뷰 스킬이 여럿이면 `skill-review`를 스킬마다 하나씩 띄웁니다. 한 에이전트에 스킬 둘을 묶으면 어느 지적이 어느 기준에서 나왔는지 가릴 수 없습니다.
-- `brief-draft`는 초안만 쓰고 돌려줍니다. 냉독 검증은 초안을 받은 세션이 `cold-read`를 직접 띄웁니다. 에이전트가 안에서 다시 에이전트를 띄우면 멈춘 것을 알아차리기 어렵습니다.
+- `brief-draft`는 초안을 쓰고 `cold-read`를 띄워 자기 초안을 검증한 뒤 돌려줍니다. 초안과 그 검증은 한 작업이라 나누지 않습니다.
+- 커밋 메시지 프로필은 두지 않습니다. 커밋 메시지는 변경을 만든 세션이 맥락을 가진 채로 씁니다.
+- 원인 보고만 필요하면 `root-cause`에, 원인을 찾아 고치는 것까지 맡길 일이면 `hard-implementer`에 맡깁니다. 원인을 찾은 에이전트와 고치는 에이전트를 나누면 고치는 쪽이 원인을 다시 찾아야 합니다.
 
 ## Paseo 오케스트레이션 방식
 
@@ -119,7 +122,7 @@ run-ticket은 여러 티켓을 실행할 때 워커 도구를 다음 순서로 �
 
 ## 확인하기
 
-- Paseo 세션에서 프로필 조회에 [프로필](#프로필) 표의 19개가 보이는지. 에이전트에게 "Paseo 프로필을 보여 줘"라고 묻거나 Settings에서 확인합니다.
+- Paseo 세션에서 프로필 조회에 [프로필](#프로필) 표의 18개가 보이는지. 에이전트에게 "Paseo 프로필을 보여 줘"라고 묻거나 Settings에서 확인합니다.
 - `paseo script ls`에 `check`가 보이는지
 - Playbooks 패널에 "티켓 실행"이 오류 없이 보이는지
 
