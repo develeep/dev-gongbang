@@ -4,7 +4,7 @@
 
 # omp multi-agent setup
 
-This guide sets up omp (oh-my-pi) to use a different model at each development stage, with per-role models, six subagents, and delegation rules. Design and orchestration use Opus 5.5 high, brief drafting uses Opus 5.5 xhigh, routine implementation uses Opus 5.5 medium, exploration and PR descriptions use Haiku 5.5, and cross review uses GPT-6.1 Sol high. Only problems that get stuck move up to Opus 5.5 xhigh with Fable 5.2 as an advisor. After reading it, you can install the files in `extras/omp/`, check that they work, and change models.
+This guide sets up omp (oh-my-pi) to use a different model at each development stage, with per-role models, six subagents, and delegation rules. Design and orchestration use Opus 5.5 high, brief drafting uses Opus 5.5 xhigh, routine implementation uses Opus 5.5 medium, exploration and PR descriptions use Haiku 5.5, and cross review uses GPT-6.2 Sol high. Only problems that get stuck move up to Opus 5.5 xhigh with Fable 5.2 as an advisor. After reading it, you can install the files in `extras/omp/`, check that they work, and change models.
 
 ## Contents
 
@@ -52,16 +52,16 @@ To keep your existing settings, copy the `modelRoles`, `advisor`, `task`, and `r
 | Routine implementation, tests, brief cold-read check | implementer, test-writer (`task`) | Opus 5.5 · medium |
 | Sub-reviews of the code review skill | Bundled task (`task`) | Opus 5.5 · medium |
 | Hard implementation, debugging | hard-implementer (`slow`) + advisor (`advisor`) | Opus 5.5 · xhigh + Fable 5.2 · high |
-| Cross review | Bundled reviewer (`review`) | GPT-6.1 Sol · high |
+| Cross review | Bundled reviewer (`review`) | GPT-6.2 Sol · high |
 | Cross review worker (a Claude Code worker, when the main session is not Claude) | Set by `AGENTS.md`; Orca uses `--model` | Opus 5.5 · medium |
-| Cross review worker (a Codex worker, when the main session is Claude and the reviewer fell back to Claude) | Paseo: the `cross-review` profile; Orca: set by `AGENTS.md` with `--model` | GPT-6.1 Sol · high |
+| Cross review worker (a Codex worker, when the main session is Claude and the reviewer fell back to Claude) | Paseo: the `cross-review` profile; Orca: set by `AGENTS.md` with `--model` | GPT-6.2 Sol · high |
 | Security and core-logic review | Bundled security-reviewer | Opus 5.5 · high |
 | UI and screen checks | ui-checker (`vision`) | GPT-6.1 Terra · medium |
 | Commit messages, PR descriptions | `commit`, doc-writer (`smol`) | Haiku 5.5 · medium |
 
-Effort follows the kind of work. Coding and code review scores stop rising at Opus 5.5 medium and GPT-6.1 Sol high, while document output keeps improving up to xhigh. Sonnet 5.5 costs half as much per token as Opus 5.5 but uses more tokens, so its cost per task is about the same, and it is not used for implementation.
+Effort follows the kind of work. Coding and code review scores stop rising at Opus 5.5 medium and GPT-6.2 Sol high, while document output keeps improving up to xhigh. Sonnet 5.5 costs half as much per token as Opus 5.5 but uses more tokens, so its cost per task is about the same, and it is not used for implementation.
 
-When a model is unavailable (for example, over its usage limit), the rest of the turn continues on GPT-6.1 Sol high. Review and UI checks fall back the other way, to Opus 5.5.
+When a model is unavailable (for example, over its usage limit), the rest of the turn continues on GPT-6.2 Sol high. Review and UI checks fall back the other way, to Opus 5.5.
 
 ## Delegation rules
 

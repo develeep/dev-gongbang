@@ -31,7 +31,7 @@ modelRoles:
   vision: openai-codex/gpt-6.1-terra:medium
 
   # 교차 리뷰 (사용자 정의 역할, bundled reviewer가 쓴다)
-  review: openai-codex/gpt-6.1-sol:high
+  review: openai-codex/gpt-6.2-sol:high
 
   # 막혔을 때 자문 (hard-implementer에만 붙인다)
   advisor: anthropic/claude-fable-5-2:high
@@ -42,7 +42,7 @@ advisor:
 
 task:
   agentModelOverrides:
-    # bundled reviewer를 다른 회사 모델(GPT-6.1 Sol) 교차 리뷰로 바꾼다.
+    # bundled reviewer를 다른 회사 모델(GPT-6.2 Sol) 교차 리뷰로 바꾼다.
     reviewer: "@review"
     # bundled security-reviewer는 세션 모델을 따르므로 Opus high로 고정한다.
     security-reviewer: anthropic/claude-opus-5-5:high
@@ -51,7 +51,7 @@ retry:
   fallbackChains:
     # 모델을 쓸 수 없을 때(한도 초과 등) 남은 턴을 이어 갈 모델. 체인이 없는 역할도 이것을 쓴다.
     default:
-      - openai-codex/gpt-6.1-sol:high
+      - openai-codex/gpt-6.2-sol:high
     # GPT를 쓸 수 없으면 리뷰와 화면 검증은 Opus로 넘긴다.
     review:
       - anthropic/claude-opus-5-5:high

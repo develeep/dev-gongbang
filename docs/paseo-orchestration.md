@@ -63,8 +63,8 @@
 | `ticket-worker` | 티켓 하나 구현과 커밋 | 예 | Opus 5.5 · medium |
 | `proposal-diff` | 티켓 하나의 제안 diff 작성 | diff만 | Opus 5.5 · medium |
 | `hard-implementer` | 두 번 실패했거나, 큰 리팩터링이거나, 원인을 모르는 실패를 고치는 티켓 하나를 원인 정리부터 구현 | 예 | Opus 5.5 · xhigh |
-| `cross-review` | 다른 회사 모델로 diff의 버그 찾기 | 아니오 | GPT-6.1 Sol · high |
-| `skill-review` | 리뷰 스킬 하나 실행 | 아니오 | GPT-6.1 Sol · high |
+| `cross-review` | 다른 회사 모델로 diff의 버그 찾기 | 아니오 | GPT-6.2 Sol · high |
+| `skill-review` | 리뷰 스킬 하나 실행 | 아니오 | GPT-6.2 Sol · high |
 | `security-review` | 보안 결함 찾기 | 아니오 | Opus 5.5 · high |
 | `ui-check` | 브라우저로 완료 기준 확인 | 아니오 | GPT-6.1 Terra · medium |
 | `pr-body` | PR 본문 작성 | 아니오 | Haiku 5.5 · medium |

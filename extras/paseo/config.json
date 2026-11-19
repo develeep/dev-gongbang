@@ -98,7 +98,7 @@
         "id": "cross-review",
         "name": "교차 리뷰",
         "provider": "omp",
-        "model": "openai-codex/gpt-6.1-sol",
+        "model": "openai-codex/gpt-6.2-sol",
         "modeId": "full",
         "thinkingOptionId": "high",
         "notes": "Claude가 구현한 diff에서 버그를 찾아 보고한다. 다른 회사 모델의 눈으로 보는 것이 목적이다. 파일을 고치지 않는다."
@@ -107,7 +107,7 @@
         "id": "skill-review",
         "name": "리뷰 스킬 실행",
         "provider": "omp",
-        "model": "openai-codex/gpt-6.1-sol",
+        "model": "openai-codex/gpt-6.2-sol",
         "modeId": "full",
         "thinkingOptionId": "high",
         "notes": "리뷰 스킬 하나를 정해진 diff에 실행하고 그 스킬의 형식대로 보고한다. 에이전트 하나에 스킬 하나만 맡긴다. 파일을 고치지 않는다."

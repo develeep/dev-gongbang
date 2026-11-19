@@ -63,8 +63,8 @@ The session that starts an agent reads each profile's notes and picks the one th
 | `ticket-worker` | Implement and commit one ticket | Yes | Opus 5.5 · medium |
 | `proposal-diff` | Write a proposed diff for one ticket | Diff only | Opus 5.5 · medium |
 | `hard-implementer` | Implement one ticket that failed twice, is a large refactor, or fixes a failure with an unknown cause, starting from the cause | Yes | Opus 5.5 · xhigh |
-| `cross-review` | Find bugs in a diff with another company's model | No | GPT-6.1 Sol · high |
-| `skill-review` | Run one review skill | No | GPT-6.1 Sol · high |
+| `cross-review` | Find bugs in a diff with another company's model | No | GPT-6.2 Sol · high |
+| `skill-review` | Run one review skill | No | GPT-6.2 Sol · high |
 | `security-review` | Find security defects | No | Opus 5.5 · high |
 | `ui-check` | Check done criteria in a browser | No | GPT-6.1 Terra · medium |
 | `pr-body` | Write a PR description | No | Haiku 5.5 · medium |

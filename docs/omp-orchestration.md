@@ -4,7 +4,7 @@
 
 # omp 멀티에이전트 설정
 
-omp(oh-my-pi)에서 개발 단계마다 다른 모델을 쓰도록 역할별 모델, 서브에이전트 6개, 위임 규칙을 설정하는 방법을 설명합니다. 설계와 오케스트레이션은 Opus 5.5 high, brief 초안은 Opus 5.5 xhigh, 반복 구현은 Opus 5.5 medium, 탐색과 PR 설명은 Haiku 5.5, 교차 리뷰는 GPT-6.1 Sol high로 두고, 막히는 문제에서만 Opus 5.5 xhigh와 Fable 5.2 자문으로 올립니다. 이 문서를 읽으면 `extras/omp/`의 파일을 설치하고, 동작을 확인하고, 모델을 바꿀 수 있습니다.
+omp(oh-my-pi)에서 개발 단계마다 다른 모델을 쓰도록 역할별 모델, 서브에이전트 6개, 위임 규칙을 설정하는 방법을 설명합니다. 설계와 오케스트레이션은 Opus 5.5 high, brief 초안은 Opus 5.5 xhigh, 반복 구현은 Opus 5.5 medium, 탐색과 PR 설명은 Haiku 5.5, 교차 리뷰는 GPT-6.2 Sol high로 두고, 막히는 문제에서만 Opus 5.5 xhigh와 Fable 5.2 자문으로 올립니다. 이 문서를 읽으면 `extras/omp/`의 파일을 설치하고, 동작을 확인하고, 모델을 바꿀 수 있습니다.
 
 ## 목차
 
@@ -52,16 +52,16 @@ ln -s "$PWD/extras/omp/AGENTS.md" ~/.omp/agent/AGENTS.md
 | 일반 구현·테스트, brief 냉독 검증 | implementer, test-writer (`task`) | Opus 5.5 · medium |
 | 코드 리뷰 스킬의 하위 리뷰 | bundled task (`task`) | Opus 5.5 · medium |
 | 어려운 구현·디버깅 | hard-implementer (`slow`) + 자문 (`advisor`) | Opus 5.5 · xhigh + Fable 5.2 · high |
-| 교차 리뷰 | bundled reviewer (`review`) | GPT-6.1 Sol · high |
+| 교차 리뷰 | bundled reviewer (`review`) | GPT-6.2 Sol · high |
 | 교차 리뷰 워커 (메인 세션이 Claude가 아닐 때의 Claude Code 워커) | `AGENTS.md`가 지정. Orca는 `--model` | Opus 5.5 · medium |
-| 교차 리뷰 워커 (메인 세션이 Claude이고 reviewer가 Claude로 넘어갔을 때의 Codex 워커) | Paseo는 `cross-review` 프로필, Orca는 `AGENTS.md`가 `--model`로 지정 | GPT-6.1 Sol · high |
+| 교차 리뷰 워커 (메인 세션이 Claude이고 reviewer가 Claude로 넘어갔을 때의 Codex 워커) | Paseo는 `cross-review` 프로필, Orca는 `AGENTS.md`가 `--model`로 지정 | GPT-6.2 Sol · high |
 | 보안·핵심 로직 리뷰 | bundled security-reviewer | Opus 5.5 · high |
 | UI·화면 검증 | ui-checker (`vision`) | GPT-6.1 Terra · medium |
 | 커밋·PR 설명 | `commit`, doc-writer (`smol`) | Haiku 5.5 · medium |
 
-Effort는 작업 종류에 맞췄습니다. 코딩과 코드 리뷰는 Opus 5.5 medium, GPT-6.1 Sol high에서 점수가 더 오르지 않고, 문서 산출물은 xhigh까지 오릅니다. Sonnet 5.5는 단가가 Opus 5.5의 절반이지만 토큰을 더 써서 작업당 비용이 비슷하므로 구현에 쓰지 않습니다.
+Effort는 작업 종류에 맞췄습니다. 코딩과 코드 리뷰는 Opus 5.5 medium, GPT-6.2 Sol high에서 점수가 더 오르지 않고, 문서 산출물은 xhigh까지 오릅니다. Sonnet 5.5는 단가가 Opus 5.5의 절반이지만 토큰을 더 써서 작업당 비용이 비슷하므로 구현에 쓰지 않습니다.
 
-모델을 쓸 수 없을 때(한도 초과 등)는 남은 턴을 GPT-6.1 Sol high로 이어 갑니다. 리뷰와 UI 검증은 반대로 Opus 5.5로 넘깁니다.
+모델을 쓸 수 없을 때(한도 초과 등)는 남은 턴을 GPT-6.2 Sol high로 이어 갑니다. 리뷰와 UI 검증은 반대로 Opus 5.5로 넘깁니다.
 
 ## 위임 규칙
 

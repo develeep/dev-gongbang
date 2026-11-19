@@ -72,9 +72,9 @@ Paseo나 Orca 워커는 서브에이전트로 할 수 없는 일에만 씁니다
 ### Paseo
 
 - 티켓 구현 워커는 `ticket-worker` 프로필로 띄웁니다. 프로필이 없으면 omp provider의 `anthropic/claude-opus-5-5`, thinking `medium`으로 띄웁니다.
-- 교차 리뷰 워커는 `cross-review` 프로필로 띄웁니다. 프로필이 없으면 omp provider의 `openai-codex/gpt-6.1-sol`, thinking `high`로 띄웁니다. 메인 세션이 Claude가 아니면 `anthropic/claude-opus-5-5`, thinking `medium`으로 띄웁니다.
+- 교차 리뷰 워커는 `cross-review` 프로필로 띄웁니다. 프로필이 없으면 omp provider의 `openai-codex/gpt-6.2-sol`, thinking `high`로 띄웁니다. 메인 세션이 Claude가 아니면 `anthropic/claude-opus-5-5`, thinking `medium`으로 띄웁니다.
 
 ### Orca
 
 - 티켓 구현 워커는 `--model @worker`로 띄웁니다.
-- 교차 리뷰를 Claude Code 워커에 맡길 때는 `--model claude-opus-5-5 --effort medium`으로 띄웁니다. 메인 세션이 Claude가 아닐 때만 해당합니다. 메인 세션이 Claude면 Codex 워커를 `--model gpt-6.1-sol --effort high`로 띄워 맡깁니다. Opus 워커는 같은 회사 모델이라 교차 리뷰가 되지 않습니다.
+- 교차 리뷰를 Claude Code 워커에 맡길 때는 `--model claude-opus-5-5 --effort medium`으로 띄웁니다. 메인 세션이 Claude가 아닐 때만 해당합니다. 메인 세션이 Claude면 Codex 워커를 `--model gpt-6.2-sol --effort high`로 띄워 맡깁니다. Opus 워커는 같은 회사 모델이라 교차 리뷰가 되지 않습니다.
