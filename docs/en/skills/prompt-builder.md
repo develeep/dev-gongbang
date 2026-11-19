@@ -26,7 +26,7 @@ Assembles a prompt only from values gathered in the interview and proposals you 
 ## Prerequisites
 
 - If you have a draft, pass it as text, a file path, or an attachment.
-- Target model guides exist for Opus 5.5, Opus 5, Sonnet 5.5, Sonnet 5, Fable 5.2, Fable 5.1, Haiku 5.5, Haiku 4.5, GPT-6 Astra, and GPT-6.1 Sol. For other models, only the common best practices apply, with no model-specific adjustment.
+- Target model guides exist for Opus 5.5, Opus 5, Sonnet 5.5, Sonnet 5, Fable 5.2, Fable 5.1, Haiku 5.5, Haiku 4.5, GPT-6.2 Astra and Sol, GPT-6 Astra, and GPT-6.1 Sol. For other models, only the common best practices apply, with no model-specific adjustment.
 
 ## How it works
 

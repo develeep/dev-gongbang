@@ -1,6 +1,6 @@
 # GPT-6 Astra 가이드
 
-출처: https://developers.openai.com/api/docs/guides/prompt-guidance ("Using GPT-6")
+출처: https://developers.openai.com/api/docs/guides/latest-model/gpt-6-astra ("Using GPT-6")
 모델·파라미터 출처:
 - https://developers.openai.com/api/docs/guides/latest-model?model=gpt-6-astra
 - https://developers.openai.com/api/docs/models
@@ -22,7 +22,7 @@ GPT-6 문서의 프롬프트 권고는 GPT-6 Astra에서 관찰한 동작을 다
 
 ## 특성 요약
 
-- 모델 ID는 `gpt-6-astra`이다. OpenAI가 가장 어려운 작업용 주력 모델로 권한다. 비용을 낮추려면 GPT-6.1 Sol(`gpt-6.1-sol`)을, 대량·단순 작업에는 GPT-6 Luna(`gpt-6-luna`)를 권한다.
+- 모델 ID는 `gpt-6-astra`이다. 같은 계열에서 비용을 낮추려면 GPT-6.1 Sol(`gpt-6.1-sol`)을, 대량·단순 작업에는 GPT-6 Luna(`gpt-6-luna`)를 권한다. 2026-11-17에 후속 GPT-6.2 Astra(`gpt-6.2-astra`)가 나와 OpenAI의 주력 권장 모델이 바뀌었다. 모델을 바꿀 수 있는 사용자면 6.2를 검토하라고 한 줄로 알린다.
 - 컨텍스트 1.05M 토큰, 최대 출력 128K 토큰, 지식 컷오프 2026-04-30 (모델 페이지 기준).
 - reasoning effort는 `low`, `medium`, `high`, `xhigh`, `max`를 받는다. `none`은 HTTP 400 오류다. 기본값은 문서에 적혀 있지 않다.
 - reasoning effort가 `none`이 아니면 `temperature`, `top_p`, `top_logprobs`를 빼야 한다. Astra는 `none`을 받지 않으므로 항상 뺀다.
