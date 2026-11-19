@@ -57,7 +57,7 @@ The two modes differ as follows. Merging, integration checks, completion records
 | Unit of execution | One Run, a Task per ticket, blocking relations as Task deps | No matching concept. The coordinating session keeps the blocking order itself |
 | Worker | An Orca worker in a child worktree | Per ticket, one worktree-isolated workspace branched from the current branch (local ref) and one agent inside it |
 | Worker model | `--model @worker` from the agent rules | Picked by reading the descriptions of saved agent profiles. Without one, the agent rules; without those, the same provider and model as the coordinating session |
-| Detecting completion | Status checks from the orchestration skill | Waits for the completion notification. Does not poll status |
+| Detecting completion | Status checks from the orchestration skill | Waits for the completion notification. Does not poll status. A session that Paseo did not start gets no notification, so it waits with `paseo wait` and reads the result with `paseo logs` |
 | Questions, rebase requests | Pass the answer to the worker | A follow-up prompt to the same agent |
 | Resuming | The recorded Run ID | The recorded workspace ID, agent ID, and branch per ticket |
 | Cleanup | Release the worker, delete the worktree and branch | Archive the workspace (Paseo removes the worktree), then delete the branch |
