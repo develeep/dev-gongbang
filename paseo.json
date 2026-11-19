@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "check": { "command": "python3 scripts/check.py" }
+  }
+}

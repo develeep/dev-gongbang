@@ -10,13 +10,13 @@ modelRoles:
   # brief 초안 (brief-writer). 문서 산출물은 high보다 xhigh에서 품질이 오른다.
   brief: anthropic/claude-opus-5-5:xhigh
 
-  # Orca 티켓 구현 워커. extras/omp/AGENTS.md가 `--model @worker`로 띄운다.
+  # 티켓 구현 워커. Orca는 extras/omp/AGENTS.md가 `--model @worker`로 띄우고, Paseo는 extras/paseo/config.json의 ticket-worker 프로필이 같은 모델을 쓴다.
   worker: anthropic/claude-opus-5-5:medium
 
   # 어려운 구현·대규모 리팩터링 (hard-implementer)
   slow: anthropic/claude-opus-5-5:xhigh
 
-  # 일반 구현·테스트, 코드 리뷰 스킬의 하위 리뷰 (bundled task, implementer, test-writer)
+  # 일반 구현·테스트, brief 냉독 읽기, 코드 리뷰 스킬의 하위 리뷰 (bundled task, implementer, test-writer, cold-reader)
   # Sonnet 5.5는 토큰을 더 써서 작업당 비용이 Opus 5.5와 비슷하고 점수는 max에서만 앞선다.
   task: anthropic/claude-opus-5-5:medium
 
@@ -31,7 +31,7 @@ modelRoles:
   vision: openai-codex/gpt-6.1-terra:medium
 
   # 교차 리뷰 (사용자 정의 역할, bundled reviewer가 쓴다)
-  review: openai-codex/gpt-6.1-sol:high
+  review: openai-codex/gpt-6.2-sol:high
 
   # 막혔을 때 자문 (hard-implementer에만 붙인다)
   advisor: anthropic/claude-fable-5-2:high
@@ -42,7 +42,7 @@ advisor:
 
 task:
   agentModelOverrides:
-    # bundled reviewer를 다른 회사 모델(GPT-6.1 Sol) 교차 리뷰로 바꾼다.
+    # bundled reviewer를 다른 회사 모델(GPT-6.2 Sol) 교차 리뷰로 바꾼다.
     reviewer: "@review"
     # bundled security-reviewer는 세션 모델을 따르므로 Opus high로 고정한다.
     security-reviewer: anthropic/claude-opus-5-5:high
@@ -51,7 +51,7 @@ retry:
   fallbackChains:
     # 모델을 쓸 수 없을 때(한도 초과 등) 남은 턴을 이어 갈 모델. 체인이 없는 역할도 이것을 쓴다.
     default:
-      - openai-codex/gpt-6.1-sol:high
+      - openai-codex/gpt-6.2-sol:high
     # GPT를 쓸 수 없으면 리뷰와 화면 검증은 Opus로 넘긴다.
     review:
       - anthropic/claude-opus-5-5:high
