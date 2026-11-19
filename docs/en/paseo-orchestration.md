@@ -21,7 +21,7 @@ This guide sets up Paseo tools, agent profiles, a workspace script, and optional
 
 | File | Install location | Role |
 |---|---|---|
-| [`extras/paseo/config.json`](../../extras/paseo/config.json) | Merge into `~/.paseo/config.json` | The setting that gives Paseo tools to agents (`daemon.mcp.injectIntoAgents`) and 12 agent profiles, one per situation |
+| [`extras/paseo/config.json`](../../extras/paseo/config.json) | Merge into `~/.paseo/config.json` | The setting that gives Paseo tools to agents (`daemon.mcp.injectIntoAgents`) and 19 agent profiles, one per purpose |
 | [`extras/paseo/playbooks/`](../../extras/paseo/playbooks/) | `.paseo/plugins/playbooks/` in the repo where you use it | The `run-ticket` playbook that runs one ticket, and two roles (`ticket-implementer`, `ticket-reviewer`). Optional, and needs the Playbooks plugin |
 | [`paseo.json`](../../paseo.json) at the repo root | Already in this repo | This repo's workspace script `check` (`python3 scripts/check.py`). For your own repo, create one in the same format |
 
@@ -45,28 +45,37 @@ This guide sets up Paseo tools, agent profiles, a workspace script, and optional
 
 ## Profiles
 
-The session that starts an agent reads each profile's notes and picks the one that fits the situation. If no profile fits, it looks up the available providers and models, picks one, and tells you what it used.
+**One profile has one purpose.** When a single agent carries several purposes at once, such as implementing and reviewing, or drafting and verifying, the main session that receives the result cannot tell which part to check against what, so review, bug hunting, and spotting AI slop get harder. For two jobs, start two agents. When you add a profile, check first that it has one purpose.
 
-| Profile | Situation | Model · thinking |
-|---|---|---|
-| `locate` | Read-only search in a known scope, checklist of behavior before a change | Haiku 5.5 · medium |
-| `root-cause` | Tracing the cause of a bug, searching the whole repo, assessing the impact of an API change | Opus 5.5 · high |
-| `draft` | Brief drafts, documents that explain a change | Opus 5.5 · xhigh |
-| `ticket-worker` | Implementing a ticket, writing a proposed diff, cold-reading a brief | Opus 5.5 · medium |
-| `hard-implementer` | A ticket that failed twice, a large refactor, a failure with an unknown cause | Opus 5.5 · xhigh |
-| `cross-review` | Cross review by another company's model, running review skills | GPT-6.1 Sol · high |
-| `security-review` | Security review of changes to authentication, permissions, payments, or personal data | Opus 5.5 · high |
-| `ui-check` | Checking done criteria in a browser | GPT-6.1 Terra · medium |
-| `commit-pr` | Commit messages, PR descriptions | Haiku 5.5 · medium |
-| `advisor` | Assessing a plan or design, a second opinion when stuck | Fable 5.2 · high |
-| `env-setup` | Setting up agent tools and the dev environment, workspace operations | Opus 5.5 · medium |
-| `connector` | Reading material through connectors that only Claude Code has (SharePoint, Figma, and so on) | Opus 5.5 on Claude Code |
+The session that starts an agent reads each profile's notes and picks the one that fits the purpose of the job. If no profile fits, it looks up the available providers and models, picks one, and tells you what it used.
+
+| Profile | Purpose | Edits files | Model · thinking |
+|---|---|---|---|
+| `locate` | Find where existing logic lives | No | Haiku 5.5 · medium |
+| `behavior-checklist` | Write a checklist of behavior before a change | No | Haiku 5.5 · medium |
+| `root-cause` | Trace the cause of a bug or failure | No | Opus 5.5 · high |
+| `impact` | Assess the impact and risk of one given change | No | Opus 5.5 · high |
+| `brief-draft` | Draft a brief | Draft only | Opus 5.5 · xhigh |
+| `cold-read` | Cold-read a brief draft | No | Opus 5.5 · medium |
+| `change-doc` | Write a document that explains a finished change | Document only | Opus 5.5 · xhigh |
+| `ticket-worker` | Implement and commit one ticket | Yes | Opus 5.5 · medium |
+| `proposal-diff` | Write a proposed diff for one ticket | Diff only | Opus 5.5 · medium |
+| `hard-implementer` | Implement one ticket that failed twice or is a large refactor | Yes | Opus 5.5 · xhigh |
+| `cross-review` | Find bugs in a diff with another company's model | No | GPT-6.1 Sol · high |
+| `skill-review` | Run one review skill | No | GPT-6.1 Sol · high |
+| `security-review` | Find security defects | No | Opus 5.5 · high |
+| `ui-check` | Check done criteria in a browser | No | GPT-6.1 Terra · medium |
+| `commit-message` | Write a commit message | No | Haiku 5.5 · medium |
+| `pr-body` | Write a PR description | No | Haiku 5.5 · medium |
+| `advisor` | Assess one plan or design | No | Fable 5.2 · high |
+| `env-setup` | Fix one tool or environment setup problem | Settings only | Opus 5.5 · medium |
+| `connector` | Read material through Claude Code connectors (SharePoint, Figma, and so on) | No | Opus 5.5 on Claude Code |
 
 The models match the per-role models in the [omp multi-agent setup](omp-orchestration.md). Only `connector` uses the `claude` provider, with the `auto` mode. If you have not connected any connector to Claude Code, delete this profile.
 
-- `locate` has a 100K context, so give it a narrow scope. Hand a search across the whole repo to `root-cause`.
-- Starting several `cross-review` agents on the same diff repeats the same findings. Give each review a different angle.
-- `draft` only writes the draft and returns it. The session that receives the draft starts the cold reads itself with `ticket-worker`. When an agent starts agents inside itself, a stall is hard to notice.
+- `locate` and `behavior-checklist` have a 100K context, so give them a narrow scope. If the whole repo must be searched, use `root-cause` or `impact`.
+- With several review skills, start one `skill-review` per skill. If one agent runs two skills, you cannot tell which finding came from which standard.
+- `brief-draft` only writes the draft and returns it. The session that receives the draft starts `cold-read` itself. When an agent starts agents inside itself, a stall is hard to notice.
 
 ## How Paseo orchestration works
 
@@ -110,7 +119,7 @@ The playbook does not merge; you do. Running several tickets in parallel is done
 
 ## Check the setup
 
-- In a Paseo session, the profile list shows the 12 profiles in the [Profiles](#profiles) table. Ask an agent "show me the Paseo profiles" or check in Settings.
+- In a Paseo session, the profile list shows the 19 profiles in the [Profiles](#profiles) table. Ask an agent "show me the Paseo profiles" or check in Settings.
 - `paseo script ls` shows `check`.
 - The Playbooks panel shows "티켓 실행" (Run ticket) without errors.
 
