@@ -1,0 +1,170 @@
+{
+  "daemon": {
+    "mcp": {
+      "injectIntoAgents": true
+    },
+    "agentProfiles": [
+      {
+        "id": "locate",
+        "name": "로직 위치 찾기",
+        "provider": "omp",
+        "model": "anthropic/claude-haiku-5-5",
+        "modeId": "full",
+        "thinkingOptionId": "medium",
+        "notes": "기존 로직이 어느 파일의 어디에 있는지 찾아 경로와 줄로 보고한다. 컨텍스트가 100K라 범위를 좁혀서 주고, 범위가 넓으면 나눠서 여러 번 맡긴다. 파일을 고치지 않는다."
+      },
+      {
+        "id": "behavior-checklist",
+        "name": "수정 전 동작 체크리스트",
+        "provider": "omp",
+        "model": "anthropic/claude-haiku-5-5",
+        "modeId": "full",
+        "thinkingOptionId": "medium",
+        "notes": "고치기 전 코드가 지금 어떻게 동작하는지 항목별 체크리스트로 적는다. 대상 파일과 함수를 정해서 주고, 범위가 넓으면 나눠서 여러 번 맡긴다(컨텍스트 100K). 파일을 고치지 않는다."
+      },
+      {
+        "id": "root-cause",
+        "name": "원인 추적",
+        "provider": "omp",
+        "model": "anthropic/claude-opus-5-5",
+        "modeId": "full",
+        "thinkingOptionId": "high",
+        "notes": "버그나 실패의 원인을 가설로 세우고 코드와 데이터로 검증해 근거와 함께 보고한다. 원인 보고만 필요할 때 쓴다. 고치는 것까지 맡길 일이면 구현 프로필에 원인 정리부터 맡긴다."
+      },
+      {
+        "id": "impact",
+        "name": "변경 영향 산정",
+        "provider": "omp",
+        "model": "anthropic/claude-opus-5-5",
+        "modeId": "full",
+        "thinkingOptionId": "high",
+        "notes": "정해진 변경(API, 스키마, 공용 함수) 하나가 닿는 호출부와 위험을 찾아 보고한다. 다른 레포와의 계약 대조도 여기에 맡긴다. 파일을 고치지 않는다."
+      },
+      {
+        "id": "brief-draft",
+        "name": "brief 초안",
+        "provider": "omp",
+        "model": "anthropic/claude-opus-5-5",
+        "modeId": "full",
+        "thinkingOptionId": "xhigh",
+        "notes": "작업 지시서(brief) 초안을 쓰고, 그 초안의 냉독 검증까지 마쳐 돌려준다. 냉독 검증은 자기 초안을 완성하는 일이므로 나누지 않는다. 게시는 하지 않는다."
+      },
+      {
+        "id": "cold-read",
+        "name": "brief 냉독 검증",
+        "provider": "omp",
+        "model": "anthropic/claude-opus-5-5",
+        "modeId": "full",
+        "thinkingOptionId": "medium",
+        "notes": "대화 없이 brief 초안만 읽고 해석이 갈리는 문장과 빠진 정보를 보고한다. 초안을 쓴 쪽이 검증하려고 띄운다. 구현 워커와 같은 모델로 읽는다. 초안을 고치지 않는다."
+      },
+      {
+        "id": "change-doc",
+        "name": "변경 설명 문서",
+        "provider": "omp",
+        "model": "anthropic/claude-opus-5-5",
+        "modeId": "full",
+        "thinkingOptionId": "xhigh",
+        "notes": "끝난 변경을 사람이 읽을 설명 문서 하나로 쓴다. 코드는 고치지 않는다."
+      },
+      {
+        "id": "ticket-worker",
+        "name": "티켓 구현 워커",
+        "provider": "omp",
+        "model": "anthropic/claude-opus-5-5",
+        "modeId": "full",
+        "thinkingOptionId": "medium",
+        "notes": "티켓 하나를 자기 worktree에서 구현하고 완료 기준을 확인한 뒤 커밋한다. run-ticket의 병렬 실행에서 쓴다."
+      },
+      {
+        "id": "proposal-diff",
+        "name": "제안 diff 작성",
+        "provider": "omp",
+        "model": "anthropic/claude-opus-5-5",
+        "modeId": "full",
+        "thinkingOptionId": "medium",
+        "notes": "티켓 하나의 제안 diff만 만들어 돌려준다. 작업 트리에 적용하거나 커밋하지 않는다. 코드를 고치기 전에 사용자 승인이 필요한 레포에서 쓴다."
+      },
+      {
+        "id": "hard-implementer",
+        "name": "어려운 티켓 구현",
+        "provider": "omp",
+        "model": "anthropic/claude-opus-5-5",
+        "modeId": "full",
+        "thinkingOptionId": "xhigh",
+        "notes": "앞선 구현이 실패해 올라온 티켓(서브에이전트 구현 두 번 실패, 구현 워커 한 번 실패), 여러 파일에 걸친 리팩터링 티켓, 원인을 모르는 실패를 고쳐야 하는 티켓 하나를 원인 정리부터 구현까지 맡는다. 앞선 실패 보고를 모두 넘긴다."
+      },
+      {
+        "id": "cross-review",
+        "name": "교차 리뷰",
+        "provider": "omp",
+        "model": "openai-codex/gpt-6.2-sol",
+        "modeId": "full",
+        "thinkingOptionId": "high",
+        "notes": "Claude가 구현한 diff에서 버그를 찾아 보고한다. 구현한 모델과 다른 회사 모델의 눈으로 보는 것이 목적이라, 구현한 모델이 Claude가 아니면 이 프로필을 쓰지 않는다. 파일을 고치지 않는다."
+      },
+      {
+        "id": "skill-review",
+        "name": "리뷰 스킬 실행",
+        "provider": "omp",
+        "model": "openai-codex/gpt-6.2-sol",
+        "modeId": "full",
+        "thinkingOptionId": "high",
+        "notes": "리뷰 스킬 하나를 정해진 diff에 실행하고 그 스킬의 형식대로 보고한다. 에이전트 하나에 스킬 하나만 맡긴다. 파일을 고치지 않는다."
+      },
+      {
+        "id": "security-review",
+        "name": "보안 리뷰",
+        "provider": "omp",
+        "model": "anthropic/claude-opus-5-5",
+        "modeId": "full",
+        "thinkingOptionId": "high",
+        "notes": "인증, 권한, 결제, 개인정보를 다루는 변경의 보안 결함을 찾아 보고한다. 파일을 고치지 않는다. Claude 모델이라 교차 리뷰로는 치지 않는다."
+      },
+      {
+        "id": "ui-check",
+        "name": "화면 확인",
+        "provider": "omp",
+        "model": "openai-codex/gpt-6.1-terra",
+        "modeId": "full",
+        "thinkingOptionId": "medium",
+        "notes": "브라우저로 화면을 열어 주어진 완료 기준을 항목별로 통과, 실패, 확인 불가로 보고한다. 로그인은 사용자가 직접 한다. 파일을 고치지 않는다."
+      },
+      {
+        "id": "pr-body",
+        "name": "PR 본문",
+        "provider": "omp",
+        "model": "anthropic/claude-haiku-5-5",
+        "modeId": "full",
+        "thinkingOptionId": "medium",
+        "notes": "PR 본문을 쓴다. diff 전문 대신 brief, 변경 파일 목록, 완료 기록, 리뷰 기록을 준다. PR을 만들거나 push하지 않는다. 커밋 메시지는 변경을 만든 세션이 직접 쓴다."
+      },
+      {
+        "id": "advisor",
+        "name": "계획·설계 자문",
+        "provider": "omp",
+        "model": "anthropic/claude-fable-5-2",
+        "modeId": "full",
+        "thinkingOptionId": "high",
+        "notes": "계획이나 설계 하나를 평가해 권고와 근거를 보고한다. 파일을 고치지 않는다."
+      },
+      {
+        "id": "env-setup",
+        "name": "도구·환경 설정",
+        "provider": "omp",
+        "model": "anthropic/claude-opus-5-5",
+        "modeId": "full",
+        "thinkingOptionId": "medium",
+        "notes": "에이전트 도구나 개발 환경의 설정 문제 하나를 고치고, 바꾼 설정과 확인한 결과를 보고한다. 제품 코드는 고치지 않는다."
+      },
+      {
+        "id": "connector",
+        "name": "커넥터 읽기",
+        "provider": "claude",
+        "model": "claude-opus-5-5",
+        "modeId": "auto",
+        "notes": "Claude Code에만 연결된 커넥터(SharePoint·OneDrive 기획서, Figma 등)에서 정해진 자료를 읽어 내용을 돌려준다. 분석이나 구현은 맡기지 않는다. 레포 파일을 고치지 않는다."
+      }
+    ]
+  }
+}
