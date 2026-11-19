@@ -10,6 +10,7 @@ This guide sets up Paseo tools, agent profiles, a workspace script, and optional
 
 - [Files](#files)
 - [Install](#install)
+- [Profiles](#profiles)
 - [How Paseo orchestration works](#how-paseo-orchestration-works)
 - [Run one ticket with a playbook](#run-one-ticket-with-a-playbook)
 - [Using it with Orca](#using-it-with-orca)
@@ -20,14 +21,14 @@ This guide sets up Paseo tools, agent profiles, a workspace script, and optional
 
 | File | Install location | Role |
 |---|---|---|
-| [`extras/paseo/config.json`](../../extras/paseo/config.json) | Merge into `~/.paseo/config.json` | The setting that gives Paseo tools to agents (`daemon.mcp.injectIntoAgents`) and two agent profiles (`ticket-worker`, `cross-review`) |
+| [`extras/paseo/config.json`](../../extras/paseo/config.json) | Merge into `~/.paseo/config.json` | The setting that gives Paseo tools to agents (`daemon.mcp.injectIntoAgents`) and 12 agent profiles, one per situation |
 | [`extras/paseo/playbooks/`](../../extras/paseo/playbooks/) | `.paseo/plugins/playbooks/` in the repo where you use it | The `run-ticket` playbook that runs one ticket, and two roles (`ticket-implementer`, `ticket-reviewer`). Optional, and needs the Playbooks plugin |
 | [`paseo.json`](../../paseo.json) at the repo root | Already in this repo | This repo's workspace script `check` (`python3 scripts/check.py`). For your own repo, create one in the same format |
 
 ## Install
 
 1. **Turn on Paseo tools**: turn on Enable Paseo tools in Settings → host → Agents, or put `daemon.mcp.injectIntoAgents: true` in `~/.paseo/config.json`. After turning it on, start a new agent or reload an existing one so it gets the tools.
-2. **Profiles**: merge the `daemon.agentProfiles` entries of `extras/paseo/config.json` into the same key of `~/.paseo/config.json`, then run `paseo reload`. Do not overwrite the existing file. Profiles take effect without restarting the daemon. You can also create them with the same values in Settings → host → Agents → Agent profiles. The profiles use the omp provider, so the omp provider must be enabled. If you use another provider, change `provider`, `model`, `modeId`, and `thinkingOptionId` to that provider's values. List the available providers with `paseo provider ls` and their models with `paseo provider models <provider>`.
+2. **Profiles**: merge the `daemon.agentProfiles` entries of `extras/paseo/config.json` into the same key of `~/.paseo/config.json`, then run `paseo reload`. Do not overwrite the existing file. Profiles take effect without restarting the daemon. You can also create them with the same values in Settings → host → Agents → Agent profiles. Every profile except `connector` uses the omp provider, so the omp provider must be enabled. If you use another provider, change `provider`, `model`, `modeId`, and `thinkingOptionId` to that provider's values. List the available providers with `paseo provider ls` and their models with `paseo provider models <provider>`.
 3. **Playbooks (optional)**: install the plugin with `paseo plugin add lerenn/playbooks`, then run the command below in the repo where you use it and commit. Starting from the Playbooks panel with "Start in a new workspace" runs it in a worktree branched from the current commit.
 
    ```bash
@@ -41,6 +42,31 @@ This guide sets up Paseo tools, agent profiles, a workspace script, and optional
    ```
 
    List scripts with `paseo script ls` and run it with `paseo script start check`.
+
+## Profiles
+
+The session that starts an agent reads each profile's notes and picks the one that fits the situation. If no profile fits, it looks up the available providers and models, picks one, and tells you what it used.
+
+| Profile | Situation | Model · thinking |
+|---|---|---|
+| `locate` | Read-only search in a known scope, checklist of behavior before a change | Haiku 5.5 · medium |
+| `root-cause` | Tracing the cause of a bug, searching the whole repo, assessing the impact of an API change | Opus 5.5 · high |
+| `draft` | Brief drafts, documents that explain a change | Opus 5.5 · xhigh |
+| `ticket-worker` | Implementing a ticket, writing a proposed diff, cold-reading a brief | Opus 5.5 · medium |
+| `hard-implementer` | A ticket that failed twice, a large refactor, a failure with an unknown cause | Opus 5.5 · xhigh |
+| `cross-review` | Cross review by another company's model, running review skills | GPT-6.1 Sol · high |
+| `security-review` | Security review of changes to authentication, permissions, payments, or personal data | Opus 5.5 · high |
+| `ui-check` | Checking done criteria in a browser | GPT-6.1 Terra · medium |
+| `commit-pr` | Commit messages, PR descriptions | Haiku 5.5 · medium |
+| `advisor` | Assessing a plan or design, a second opinion when stuck | Fable 5.2 · high |
+| `env-setup` | Setting up agent tools and the dev environment, workspace operations | Opus 5.5 · medium |
+| `connector` | Reading material through connectors that only Claude Code has (SharePoint, Figma, and so on) | Opus 5.5 on Claude Code |
+
+The models match the per-role models in the [omp multi-agent setup](omp-orchestration.md). Only `connector` uses the `claude` provider, with the `auto` mode. If you have not connected any connector to Claude Code, delete this profile.
+
+- `locate` has a 100K context, so give it a narrow scope. Hand a search across the whole repo to `root-cause`.
+- Starting several `cross-review` agents on the same diff repeats the same findings. Give each review a different angle.
+- `draft` only writes the draft and returns it. The session that receives the draft starts the cold reads itself with `ticket-worker`. When an agent starts agents inside itself, a stall is hard to notice.
 
 ## How Paseo orchestration works
 
@@ -84,7 +110,7 @@ The playbook does not merge; you do. Running several tickets in parallel is done
 
 ## Check the setup
 
-- In a Paseo session, the profile list shows `ticket-worker` and `cross-review`. Ask an agent "show me the Paseo profiles" or check in Settings.
+- In a Paseo session, the profile list shows the 12 profiles in the [Profiles](#profiles) table. Ask an agent "show me the Paseo profiles" or check in Settings.
 - `paseo script ls` shows `check`.
 - The Playbooks panel shows "티켓 실행" (Run ticket) without errors.
 

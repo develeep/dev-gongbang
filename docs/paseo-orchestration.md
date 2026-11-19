@@ -10,6 +10,7 @@
 
 - [파일 구성](#파일-구성)
 - [설치](#설치)
+- [프로필](#프로필)
 - [Paseo 오케스트레이션 방식](#paseo-오케스트레이션-방식)
 - [플레이북으로 티켓 하나 실행하기](#플레이북으로-티켓-하나-실행하기)
 - [Orca와 함께 쓰기](#orca와-함께-쓰기)
@@ -20,14 +21,14 @@
 
 | 파일 | 설치 위치 | 역할 |
 |---|---|---|
-| [`extras/paseo/config.json`](../extras/paseo/config.json) | `~/.paseo/config.json`에 합침 | Paseo 도구를 에이전트에 주는 설정(`daemon.mcp.injectIntoAgents`)과 에이전트 프로필 2개(`ticket-worker`, `cross-review`) |
+| [`extras/paseo/config.json`](../extras/paseo/config.json) | `~/.paseo/config.json`에 합침 | Paseo 도구를 에이전트에 주는 설정(`daemon.mcp.injectIntoAgents`)과 상황별 에이전트 프로필 12개 |
 | [`extras/paseo/playbooks/`](../extras/paseo/playbooks/) | 쓰려는 레포의 `.paseo/plugins/playbooks/` | 티켓 하나를 실행하는 플레이북 `run-ticket`과 역할 2개(`ticket-implementer`, `ticket-reviewer`). 선택 사항이고 Playbooks 플러그인이 필요합니다 |
 | 레포 루트 [`paseo.json`](../paseo.json) | 이 레포에 있음 | 이 레포의 워크스페이스 스크립트 `check`(`python3 scripts/check.py`). 자기 레포에는 같은 형식으로 직접 만듭니다 |
 
 ## 설치
 
 1. **Paseo 도구 켜기**: Settings → 호스트 → Agents에서 Enable Paseo tools를 켜거나, `~/.paseo/config.json`에 `daemon.mcp.injectIntoAgents: true`를 넣습니다. 켠 뒤 새 에이전트를 시작하거나 기존 에이전트를 다시 불러와야 도구를 받습니다.
-2. **프로필**: `extras/paseo/config.json`의 `daemon.agentProfiles` 항목을 `~/.paseo/config.json`의 같은 키에 합치고 `paseo reload`를 실행합니다. 기존 파일을 덮어쓰지 않습니다. 프로필은 데몬을 재시작하지 않아도 반영됩니다. Settings → 호스트 → Agents → Agent profiles에서 같은 값으로 직접 만들어도 됩니다. 프로필의 provider는 omp이므로 omp provider가 켜져 있어야 합니다. 다른 provider를 쓰면 `provider`, `model`, `modeId`, `thinkingOptionId`를 그 provider의 값으로 바꿉니다. 쓸 수 있는 provider는 `paseo provider ls`로, 모델은 `paseo provider models <provider>`로 확인합니다.
+2. **프로필**: `extras/paseo/config.json`의 `daemon.agentProfiles` 항목을 `~/.paseo/config.json`의 같은 키에 합치고 `paseo reload`를 실행합니다. 기존 파일을 덮어쓰지 않습니다. 프로필은 데몬을 재시작하지 않아도 반영됩니다. Settings → 호스트 → Agents → Agent profiles에서 같은 값으로 직접 만들어도 됩니다. `connector`를 뺀 프로필의 provider는 omp이므로 omp provider가 켜져 있어야 합니다. 다른 provider를 쓰면 `provider`, `model`, `modeId`, `thinkingOptionId`를 그 provider의 값으로 바꿉니다. 쓸 수 있는 provider는 `paseo provider ls`로, 모델은 `paseo provider models <provider>`로 확인합니다.
 3. **플레이북(선택)**: `paseo plugin add lerenn/playbooks`로 플러그인을 설치하고, 쓰려는 레포에서 아래 명령을 실행한 뒤 커밋합니다. Playbooks 패널에서 "Start in a new workspace"로 시작하면 현재 커밋에서 갈라진 worktree에서 실행됩니다.
 
    ```bash
@@ -41,6 +42,31 @@
    ```
 
    `paseo script ls`로 목록을 보고 `paseo script start check`로 실행합니다.
+
+## 프로필
+
+에이전트를 띄우는 세션은 프로필마다 설명을 읽고 상황에 맞는 것을 고릅니다. 맞는 프로필이 없으면 쓸 수 있는 provider와 모델을 조회해 고르고, 무엇으로 띄웠는지 알립니다.
+
+| 프로필 | 상황 | 모델 · thinking |
+|---|---|---|
+| `locate` | 범위가 정해진 읽기 전용 탐색, 수정 전 동작 체크리스트 | Haiku 5.5 · medium |
+| `root-cause` | 버그 원인 추적, 저장소 전체 탐색, API 변경의 영향 산정 | Opus 5.5 · high |
+| `draft` | 작업 지시서(brief) 초안, 변경 설명 문서 | Opus 5.5 · xhigh |
+| `ticket-worker` | 티켓 구현, 제안 diff 작성, brief 냉독 검증 | Opus 5.5 · medium |
+| `hard-implementer` | 두 번 실패한 티켓, 큰 리팩터링, 원인을 모르는 실패 | Opus 5.5 · xhigh |
+| `cross-review` | 다른 회사 모델의 교차 리뷰, 리뷰 스킬 실행 | GPT-6.1 Sol · high |
+| `security-review` | 인증, 권한, 결제, 개인정보 변경의 보안 리뷰 | Opus 5.5 · high |
+| `ui-check` | 브라우저로 완료 기준 확인 | GPT-6.1 Terra · medium |
+| `commit-pr` | 커밋 메시지, PR 본문 | Haiku 5.5 · medium |
+| `advisor` | 계획과 설계 평가, 막혔을 때의 두 번째 의견 | Fable 5.2 · high |
+| `env-setup` | 에이전트 도구와 개발 환경 설정, 워크스페이스 조작 | Opus 5.5 · medium |
+| `connector` | Claude Code에만 연결된 커넥터(SharePoint, Figma 등)로 자료 읽기 | Claude Code의 Opus 5.5 |
+
+모델은 [omp 멀티에이전트 설정](omp-orchestration.md)의 역할별 모델과 같게 두었습니다. `connector`만 provider가 `claude`이고 모드는 `auto`입니다. Claude Code에 커넥터를 연결해 두지 않았으면 이 프로필을 지웁니다.
+
+- `locate`는 컨텍스트가 100K라 범위를 좁혀 맡깁니다. 저장소 전체를 훑는 탐색은 `root-cause`에 맡깁니다.
+- `cross-review`를 같은 diff에 여러 개 띄우면 같은 지적이 되풀이됩니다. 리뷰마다 보는 관점을 다르게 줍니다.
+- `draft`는 초안만 쓰고 돌려줍니다. 냉독 검증은 초안을 받은 세션이 `ticket-worker`로 직접 띄웁니다. 에이전트가 안에서 다시 에이전트를 띄우면 멈춘 것을 알아차리기 어렵습니다.
 
 ## Paseo 오케스트레이션 방식
 
@@ -84,7 +110,7 @@ run-ticket은 여러 티켓을 실행할 때 워커 도구를 다음 순서로 �
 
 ## 확인하기
 
-- Paseo 세션에서 프로필 조회에 `ticket-worker`와 `cross-review`가 보이는지. 에이전트에게 "Paseo 프로필을 보여 줘"라고 묻거나 Settings에서 확인합니다.
+- Paseo 세션에서 프로필 조회에 [프로필](#프로필) 표의 12개가 보이는지. 에이전트에게 "Paseo 프로필을 보여 줘"라고 묻거나 Settings에서 확인합니다.
 - `paseo script ls`에 `check`가 보이는지
 - Playbooks 패널에 "티켓 실행"이 오류 없이 보이는지
 

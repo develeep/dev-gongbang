@@ -5,13 +5,49 @@
     },
     "agentProfiles": [
       {
+        "id": "locate",
+        "name": "로직 위치 찾기",
+        "provider": "omp",
+        "model": "anthropic/claude-haiku-5-5",
+        "modeId": "full",
+        "thinkingOptionId": "medium",
+        "notes": "범위가 정해진 읽기 전용 탐색. 파일이나 함수 몇 개 안에서 기존 로직의 위치와 동작을 찾거나, 수정 전 동작 체크리스트를 만들 때 쓴다. 컨텍스트가 100K라 저장소 전체를 훑는 탐색과 원인 추적에는 쓰지 않는다."
+      },
+      {
+        "id": "root-cause",
+        "name": "원인 추적",
+        "provider": "omp",
+        "model": "anthropic/claude-opus-5-5",
+        "modeId": "full",
+        "thinkingOptionId": "high",
+        "notes": "버그 원인 추적, 저장소 전체에 걸친 전수 탐색, API 변경의 영향과 위험 산정, 다른 레포와의 계약 대조. 가설을 세우고 코드와 데이터로 검증해 근거와 함께 보고한다. 파일을 고치지 않는다."
+      },
+      {
+        "id": "draft",
+        "name": "문서 초안",
+        "provider": "omp",
+        "model": "anthropic/claude-opus-5-5",
+        "modeId": "full",
+        "thinkingOptionId": "xhigh",
+        "notes": "작업 지시서(brief) 초안, 변경 설명 문서처럼 사람이나 다른 에이전트가 그대로 읽고 일할 문서를 쓸 때 쓴다. 초안만 쓰고 돌려준다. 냉독 검증 같은 하위 에이전트는 띄우지 않는다."
+      },
+      {
         "id": "ticket-worker",
         "name": "티켓 구현 워커",
         "provider": "omp",
         "model": "anthropic/claude-opus-5-5",
         "modeId": "full",
         "thinkingOptionId": "medium",
-        "notes": "티켓 구현 워커. run-ticket의 병렬 실행에서 티켓 하나를 자기 worktree에서 구현하고 커밋할 때 쓴다."
+        "notes": "명세가 분명한 구현. run-ticket의 병렬 실행에서 티켓 하나를 자기 worktree에서 구현하고 커밋할 때, 제안 diff만 만들 때, brief 냉독 검증에 쓴다."
+      },
+      {
+        "id": "hard-implementer",
+        "name": "어려운 구현·디버깅",
+        "provider": "omp",
+        "model": "anthropic/claude-opus-5-5",
+        "modeId": "full",
+        "thinkingOptionId": "xhigh",
+        "notes": "티켓 구현 워커가 두 번 실패한 티켓, 여러 파일에 걸친 큰 리팩터링, 통합 검증 실패처럼 원인을 모르는 실패를 고칠 때 쓴다. 앞선 실패 보고를 모두 넘긴다."
       },
       {
         "id": "cross-review",
@@ -20,7 +56,60 @@
         "model": "openai-codex/gpt-6.1-sol",
         "modeId": "full",
         "thinkingOptionId": "high",
-        "notes": "교차 리뷰. Claude가 구현한 변경을 다른 회사 모델로 리뷰할 때 쓴다. 파일을 고치지 않고 지적만 보고한다."
+        "notes": "Claude가 구현한 변경을 다른 회사 모델로 리뷰할 때와 리뷰 스킬(code-review 등)을 실행할 때 쓴다. 파일을 고치지 않고 지적만 보고한다. 같은 diff에 이 프로필을 여러 개 띄우면 같은 지적이 되풀이되므로, 리뷰마다 보는 관점을 다르게 준다."
+      },
+      {
+        "id": "security-review",
+        "name": "보안 리뷰",
+        "provider": "omp",
+        "model": "anthropic/claude-opus-5-5",
+        "modeId": "full",
+        "thinkingOptionId": "high",
+        "notes": "인증, 권한, 결제, 개인정보를 다루는 변경의 보안 리뷰. 파일을 고치지 않는다. Claude 모델이라 Claude가 구현한 변경의 교차 리뷰로는 치지 않는다."
+      },
+      {
+        "id": "ui-check",
+        "name": "화면 확인",
+        "provider": "omp",
+        "model": "openai-codex/gpt-6.1-terra",
+        "modeId": "full",
+        "thinkingOptionId": "medium",
+        "notes": "브라우저로 화면을 열어 완료 기준을 항목별로 확인한다. 로그인은 사용자가 직접 하고, 저장이나 결제처럼 데이터를 바꾸는 동작은 지시받은 것만 한다. 파일을 고치지 않는다."
+      },
+      {
+        "id": "commit-pr",
+        "name": "커밋·PR 글",
+        "provider": "omp",
+        "model": "anthropic/claude-haiku-5-5",
+        "modeId": "full",
+        "thinkingOptionId": "medium",
+        "notes": "커밋 메시지와 PR 본문. diff 전문 대신 brief, 변경 파일 목록, 완료 기록, 리뷰 기록을 넘긴다. 레포 커밋 규칙 파일 경로를 함께 준다."
+      },
+      {
+        "id": "advisor",
+        "name": "자문",
+        "provider": "omp",
+        "model": "anthropic/claude-fable-5-2",
+        "modeId": "full",
+        "thinkingOptionId": "high",
+        "notes": "계획과 설계 평가, 선택지 비교, 구현이 막혔을 때의 두 번째 의견. 파일을 고치지 않는다. 다른 회사 모델의 관점이 필요하면 교차 리뷰 프로필을 쓴다."
+      },
+      {
+        "id": "env-setup",
+        "name": "도구·환경 설정",
+        "provider": "omp",
+        "model": "anthropic/claude-opus-5-5",
+        "modeId": "full",
+        "thinkingOptionId": "medium",
+        "notes": "에이전트 도구와 개발 환경 설정, 연결 문제, 워크스페이스와 브랜치 조작처럼 제품 코드를 고치지 않는 작업. 바꾼 설정과 확인한 결과를 함께 보고한다."
+      },
+      {
+        "id": "connector",
+        "name": "커넥터 읽기",
+        "provider": "claude",
+        "model": "claude-opus-5-5",
+        "modeId": "auto",
+        "notes": "Claude Code에만 연결된 커넥터(SharePoint·OneDrive 기획서, Figma 등)로 자료를 읽어 와야 할 때 쓴다. 읽은 내용을 정리해 돌려주고 레포 파일은 고치지 않는다."
       }
     ]
   }
