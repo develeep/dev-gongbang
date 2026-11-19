@@ -47,7 +47,7 @@ mod는 `mods/<플러그인 이름>/`에 두고 `marketplace.json`에 따로 등�
 
 ## Extras
 
-`extras/<이름>/`에는 플러그인에 넣을 수 없어 사용자가 직접 설치하는 파일을 둔다. 지금은 `statusline/`, mod 환경을 한 번에 설정하는 `setup.sh`, omp 역할·에이전트·위임 규칙인 `omp/`가 있다. mod나 외부 mod 목록이 바뀌면 `setup.sh`도 고친다. 버전을 매기지 않고, 설치 방법과 동작은 `statusline/`과 `setup.sh`는 `docs/mods.md`에, `omp/`는 `docs/omp-orchestration.md`에 적고 영어판(`docs/en/`)도 함께 고친다.
+`extras/<이름>/`에는 플러그인에 넣을 수 없어 사용자가 직접 설치하는 파일을 둔다. 지금은 `statusline/`, mod 환경을 한 번에 설정하는 `setup.sh`, omp 역할·에이전트·위임 규칙인 `omp/`, Paseo 에이전트 프로필과 플레이북인 `paseo/`가 있다. mod나 외부 mod 목록이 바뀌면 `setup.sh`도 고친다. 버전을 매기지 않고, 설치 방법과 동작은 `statusline/`과 `setup.sh`는 `docs/mods.md`에, `omp/`는 `docs/omp-orchestration.md`에, `paseo/`는 `docs/paseo-orchestration.md`에 적고 영어판(`docs/en/`)도 함께 고친다. `paseo/playbooks/`를 고치면 `.paseo/plugins/playbooks/`에 복사해 Paseo의 플레이북 검증으로 오류가 없는지 확인한 뒤 복사본을 지운다.
 
 ## 릴리스
 

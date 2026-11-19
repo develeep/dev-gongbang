@@ -1,0 +1,27 @@
+{
+  "daemon": {
+    "mcp": {
+      "injectIntoAgents": true
+    },
+    "agentProfiles": [
+      {
+        "id": "ticket-worker",
+        "name": "티켓 구현 워커",
+        "provider": "omp",
+        "model": "anthropic/claude-opus-5-5",
+        "modeId": "full",
+        "thinkingOptionId": "medium",
+        "notes": "티켓 구현 워커. run-ticket의 병렬 실행에서 티켓 하나를 자기 worktree에서 구현하고 커밋할 때 쓴다."
+      },
+      {
+        "id": "cross-review",
+        "name": "교차 리뷰",
+        "provider": "omp",
+        "model": "openai-codex/gpt-6.1-sol",
+        "modeId": "full",
+        "thinkingOptionId": "high",
+        "notes": "교차 리뷰. Claude가 구현한 변경을 다른 회사 모델로 리뷰할 때 쓴다. 파일을 고치지 않고 지적만 보고한다."
+      }
+    ]
+  }
+}

@@ -10,7 +10,7 @@ modelRoles:
   # brief 초안 (brief-writer). 문서 산출물은 high보다 xhigh에서 품질이 오른다.
   brief: anthropic/claude-opus-5-5:xhigh
 
-  # Orca 티켓 구현 워커. extras/omp/AGENTS.md가 `--model @worker`로 띄운다.
+  # 티켓 구현 워커. Orca는 extras/omp/AGENTS.md가 `--model @worker`로 띄우고, Paseo는 extras/paseo/config.json의 ticket-worker 프로필이 같은 모델을 쓴다.
   worker: anthropic/claude-opus-5-5:medium
 
   # 어려운 구현·대규모 리팩터링 (hard-implementer)
