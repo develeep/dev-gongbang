@@ -25,16 +25,17 @@
 | 작업 | 에이전트 |
 |---|---|
 | 코드 탐색·검색 | scout |
-| brief 초안 작성 (set-brief의 입력 수집, 초안, 냉독 검증) | brief-writer |
+| brief 초안 작성 (set-brief의 입력 수집, 초안) | brief-writer |
 | brief 냉독 검증 | implementer |
 | 명세가 분명한 티켓 구현 | implementer |
-| implementer가 2회 실패한 티켓, 대규모 리팩터링, 원인을 모르는 실패의 디버깅 | hard-implementer |
+| implementer가 2회 실패한 티켓, 대규모 리팩터링 티켓의 구현 | hard-implementer |
+| 원인을 모르는 실패의 원인 추적 (고치지 않음) | debugger |
 | 테스트 작성·실행 | test-writer |
 | UI·화면 검증 | ui-checker |
 | 교차 리뷰 | reviewer |
 | 코드 리뷰 스킬이 띄우는 하위 리뷰 | task |
 | 보안·인증·결제 등 핵심 로직 리뷰 | security-reviewer |
-| PR 설명·커밋 메시지 | doc-writer |
+| PR 설명 | doc-writer |
 
 티켓이 처음부터 hard-implementer 행에 해당하면 implementer를 거치지 않고 바로 맡깁니다. run-ticket의 차례 실행에서 티켓마다 띄우는 서브에이전트도 이 표의 구현 에이전트로 띄웁니다.
 
@@ -45,7 +46,8 @@ reviewer는 다른 회사 모델이므로 교차 리뷰에만 씁니다. 코드 
 ## 넘기는 것
 
 - 구현·테스트·UI 에이전트에는 대화 기록 대신 brief와 티켓 하나의 전문, 레포 규칙 파일 경로, 검증 명령, 같은 brief의 done 티켓 `## 산출물`을 넘깁니다. 서브에이전트는 `AGENTS.md`를 받지 않으므로 넘기지 않은 규칙은 모릅니다. brief를 프롬프트 맨 앞에 두면 같은 brief로 여러 티켓을 맡길 때 캐시를 다시 씁니다.
-- brief-writer에는 냉독 검증을 implementer로 띄우라고 함께 알립니다.
+- brief-writer에는 초안만 맡깁니다. 냉독 검증은 메인 세션이 implementer 3개를 직접 띄웁니다. brief-writer가 안에서 띄우면 멈춰도 메인 세션이 알아차리지 못합니다.
+- 커밋 메시지는 메인 세션이 레포 커밋 규칙대로 씁니다.
 - 리뷰 에이전트에는 리뷰할 diff 범위와 brief를 넘깁니다. diff가 272K 토큰(약 1MB)을 넘으면 디렉터리별로 나눠 맡깁니다. GPT는 입력이 272K 토큰을 넘으면 입력 단가가 2배, 출력 단가가 1.5배가 됩니다. 나눌 때는 디렉터리를 넘는 공유 타입, API, 설정을 리뷰마다 함께 넘기고, 디렉터리 경계를 넘는 결함은 메인 세션이 봅니다.
 - doc-writer에는 diff 전문 대신 brief, 변경 파일 목록(`git diff --stat`), 티켓 완료 기록, 리뷰 기록을 넘깁니다.
 
