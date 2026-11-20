@@ -4,7 +4,7 @@
 
 # run-ticket
 
-Implements and reviews one ticket made by set-ticket in a new session, then updates the ticket status and the brief checkboxes. It works without the conversation that made the brief, using only the brief, the ticket, and the completion records of earlier tickets. It does not commit. If you ask for several tickets and two or more of them can start together, it runs them in parallel with Paseo or Orca workers, one worktree per ticket, and only then commits to ticket branches and merges them.
+Implements and reviews one ticket made by set-ticket in a new session, then updates the ticket status and the brief checkboxes. It works without the conversation that made the brief, using only the brief, the ticket, and the completion records of earlier tickets. It does not commit. If you ask for several tickets and two or more of them can start together, it runs them in parallel with Orca or Paseo workers, one worktree per ticket, and only then commits to ticket branches and merges them.
 
 > This skill is in progress. Install `gongbang-dev` to use it. Its behavior may change.
 
@@ -21,7 +21,7 @@ Implements and reviews one ticket made by set-ticket in a new session, then upda
 
 - Run the tickets split with set-ticket one at a time.
 - Run a small brief that was not split into tickets. The whole brief is treated as one ticket.
-- Run several tickets at once, as in "all remaining tickets". If Paseo or Orca is available and two or more tickets can start together, it runs them in parallel; otherwise, in order.
+- Run several tickets at once, as in "all remaining tickets". If Orca or Paseo is available and two or more tickets can start together, it runs them in parallel; otherwise, in order.
 
 ## Prerequisites
 
@@ -29,9 +29,9 @@ Implements and reviews one ticket made by set-ticket in a new session, then upda
 - For GitHub tickets, the `gh` CLI must be logged in.
 - If the working tree has changes outside the brief and tickets, it asks whether to commit them before continuing. If you continue as is, earlier changes get mixed into the review. Changes that are not in any finished ticket's changed-file list may be the unfinished work of an interrupted ticket, so it shows them separately and asks whether to revert them or keep building on them.
 - To run several tickets in parallel, it needs a tool to start workers. It uses the first one available in the order below; if neither is, it runs them in order. If you name a tool, it uses that one.
-  1. Paseo: the session must be running in Paseo with the Paseo tools enabled, or the `paseo` CLI must work. For setup, see [Paseo orchestration setup](../paseo-orchestration.md).
-  2. Orca: Orca must be running and the `orchestration` skill installed.
-- The cross review is a review by a model from a different company than the model that implemented the change. The implementing model is the model of the agent or worker the implementation was handed to, or this session's model if this session implemented it. The cross review needs one of: a review agent on another company's model (for example, the reviewer in the [omp multi-agent setup](../omp-orchestration.md)), Paseo, or Orca. If none is available, it skips the cross review and says so in the report. If the review agent turns out to run on the same company's model as the implementing model, it hands the review to the next method (Paseo, then Orca).
+  1. Orca: Orca must be running and the `orchestration` skill installed. For setup, see [Orca orchestration setup](../orca-orchestration.md).
+  2. Paseo: the session must be running in Paseo with the Paseo tools enabled, or the `paseo` CLI must work. For setup, see [Paseo orchestration setup](../paseo-orchestration.md).
+- The cross review is a review by a model from a different company than the model that implemented the change. The implementing model is the model of the agent or worker the implementation was handed to, or this session's model if this session implemented it. The cross review needs one of: a review agent on another company's model (for example, the reviewer in the [omp multi-agent setup](../omp-orchestration.md)), Orca, or Paseo. If none is available, it skips the cross review and says so in the report. If the review agent turns out to run on the same company's model as the implementing model, it hands the review to the next method (Orca, then Paseo).
 
 ## How it works
 
@@ -39,14 +39,14 @@ Implements and reviews one ticket made by set-ticket in a new session, then upda
 2. It reads the ticket, the full brief, the completion records of finished tickets in the same brief, and the repo's CLAUDE.md and AGENTS.md.
 3. It implements "만들 것" (what to build). If the agent rules name an agent for implementing tickets, it hands over the brief, the ticket, the repo rules path, the verification commands, and earlier tickets' output artifacts. It does not fix problems outside the ticket's scope and leaves them in the report.
 4. It checks each done criterion with a command or observation. If the implementation was handed to an agent, this session checks again even when that agent reports a pass, so that a pass report is not taken on trust. If the agent rules name a UI-check agent, criteria that must be seen on screen go to it. If one fails, it fixes it. If it cannot fix it, it first follows the failure handling in the agent rules (handing it over again, moving it up to another agent); if it still fails, it reports the agents tried and the attempt count, and stops.
-5. It reviews. It runs the code review (the first method that applies in this order: the review skill named in the repo rules, the `code-review` skill, its own review), a check-guidelines rule check, and a cross review by another company's model together, and writes the completion record only after it has all the results. The cross review goes to the first method that works in this order: the agent named in the agent rules, an agent on another company's model started with Paseo, an Orca worker. If the model that actually ran the cross review is from the same company as the implementing model, it hands the review to the next method, and reports it as skipped only when no method is left. If the change touches authentication, authorization, payments, or personal data and the agent rules name a security review agent, it also hands the change to a security review.
+5. It reviews. It runs the code review (the first method that applies in this order: the review skill named in the repo rules, the `code-review` skill, its own review), a check-guidelines rule check, and a cross review by another company's model together, and writes the completion record only after it has all the results. The cross review goes to the first method that works in this order: the agent named in the agent rules, an Orca worker on another company's model started in this worktree, an agent on another company's model started with Paseo. If the model that actually ran the cross review is from the same company as the implementing model, it hands the review to the next method, and reports it as skipped only when no method is left. If the change touches authentication, authorization, payments, or personal data and the agent rules name a security review agent, it also hands the change to a security review.
 6. It sets the ticket status to done or closes the issue, updates the brief checkboxes, and leaves a completion record. If the repo rules or the run-flow state file define a different completion status, it writes that value instead of done. For the last ticket, it runs the brief's "확인 기준" (verification criteria) and closes the brief. In a multi-ticket run, it does this once after the integrated review.
 
 If the ticket and the repo rules conflict, it asks before continuing. The priority is: the ticket's "하면 안 되는 것" (what not to do) and "작업 경계" (work boundaries), then the repo rules, then the skill's default behavior.
 
 ### Running multiple tickets
 
-If you ask for a number range or "all remaining tickets", the method differs. If two or more tickets can start together, no ticket shares an integration branch, and a tool to start workers is available (Paseo, then Orca), it runs the parallel run; if any of these is not true, it runs sequentially.
+If you ask for a number range or "all remaining tickets", the method differs. If two or more tickets can start together, no ticket shares an integration branch, and a tool to start workers is available (Orca, then Paseo), it runs the parallel run; if any of these is not true, it runs sequentially.
 
 **Parallel run**: it starts one worker per ticket, each in a worktree branched from the current branch. This session acts as the coordinator: it keeps the blocked-by order, merges finished branches, and writes completion records.
 
@@ -59,12 +59,13 @@ If you ask for a number range or "all remaining tickets", the method differs. If
 
 What differs by tool:
 
-| Task | Paseo | Orca |
+| Task | Orca | Paseo |
 |---|---|---|
-| Creating workers | One worktree-isolated workspace per ticket, branched from the current branch's local ref, with one agent in it. There is no Run or Task, so this session keeps the blocked-by order itself. The worker model is picked by reading the descriptions of saved agent profiles; if no profile fits, the agent rules decide, and failing that, the same provider and model as this session. | One Orca Run per brief and one Task per ticket, with the blocked-by relations as Task deps. Workers start in child worktrees. If the agent rules set the model and effort for implementation workers, it starts them with those. |
-| Identifiers recorded | Workspace ID, agent ID, and branch per ticket | Run ID |
-| Waiting | It waits for the completion notification. A session that Paseo did not start gets no notification, so it waits with `paseo wait` and reads the result with `paseo logs`. Even when the worker ends its turn, the ticket counts as passed only if the reported commit is on the ticket branch. Answers to questions and rebase requests go to the same agent as follow-up prompts. | It checks worker status the way the `orchestration` skill says. |
-| Cleanup | After the merge, it archives the workspace, and Paseo removes the worktree. It deletes the ticket branch if one remains. | After the merge, it releases the worker and removes the worktree along with its branch. |
+| Creating workers | One Orca Run per brief. Each ticket's Task is created when its worker starts, so the Task spec carries every decision made up to then. Workers start in child worktrees branched from the current branch's local ref, and workers due at the same time start from one shell command. If the agent rules set the model and effort for implementation workers, it starts them with those. | One worktree-isolated workspace per ticket, branched from the current branch's local ref, with one agent in it. The worker model is picked by reading the descriptions of saved agent profiles; if no profile fits, the agent rules decide, and failing that, the same provider and model as this session. |
+| Identifiers recorded | Run ID. Per-ticket Tasks and workers are found through the Run. | Workspace ID, agent ID, and branch per ticket |
+| Waiting | After starting workers it ends its turn, and Orca wakes it with a message. It does not poll status. A ticket counts as passed only on a successful `worker_done` whose reported commit is on the ticket branch. It answers worker questions (`ask`) with `reply`, sends rebase requests to the same Dispatch with `send`, and denies out-of-scope permission prompts with `deny`. | It waits for the completion notification. A session that Paseo did not start gets no notification, so it waits with `paseo wait` and reads the result with `paseo logs`. Even when the worker ends its turn, the ticket counts as passed only if the reported commit is on the ticket branch. Answers to questions and rebase requests go to the same agent as follow-up prompts. |
+| Resuming | It rebinds the recorded Run with `run-use` and reads each ticket's state and last report with `task-list`, `worker-list`, and `worker-read`. A worker that failed to start is restarted on the same Task only after the cause has changed. | It checks the status of each recorded agent ID once. |
+| Cleanup | After the merge, it releases the worker with `worker-release` and removes the worktree and the merged branch with `worktree rm --delete-branch`. | After the merge, it archives the workspace, and Paseo removes the worktree. It deletes the ticket branch if one remains. |
 
 **Sequential run**: it starts one subagent per ticket, one after another. If the agent rules name an implementation agent, it starts that agent. They edit the same working tree, so it does not run them in parallel and does not commit. If the repo rules require your approval before code changes, the subagent only prepares a proposed diff, and this session applies it after you approve. If a ticket fails its done criteria, it follows the failure handling in the agent rules, and stops if the ticket still fails. When all are done, it reviews the whole change once and then runs the brief's "확인 기준". If commits were made midway because of the repo rules or your decision, the review covers them too.
 
@@ -93,7 +94,7 @@ Not committing is a core rule. Even if the repo rules require commits, it leaves
 - **run-flow**: uses this skill in its stage 5 to run the brief's remaining tickets.
 - If the **code-review** skill is installed, it is used for the code review in step 5.
 - **check-guidelines**: used for the rule check in step 5.
-- **orchestration** (Orca): used for running several tickets in parallel and for cross-review workers when Paseo is not available.
+- **orchestration** (Orca): used first for running several tickets in parallel and for cross-review workers. If Orca is not available, Paseo is used.
 
 ---
 

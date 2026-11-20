@@ -4,7 +4,7 @@
 
 # Paseo orchestration setup
 
-This guide sets up Paseo tools, agent profiles, a workspace script, and optional playbooks in [Paseo](https://paseo.sh/docs) so run-ticket can run several tickets in parallel with workers. In the Paseo mode, each ticket gets one worktree workspace branched from the current branch and one agent inside it, and the coordinating session keeps the blocking order and does the merges. After reading it, you can install the files in `extras/paseo/`, check that they work, and use them alongside Orca.
+This guide sets up Paseo tools, agent profiles, a workspace script, and optional playbooks in [Paseo](https://paseo.sh/docs) so run-ticket can run several tickets in parallel with workers. In the Paseo mode, each ticket gets one worktree workspace branched from the current branch and one agent inside it, and the coordinating session keeps the blocking order and does the merges. run-ticket uses Orca first and falls back to Paseo when Orca is not available. After reading it, you can install the files in `extras/paseo/`, check that they work, and use them alongside Orca.
 
 ## Contents
 
@@ -82,25 +82,19 @@ The models match the per-role models in the [omp multi-agent setup](omp-orchestr
 
 ## How Paseo orchestration works
 
-When running several tickets, run-ticket picks a worker tool in this order and uses the first one that works. If you name a tool, it uses that one.
+When running several tickets, run-ticket picks a worker tool in the order Orca, then Paseo, and uses the first one that works. If you name a tool, it uses that one. Paseo is used when the session has Paseo's workspace and agent management tools, or `paseo ls` succeeds. The comparison of the two modes is in [Orca orchestration setup](orca-orchestration.md#how-the-two-modes-differ).
 
-1. Paseo: the session has Paseo's workspace and agent management tools, or `paseo ls` succeeds
-2. Orca: the `orchestration` skill is available
-3. Neither: run the tickets one after another with subagents
+With Paseo, it works as follows. Merging, integration checks, completion records, the cross review, and the integration review are the same as with Orca.
 
-The two modes differ as follows. Merging, integration checks, completion records, the cross review, and the integration review are the same in both.
+- **Unit of execution**: Paseo has nothing like a Run or Task, so the coordinating session keeps the blocking order itself.
+- **Worker**: per ticket, one worktree-isolated workspace branched from the current branch (local ref) and one agent inside it.
+- **Worker model**: picked by reading the descriptions of saved agent profiles. Without one, the agent rules; without those, the same provider and model as the coordinating session.
+- **Detecting completion**: waits for the completion notification and does not poll status. A session that Paseo did not start gets no notification, so it waits with `paseo wait` and reads the result with `paseo logs`.
+- **Questions, rebase requests**: a follow-up prompt to the same agent.
+- **Resuming**: from the recorded workspace ID, agent ID, and branch per ticket.
+- **Cleanup**: archive the workspace (Paseo removes the worktree), then delete the branch.
 
-| Task | Orca | Paseo |
-|---|---|---|
-| Unit of execution | One Run, a Task per ticket, blocking relations as Task deps | No matching concept. The coordinating session keeps the blocking order itself |
-| Worker | An Orca worker in a child worktree | Per ticket, one worktree-isolated workspace branched from the current branch (local ref) and one agent inside it |
-| Worker model | `--model @worker` from the agent rules | Picked by reading the descriptions of saved agent profiles. Without one, the agent rules; without those, the same provider and model as the coordinating session |
-| Detecting completion | Status checks from the orchestration skill | Waits for the completion notification. Does not poll status. A session that Paseo did not start gets no notification, so it waits with `paseo wait` and reads the result with `paseo logs` |
-| Questions, rebase requests | Pass the answer to the worker | A follow-up prompt to the same agent |
-| Resuming | The recorded Run ID | The recorded workspace ID, agent ID, and branch per ticket |
-| Cleanup | Release the worker, delete the worktree and branch | Archive the workspace (Paseo removes the worktree), then delete the branch |
-
-The cross review is done by a model from a different company than the model that implemented the change. It uses the first method that works in this order: the agent set by the agent rules, an agent on another company's model started with Paseo, then an Orca worker. If none works, it skips the cross review. When starting it with Paseo, it uses the `cross-review` profile if the implementing model is Claude, and otherwise picks a model from a different company than the implementing model.
+The cross review is done by a model from a different company than the model that implemented the change. It uses the first method that works in this order: the agent set by the agent rules, an Orca worker, then an agent on another company's model started with Paseo. If none works, it skips the cross review. When starting it with Paseo, it uses the `cross-review` profile if the implementing model is Claude, and otherwise picks a model from a different company than the implementing model.
 
 The detailed steps are in [run-ticket](skills/run-ticket.md#running-multiple-tickets).
 
@@ -116,7 +110,7 @@ The playbook does not merge; you do. Running several tickets in parallel is done
 
 ## Using it with Orca
 
-- If both tools are available, Paseo is used. To use Orca, write "with Orca" in your request or put it in the agent rules.
+- If both tools are available, Orca is used. To use Paseo, write "with Paseo" in your request or put it in the agent rules.
 - A resumed run uses the tool whose identifiers are in the record.
 - The "워커" (Workers) section of the omp delegation rules ([omp multi-agent setup](omp-orchestration.md)) sets the worker models for both tools.
 

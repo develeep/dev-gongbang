@@ -32,7 +32,7 @@ dev-gongbang의 모든 사용 문서 목록입니다. 스킬 페이지에는 언
 
 - [set-brief](skills/set-brief.md): 대화에서 확정한 내용을 작업 지시서(brief)로 남깁니다.
 - [set-ticket](skills/set-ticket.md): 큰 brief를 티켓으로 나눕니다.
-- [run-ticket](skills/run-ticket.md): 티켓 하나를 새 세션에서 구현하고 리뷰합니다. 여러 티켓은 Paseo나 Orca로 병렬 실행합니다.
+- [run-ticket](skills/run-ticket.md): 티켓 하나를 새 세션에서 구현하고 리뷰합니다. 여러 티켓은 Orca나 Paseo로 병렬 실행합니다.
 - [analyzing-requirements](skills/analyzing-requirements.md): 기획서를 요구사항과 개발 범위 문서로 정리합니다.
 
 ## Mod
@@ -43,5 +43,6 @@ dev-gongbang의 모든 사용 문서 목록입니다. 스킬 페이지에는 언
 
 - [스킬 커스텀하기](customization.md): 스킬을 복사해 고치고, 검사하고, 시험하는 방법
 - [omp 멀티에이전트 설정](omp-orchestration.md): 단계마다 모델을 나눠 쓰는 omp 역할·에이전트·위임 규칙 설치 방법
+- [Orca 오케스트레이션 설정](orca-orchestration.md): Orca 워커로 티켓을 병렬 실행하기 위한 설치 방법과 오케스트레이션 방식
 - [Paseo 오케스트레이션 설정](paseo-orchestration.md): Paseo 워커로 티켓을 병렬 실행하기 위한 에이전트 프로필·플레이북 설치 방법과 오케스트레이션 방식
 - [상황별로 고르기](../README.md#상황별로-고르기): 상황에 맞는 스킬과 스킬을 이어 쓰는 흐름

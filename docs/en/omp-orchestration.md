@@ -22,9 +22,9 @@ This guide sets up omp (oh-my-pi) to use a different model at each development s
 |---|---|---|
 | [`extras/omp/config.yml`](../../extras/omp/config.yml) | Merge into `~/.omp/agent/config.yml` | Per-role models and effort, reviewer and security-reviewer models, fallback models |
 | [`extras/omp/agents/`](../../extras/omp/agents/) | `~/.omp/agent/agents/` | brief-writer, cold-reader, implementer, hard-implementer, root-cause, test-writer, ui-checker, doc-writer, code-reviewer |
-| [`extras/omp/AGENTS.md`](../../extras/omp/AGENTS.md) | `~/.omp/agent/AGENTS.md` | Development stages, delegation targets, escalation on failure, when to use Paseo and Orca workers |
+| [`extras/omp/AGENTS.md`](../../extras/omp/AGENTS.md) | `~/.omp/agent/AGENTS.md` | Development stages, delegation targets, escalation on failure, when to use Orca and Paseo workers |
 
-The agents and the delegation rules live at the user level, so every project and every Paseo or Orca worker uses the same setup. If a project's `.omp/agents/` has an agent with the same name, the project's agent wins.
+The agents and the delegation rules live at the user level, so every project and every Orca or Paseo worker uses the same setup. If a project's `.omp/agents/` has an agent with the same name, the project's agent wins.
 
 ## Install
 
@@ -47,7 +47,7 @@ To keep your existing settings, copy the `modelRoles`, `advisor`, `task`, and `r
 |---|---|---|
 | Orchestrator, design | Main session `default`, plan mode `plan` | Opus 5.5 · high |
 | Brief drafting | brief-writer (`brief`) | Opus 5.5 · xhigh |
-| Ticket implementation worker (parallel run) | Paseo: the `ticket-worker` profile; Orca: started by `AGENTS.md` with `--model @worker` (`worker`) | Paseo: Opus 5.5 · medium; Orca: Opus 5.5 · xhigh |
+| Ticket implementation worker (parallel run) | Orca: started by `AGENTS.md` with `--model @worker` (`worker`); Paseo: the `ticket-worker` profile | Orca: Opus 5.5 · xhigh; Paseo: Opus 5.5 · medium |
 | Finding code and checking behavior in a known scope | Bundled scout (`smol`) | Haiku 5.5 · medium |
 | Routine implementation, tests | implementer, test-writer (`task`) | Opus 5.5 · xhigh |
 | Brief cold read | cold-reader (`task`) | Opus 5.5 · xhigh |
@@ -56,7 +56,7 @@ To keep your existing settings, copy the `modelRoles`, `advisor`, `task`, and `r
 | Root-cause report without fixing | root-cause | Opus 5.5 · high |
 | Cross review | Bundled reviewer (`review`) | GPT-6.2 Sol · high |
 | Cross review worker (a Claude Code worker, when the implementing model is not Claude) | Set by `AGENTS.md`; Orca uses `--model` | Opus 5.5 · medium |
-| Cross review worker (a Codex worker, when the implementing model is Claude and the reviewer fell back to Claude) | Paseo: the `cross-review` profile; Orca: set by `AGENTS.md` with `--model` | GPT-6.2 Sol · high |
+| Cross review worker (a Codex worker, when the implementing model is Claude and the reviewer fell back to Claude) | Orca: set by `AGENTS.md` with `--model`; Paseo: the `cross-review` profile | GPT-6.2 Sol · high |
 | Security and core-logic review | Bundled security-reviewer | Opus 5.5 · high |
 | UI and screen checks | ui-checker (`vision`) | GPT-6.1 Terra · medium |
 | Commit messages, PR descriptions | `commit`, doc-writer (`smol`) | Haiku 5.5 · medium |
@@ -75,13 +75,13 @@ When a model is unavailable (for example, over its usage limit), the rest of the
 
 ## Delegation rules
 
-`AGENTS.md` is read only by the main session and by omp workers started by Paseo or Orca. Task subagents do not read it. It covers:
+`AGENTS.md` is read only by the main session and by omp workers started by Orca or Paseo. Task subagents do not read it. It covers:
 
 - **Development stages**: the seven stages from planning document to PR, the skill for each stage, and the points where you confirm. Running [run-flow](skills/run-flow.md) goes through them in order.
 - **Delegation**: which agent takes each kind of work. One agent gets one purpose, and a purpose is defined by the standard used to check its result. Work checked against different standards goes to separate agents, because a result that mixes standards is hard for the main session to review and to check for bugs and AI slop. Completeness comes first, though, so work is not split in ways that lose context. The agent that writes or implements something is responsible for verifying its own output and applying the results. Only checks that need a fresh context, such as a cold read or a screen check, go to a separate agent, and the agent that made the output takes their results and applies them. The cross review goes to the bundled reviewer, and review skills with their sub-reviews go to code-reviewer. Both run another company's model (GPT), so they catch mistakes the implementing model misses. The reviewer has a fixed bug-only report format and cannot follow a review skill's instructions, so the two are kept separate.
 - **What to hand over**: implementation, test, and UI agents get the brief and one ticket, the repo rules file paths, the verification commands, and earlier tickets' output artifacts instead of the conversation. Review agents get the diff range and the brief. doc-writer gets the changed-file list, completion records, and review record instead of the full diff.
-- **On failure**: if implementer fails, it is handed the task once more along with the failure report; if it fails the same ticket twice, hard-implementer takes it. If that also fails, or the cause of failure is an ambiguous ticket, the session stops and suggests splitting the ticket again. A large refactor or a debugging task with an unknown cause from the start goes straight to hard-implementer. An implementation worker (a Paseo or Orca worker) that implements a ticket itself and fails hands it straight to hard-implementer. When only a root-cause report is needed without a fix, such as when integration verification fails, root-cause takes it.
-- **Workers**: Paseo or Orca workers are used only to run tickets in parallel in separate worktrees when two or more tickets can start together, to hand work to another agent, or when you want to watch a worker directly. If both are available, Paseo is used ([Paseo orchestration setup](paseo-orchestration.md)). Ticket implementation workers start on Opus 5.5 medium in Paseo and Opus 5.5 xhigh in Orca, and do the implementation and tests themselves instead of handing them to implementer. The worker and implementer run the same model, so handing over would only read the same documents twice. Only screen checks go to ui-checker. To change it, edit the `ticket-worker` profile for Paseo, or `modelRoles.worker` for Orca. The cross review is done by a model from a different company than the model that implemented the change, not the main session's model. In this setup the implementation agents and implementation workers are all Claude, so the reviewer (GPT) takes it whatever the main session's model is.
+- **On failure**: if implementer fails, it is handed the task once more along with the failure report; if it fails the same ticket twice, hard-implementer takes it. If that also fails, or the cause of failure is an ambiguous ticket, the session stops and suggests splitting the ticket again. A large refactor or a debugging task with an unknown cause from the start goes straight to hard-implementer. An implementation worker (an Orca or Paseo worker) that implements a ticket itself and fails hands it straight to hard-implementer. When only a root-cause report is needed without a fix, such as when integration verification fails, root-cause takes it.
+- **Workers**: Orca or Paseo workers are used only to run tickets in parallel in separate worktrees when two or more tickets can start together, to hand work to another agent, or when you want to watch a worker directly. If both are available, Orca is used ([Orca orchestration setup](orca-orchestration.md), [Paseo orchestration setup](paseo-orchestration.md)). Ticket implementation workers start on Opus 5.5 xhigh in Orca and Opus 5.5 medium in Paseo, and do the implementation and tests themselves instead of handing them to implementer. The worker and implementer run the same model, so handing over would only read the same documents twice. Only screen checks go to ui-checker. To change it, edit `modelRoles.worker` for Orca, or the `ticket-worker` profile for Paseo. The cross review is done by a model from a different company than the model that implemented the change, not the main session's model. In this setup the implementation agents and implementation workers are all Claude, so the reviewer (GPT) takes it whatever the main session's model is.
 
 How several tickets run in parallel is described in [run-ticket](skills/run-ticket.md#running-multiple-tickets).
 

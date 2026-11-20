@@ -90,7 +90,7 @@ Available when you install `gongbang-dev`. Their behavior changes often.
 
 - [set-brief](docs/en/skills/set-brief.md): Turns a framing record or session result into a brief that a worker with no context can pick up, and saves it as a GitHub issue or a `docs/context/` document. Runs only when you ask or run-flow tells it to. `/gongbang:set-brief [summary of the work to record]` · [SKILL.md](skills/in-progress/set-brief/SKILL.md)
 - [set-ticket](docs/en/skills/set-ticket.md): Splits a large brief into tickets that can each be verified on their own, saves them as GitHub sub-issues or docs files, and links them to the brief. Runs only when you ask or run-flow tells it to. `/gongbang:set-ticket [brief issue number/URL or docs path]` · [SKILL.md](skills/in-progress/set-ticket/SKILL.md)
-- [run-ticket](docs/en/skills/run-ticket.md): Implements and reviews one ticket in a new session, then updates the ticket status and the brief checkbox. Does not commit. Runs several tickets in parallel with Paseo or Orca workers. Runs only when you ask or run-flow tells it to. `/gongbang:run-ticket [ticket/brief path, issue number/URL] [range, for multiple tickets]` · [SKILL.md](skills/in-progress/run-ticket/SKILL.md)
+- [run-ticket](docs/en/skills/run-ticket.md): Implements and reviews one ticket in a new session, then updates the ticket status and the brief checkbox. Does not commit. Runs several tickets in parallel with Orca or Paseo workers. Runs only when you ask or run-flow tells it to. `/gongbang:run-ticket [ticket/brief path, issue number/URL] [range, for multiple tickets]` · [SKILL.md](skills/in-progress/run-ticket/SKILL.md)
 - [analyzing-requirements](docs/en/skills/analyzing-requirements.md): Reads a planning document received as a link or as PDF/PPT/MD, and organizes requirements and development scope by service and development area into a Markdown document. `/gongbang:analyzing-requirements [planning document link or file path]` · [SKILL.md](skills/in-progress/analyzing-requirements/SKILL.md)
 
 ## Mods
@@ -126,7 +126,7 @@ Skills chain together as follows.
 - **Building a prompt**: Frame the task first with `/gongbang:framing-problems`, then pass the confirmed framing record to `/gongbang:prompt-builder` as a draft. You can make an agent prompt that talks to people, or a reusable template, call framing-problems every time it runs.
 - **Building a skill**: Create a SKILL.md draft with `/gongbang:prompt-builder`, then pass the result to `/gongbang:building-skills` to test and refine it.
 - **Code rules**: Create rules with `/gongbang:set-guidelines`, then check code with `/gongbang:check-guidelines`.
-- **Handing off large work**: Save the result framed with framing-problems using `/gongbang:set-brief`. If it is large, split it with `/gongbang:set-ticket`, then run the tickets one at a time with `/gongbang:run-ticket` in a new session. With Paseo or Orca, ask for "all remaining tickets" to run them in parallel.
+- **Handing off large work**: Save the result framed with framing-problems using `/gongbang:set-brief`. If it is large, split it with `/gongbang:set-ticket`, then run the tickets one at a time with `/gongbang:run-ticket` in a new session. With Orca or Paseo, ask for "all remaining tickets" to run them in parallel.
 - **Handing over the whole run**: Run `/gongbang:run-flow <planning document or request>` and it goes through analyzing-requirements and framing-problems, the flow above, and opening the PR, in order. To continue a stopped run, run `/gongbang:run-flow` again.
 
 ## Customize

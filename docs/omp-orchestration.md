@@ -22,9 +22,9 @@ omp(oh-my-pi)에서 개발 단계마다 다른 모델을 쓰도록 역할별 모
 |---|---|---|
 | [`extras/omp/config.yml`](../extras/omp/config.yml) | `~/.omp/agent/config.yml`에 합침 | 역할별 모델·Effort, reviewer·security-reviewer 모델, 대체 모델 |
 | [`extras/omp/agents/`](../extras/omp/agents/) | `~/.omp/agent/agents/` | brief-writer, cold-reader, implementer, hard-implementer, root-cause, test-writer, ui-checker, doc-writer, code-reviewer |
-| [`extras/omp/AGENTS.md`](../extras/omp/AGENTS.md) | `~/.omp/agent/AGENTS.md` | 개발 단계, 위임 대상, 실패 시 승격, Paseo·Orca 워커 사용 기준 |
+| [`extras/omp/AGENTS.md`](../extras/omp/AGENTS.md) | `~/.omp/agent/AGENTS.md` | 개발 단계, 위임 대상, 실패 시 승격, Orca·Paseo 워커 사용 기준 |
 
-에이전트와 위임 규칙은 사용자 전역에 두므로 모든 프로젝트와 Paseo·Orca 워커가 같은 설정을 씁니다. 프로젝트의 `.omp/agents/`에 같은 이름의 에이전트가 있으면 프로젝트 쪽이 이깁니다.
+에이전트와 위임 규칙은 사용자 전역에 두므로 모든 프로젝트와 Orca·Paseo 워커가 같은 설정을 씁니다. 프로젝트의 `.omp/agents/`에 같은 이름의 에이전트가 있으면 프로젝트 쪽이 이깁니다.
 
 ## 설치
 
@@ -47,7 +47,7 @@ ln -s "$PWD/extras/omp/AGENTS.md" ~/.omp/agent/AGENTS.md
 |---|---|---|
 | 오케스트레이터·설계 | 메인 세션 `default`, 계획 모드 `plan` | Opus 5.5 · high |
 | brief 초안 작성 | brief-writer (`brief`) | Opus 5.5 · xhigh |
-| 티켓 구현 워커 (병렬 실행) | Paseo는 `ticket-worker` 프로필, Orca는 `AGENTS.md`가 `--model @worker`로 띄움 (`worker`) | Paseo는 Opus 5.5 · medium, Orca는 Opus 5.5 · xhigh |
+| 티켓 구현 워커 (병렬 실행) | Orca는 `AGENTS.md`가 `--model @worker`로 띄움 (`worker`), Paseo는 `ticket-worker` 프로필 | Orca는 Opus 5.5 · xhigh, Paseo는 Opus 5.5 · medium |
 | 범위가 정해진 코드 위치 찾기·동작 조사 | bundled scout (`smol`) | Haiku 5.5 · medium |
 | 일반 구현·테스트 | implementer, test-writer (`task`) | Opus 5.5 · xhigh |
 | brief 냉독 읽기 | cold-reader (`task`) | Opus 5.5 · xhigh |
@@ -56,7 +56,7 @@ ln -s "$PWD/extras/omp/AGENTS.md" ~/.omp/agent/AGENTS.md
 | 고치지 않는 원인 보고 | root-cause | Opus 5.5 · high |
 | 교차 리뷰 | bundled reviewer (`review`) | GPT-6.2 Sol · high |
 | 교차 리뷰 워커 (구현한 모델이 Claude가 아닐 때의 Claude Code 워커) | `AGENTS.md`가 지정. Orca는 `--model` | Opus 5.5 · medium |
-| 교차 리뷰 워커 (구현한 모델이 Claude이고 reviewer가 Claude로 넘어갔을 때의 Codex 워커) | Paseo는 `cross-review` 프로필, Orca는 `AGENTS.md`가 `--model`로 지정 | GPT-6.2 Sol · high |
+| 교차 리뷰 워커 (구현한 모델이 Claude이고 reviewer가 Claude로 넘어갔을 때의 Codex 워커) | Orca는 `AGENTS.md`가 `--model`로 지정, Paseo는 `cross-review` 프로필 | GPT-6.2 Sol · high |
 | 보안·핵심 로직 리뷰 | bundled security-reviewer | Opus 5.5 · high |
 | UI·화면 검증 | ui-checker (`vision`) | GPT-6.1 Terra · medium |
 | 커밋·PR 설명 | `commit`, doc-writer (`smol`) | Haiku 5.5 · medium |
@@ -75,13 +75,13 @@ ln -s "$PWD/extras/omp/AGENTS.md" ~/.omp/agent/AGENTS.md
 
 ## 위임 규칙
 
-`AGENTS.md`는 메인 세션과 Paseo나 Orca가 띄운 omp 워커만 읽고, task 서브에이전트는 읽지 않습니다. 담긴 내용은 다음과 같습니다.
+`AGENTS.md`는 메인 세션과 Orca나 Paseo가 띄운 omp 워커만 읽고, task 서브에이전트는 읽지 않습니다. 담긴 내용은 다음과 같습니다.
 
 - **개발 단계**: 기획서부터 PR까지 7단계와 단계마다 쓸 스킬, 사용자 확인 지점. [run-flow](skills/run-flow.md)를 실행하면 이 순서를 이어서 진행합니다.
 - **위임**: 작업마다 맡길 에이전트. 에이전트 하나에는 목적 하나만 맡기고, 목적은 받은 결과를 확인할 기준으로 가릅니다. 확인할 기준이 다르면 에이전트를 나눕니다. 기준이 섞인 결과는 메인 세션이 리뷰하거나 버그와 AI slop을 찾기 어렵기 때문입니다. 다만 완성도가 먼저이므로 맥락을 잃는 분리는 하지 않습니다. 작성이나 구현을 맡은 에이전트가 자기 산출물의 검증과 결과 반영까지 책임지고, 냉독 읽기나 화면 확인처럼 새 컨텍스트가 필요한 검증만 별도 에이전트가 하되 그 결과는 산출물을 만든 쪽이 받아 반영합니다. 교차 리뷰는 bundled reviewer, 리뷰 스킬과 그 하위 리뷰는 code-reviewer에 맡깁니다. 둘 다 다른 회사 모델(GPT)이라 구현한 모델과 다른 실수를 잡습니다. reviewer는 버그만 보고하는 형식이 고정돼 있어 리뷰 스킬의 지시를 따르지 못하므로 따로 둡니다.
 - **넘기는 것**: 구현·테스트·UI 에이전트에는 대화 기록 대신 brief와 티켓 하나, 레포 규칙 파일 경로, 검증 명령, 앞 티켓 산출물을 넘깁니다. 리뷰 에이전트에는 diff 범위와 brief를, doc-writer에는 diff 전문 대신 변경 파일 목록, 완료 기록, 리뷰 기록을 넘깁니다.
-- **실패했을 때**: implementer가 실패하면 실패 보고를 함께 넘겨 한 번 더 맡기고, 같은 티켓에서 2회 실패하면 hard-implementer에 맡깁니다. 그래도 실패하거나 실패 원인이 티켓의 모호함이면 멈추고 티켓을 다시 나누자고 제안합니다. 처음부터 대규모 리팩터링이나 원인 모를 디버깅이면 바로 hard-implementer에 맡깁니다. 구현 워커(Paseo나 Orca 워커)는 직접 구현해 실패하면 바로 hard-implementer에 맡깁니다. 통합 검증 실패처럼 고치지 않고 원인 보고만 필요하면 root-cause에 맡깁니다.
-- **워커**: 함께 시작할 수 있는 티켓이 둘 이상이라 worktree를 나눠 병렬로 실행할 때, 다른 에이전트에게 맡길 때, 사용자가 워커를 직접 볼 때만 Paseo나 Orca 워커를 씁니다. 둘 다 쓸 수 있으면 Paseo를 씁니다([Paseo 오케스트레이션 설정](paseo-orchestration.md)). 티켓 구현 워커는 Paseo에서는 Opus 5.5 medium, Orca에서는 Opus 5.5 xhigh로 띄우고, 구현과 테스트를 implementer에 맡기지 않고 직접 합니다. 워커와 implementer의 모델이 같아서 맡기면 같은 문서를 두 번 읽기 때문입니다. 화면 검증만 ui-checker에 맡깁니다. 바꾸려면 Paseo는 `ticket-worker` 프로필을, Orca는 `modelRoles.worker`를 고칩니다. 교차 리뷰는 메인 세션이 아니라 변경을 구현한 모델과 다른 회사의 모델이 맡습니다. 이 설정에서 구현 에이전트와 구현 워커는 모두 Claude이므로 메인 세션의 모델과 상관없이 reviewer(GPT)가 맡습니다.
+- **실패했을 때**: implementer가 실패하면 실패 보고를 함께 넘겨 한 번 더 맡기고, 같은 티켓에서 2회 실패하면 hard-implementer에 맡깁니다. 그래도 실패하거나 실패 원인이 티켓의 모호함이면 멈추고 티켓을 다시 나누자고 제안합니다. 처음부터 대규모 리팩터링이나 원인 모를 디버깅이면 바로 hard-implementer에 맡깁니다. 구현 워커(Orca나 Paseo 워커)는 직접 구현해 실패하면 바로 hard-implementer에 맡깁니다. 통합 검증 실패처럼 고치지 않고 원인 보고만 필요하면 root-cause에 맡깁니다.
+- **워커**: 함께 시작할 수 있는 티켓이 둘 이상이라 worktree를 나눠 병렬로 실행할 때, 다른 에이전트에게 맡길 때, 사용자가 워커를 직접 볼 때만 Orca나 Paseo 워커를 씁니다. 둘 다 쓸 수 있으면 Orca를 씁니다([Orca 오케스트레이션 설정](orca-orchestration.md), [Paseo 오케스트레이션 설정](paseo-orchestration.md)). 티켓 구현 워커는 Orca에서는 Opus 5.5 xhigh, Paseo에서는 Opus 5.5 medium으로 띄우고, 구현과 테스트를 implementer에 맡기지 않고 직접 합니다. 워커와 implementer의 모델이 같아서 맡기면 같은 문서를 두 번 읽기 때문입니다. 화면 검증만 ui-checker에 맡깁니다. 바꾸려면 Orca는 `modelRoles.worker`를, Paseo는 `ticket-worker` 프로필을 고칩니다. 교차 리뷰는 메인 세션이 아니라 변경을 구현한 모델과 다른 회사의 모델이 맡습니다. 이 설정에서 구현 에이전트와 구현 워커는 모두 Claude이므로 메인 세션의 모델과 상관없이 reviewer(GPT)가 맡습니다.
 
 여러 티켓을 병렬로 실행하는 과정은 [run-ticket](skills/run-ticket.md#여러-티켓-실행)에 있습니다.
 

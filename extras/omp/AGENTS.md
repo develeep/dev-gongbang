@@ -1,6 +1,6 @@
 # 멀티에이전트 개발 규칙
 
-메인 세션(오케스트레이터)이 따르는 규칙입니다. task 서브에이전트는 이 파일을 받지 않습니다. Paseo나 Orca 워커로 띄운 omp 세션은 메인 세션이므로 이 규칙을 따릅니다.
+메인 세션(오케스트레이터)이 따르는 규칙입니다. task 서브에이전트는 이 파일을 받지 않습니다. Orca나 Paseo 워커로 띄운 omp 세션은 메인 세션이므로 이 규칙을 따릅니다.
 
 ## 개발 단계
 
@@ -16,11 +16,11 @@
 | 6 | 규칙 검사·교차 리뷰 | run-ticket의 리뷰 단계 | 리뷰 보고 | 머지 여부 결정 |
 | 7 | PR | doc-writer가 본문 작성, run-flow가 PR 생성 | PR | PR 본문 |
 
-여러 티켓을 한 번에 실행할 때 함께 시작할 수 있는 티켓이 둘 이상이면 run-ticket이 Paseo나 Orca 워커로 티켓마다 worktree를 나눠 병렬로 실행합니다. 아니면 서브에이전트로 차례로 실행합니다.
+여러 티켓을 한 번에 실행할 때 함께 시작할 수 있는 티켓이 둘 이상이면 run-ticket이 Orca나 Paseo 워커로 티켓마다 worktree를 나눠 병렬로 실행합니다. 아니면 서브에이전트로 차례로 실행합니다.
 
 ## 위임
 
-에이전트 하나에는 목적 하나만 맡깁니다. 서브에이전트, Paseo 워커, Orca 워커 모두 같습니다. 목적은 받은 결과를 확인할 기준으로 가릅니다. 확인할 기준이 하나면 목적이 하나입니다. 구현과 독립 리뷰, 리뷰 스킬 둘처럼 확인할 기준이 다르면 에이전트를 둘 띄웁니다. 한 에이전트의 결과에 기준이 다른 것이 섞이면 메인 세션이 그 결과를 리뷰하거나 버그와 AI slop을 찾기 어렵습니다.
+에이전트 하나에는 목적 하나만 맡깁니다. 서브에이전트, Orca 워커, Paseo 워커 모두 같습니다. 목적은 받은 결과를 확인할 기준으로 가릅니다. 확인할 기준이 하나면 목적이 하나입니다. 구현과 독립 리뷰, 리뷰 스킬 둘처럼 확인할 기준이 다르면 에이전트를 둘 띄웁니다. 한 에이전트의 결과에 기준이 다른 것이 섞이면 메인 세션이 그 결과를 리뷰하거나 버그와 AI slop을 찾기 어렵습니다.
 
 완성도가 먼저이므로 맥락을 잃는 분리는 하지 않습니다. 작성이나 구현을 맡은 에이전트는 자기 산출물을 검증하고 그 결과를 반영해 완성하는 것까지 책임집니다. 초안의 냉독 검증, 구현의 완료 기준 확인, 실패한 티켓의 원인 정리를 떼어 다른 에이전트에 완성을 넘기지 않습니다. 냉독 읽기나 화면 확인처럼 새 컨텍스트가 있어야 하는 검증은 별도 에이전트가 하되, 그 결과는 산출물을 만든 쪽이 받아 반영합니다.
 
@@ -41,7 +41,7 @@
 
 티켓이 처음부터 hard-implementer 행에 해당하면 implementer를 거치지 않고 바로 맡깁니다. run-ticket의 차례 실행에서 티켓마다 띄우는 서브에이전트도 이 표의 구현 에이전트로 띄웁니다.
 
-구현 워커(run-ticket의 2, 3, 4단계를 지시받은 Paseo나 Orca 워커)는 구현과 테스트를 implementer와 test-writer에 맡기지 않고 직접 합니다. 워커와 implementer의 모델이 같아서, 맡기면 같은 문서를 두 번 읽고 넘기지 않은 규칙이 빠집니다. 화면 검증은 ui-checker에 맡깁니다.
+구현 워커(run-ticket의 2, 3, 4단계를 지시받은 Orca나 Paseo 워커)는 구현과 테스트를 implementer와 test-writer에 맡기지 않고 직접 합니다. 워커와 implementer의 모델이 같아서, 맡기면 같은 문서를 두 번 읽고 넘기지 않은 규칙이 빠집니다. 화면 검증은 ui-checker에 맡깁니다.
 
 reviewer와 code-reviewer는 다른 회사 모델(GPT)이라 구현한 모델과 다른 실수를 잡습니다. reviewer는 버그만 보고하는 형식이 고정돼 있어 리뷰 스킬의 지시(규칙 위반, 불필요한 코드, 테스트 케이스)를 따르지 못하므로, 리뷰 스킬은 code-reviewer에 맡깁니다.
 
@@ -64,20 +64,21 @@ reviewer와 code-reviewer는 다른 회사 모델(GPT)이라 구현한 모델과
 
 ## 워커
 
-Paseo나 Orca 워커는 서브에이전트로 할 수 없는 일에만 씁니다. 둘 다 쓸 수 있으면 Paseo를 씁니다.
+Orca나 Paseo 워커는 서브에이전트로 할 수 없는 일에만 씁니다. 둘 다 쓸 수 있으면 Orca를 씁니다.
 
 - 여러 티켓을 worktree를 나눠 병렬로 실행할 때. run-ticket의 "병렬 실행"을 따릅니다. 워커는 티켓 하나를 직접 구현하므로 implementer와 같은 모델과 Effort를 씁니다.
 - 다른 에이전트(Codex, Claude Code)에게 리뷰나 작업을 맡길 때
-- 사용자가 작업 과정을 Paseo나 Orca에서 보거나 워커에게 직접 말을 걸어야 할 때
+- 사용자가 작업 과정을 Orca나 Paseo에서 보거나 워커에게 직접 말을 걸어야 할 때
 
 교차 리뷰는 변경을 구현한 모델과 다른 회사의 모델이 맡습니다. 이 설정에서 implementer, hard-implementer, 구현 워커는 모두 Claude이므로 메인 세션의 모델과 상관없이 reviewer(GPT)가 맡습니다. reviewer가 Claude로 넘어갔을 때만 워커에 맡깁니다.
+
+### Orca
+
+- 티켓 구현 워커는 메인 세션과 같은 omp 에이전트로, `--model @worker`로 띄웁니다. Effort는 `worker` 역할에 들어 있으므로 `--effort`를 붙이지 않습니다.
+- 교차 리뷰 워커는 구현한 모델이 Claude면 Codex 워커를 `--model gpt-6.2-sol --effort high`로, Claude가 아니면 Claude Code 워커를 `--model claude-opus-5-5 --effort medium`으로 띄웁니다. 구현한 모델과 같은 회사의 워커는 교차 리뷰가 되지 않습니다.
+- 사용자가 워커의 대화를 이어 쓰려고 하면 `--keep-open`으로 띄웁니다. 아니면 끝난 워커는 Orca가 닫습니다.
 
 ### Paseo
 
 - 티켓 구현 워커는 `ticket-worker` 프로필로 띄웁니다. 프로필이 없으면 omp provider의 `anthropic/claude-opus-5-5`, thinking `medium`으로 띄웁니다.
 - 교차 리뷰 워커는 `cross-review` 프로필로 띄웁니다. 프로필이 없으면 omp provider의 `openai-codex/gpt-6.2-sol`, thinking `high`로 띄웁니다. 구현한 모델이 Claude가 아니면 `anthropic/claude-opus-5-5`, thinking `medium`으로 띄웁니다.
-
-### Orca
-
-- 티켓 구현 워커는 `--model @worker`로 띄웁니다.
-- 교차 리뷰 워커는 구현한 모델이 Claude면 Codex 워커를 `--model gpt-6.2-sol --effort high`로, Claude가 아니면 Claude Code 워커를 `--model claude-opus-5-5 --effort medium`으로 띄웁니다. 구현한 모델과 같은 회사의 워커는 교차 리뷰가 되지 않습니다.
