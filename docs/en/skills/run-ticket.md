@@ -4,7 +4,7 @@
 
 # run-ticket
 
-Implements and reviews one ticket made by set-ticket in a new session, then updates the ticket status and the brief checkboxes. It works without the conversation that made the brief, using only the brief, the ticket, and the completion records of earlier tickets. It does not commit. If you ask for several tickets, two or more of them can start together, and the repo or agent rules name a worker tool procedure, it uses that procedure to run them in parallel with workers, one worktree per ticket, and only then commits to ticket branches and merges them. Without a named procedure, it runs them in order.
+Implements and reviews one ticket made by set-ticket in a new session, then updates the ticket status and the brief checkboxes. It works without the conversation that made the brief, using only the brief, the ticket, and the completion records of earlier tickets. It does not commit. If you ask for several tickets, two or more of them can start together, and you or the repo or agent rules name a usable worker tool procedure, it uses that procedure to run them in parallel with workers, one worktree per ticket, and only then commits to ticket branches and merges them. Without a usable procedure, it runs them in order.
 
 > This skill is in progress. Install `gongbang-dev` to use it. Its behavior may change.
 

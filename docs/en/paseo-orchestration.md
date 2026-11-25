@@ -113,7 +113,7 @@ With the Paseo procedure, it works as follows. Merging, integration checks, comp
 
 - **Unit of execution**: Paseo has nothing like a Run or Task, so the coordinating session keeps the blocking order itself.
 - **Worker**: per ticket, one worktree-isolated workspace branched from the current branch (local ref) and one agent inside it.
-- **Worker model**: picked by reading the descriptions of saved agent profiles. Without one, the agent rules; without those, the same provider and model as the coordinating session.
+- **Worker model**: picked in this order: the profile pinned by the worker model lines of the registration text, the model those lines give for when that profile is missing, the descriptions of saved agent profiles, then the same provider and model as the coordinating session.
 - **Detecting completion**: waits for the completion notification and does not poll status. A session that Paseo did not start gets no notification, so it waits with `paseo wait` and reads the result with `paseo logs`.
 - **Questions, rebase requests**: a follow-up prompt to the same agent.
 - **Resuming**: from the recorded workspace ID, agent ID, and branch per ticket. In run-flow they go into `- 워커 식별자:` (worker identifier) in the state file in the format `Paseo 01: 워크스페이스 <ID>, 에이전트 <ID>, 브랜치 <브랜치>; 02: …`.
