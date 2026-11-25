@@ -4,7 +4,7 @@
 
 # run-ticket
 
-Implements and reviews one ticket made by set-ticket in a new session, then updates the ticket status and the brief checkboxes. It works without the conversation that made the brief, using only the brief, the ticket, and the completion records of earlier tickets. It does not commit. If you ask for several tickets, two or more of them can start together, and you or the repo or agent rules name a usable worker tool procedure, it uses that procedure to run them in parallel with workers, one worktree per ticket, and only then commits to ticket branches and merges them. Without a usable procedure, it runs them in order.
+Implements and reviews one ticket made by set-ticket in a new session, then updates the ticket status and the brief checkboxes. It works without the conversation that made the brief, using only the brief, the ticket, and the completion records of earlier tickets. It does not commit. If you ask for several tickets, two or more of them can start together, none of them share an integration branch, and you or the repo or agent rules name a usable worker tool procedure, it uses that procedure to run them in parallel with workers, one worktree per ticket, and only then commits to ticket branches and merges them. Without a usable procedure, it runs them in order.
 
 > This skill is in progress. Install `gongbang-dev` to use it. Its behavior may change.
 
@@ -21,7 +21,7 @@ Implements and reviews one ticket made by set-ticket in a new session, then upda
 
 - Run the tickets split with set-ticket one at a time.
 - Run a small brief that was not split into tickets. The whole brief is treated as one ticket.
-- Run several tickets at once, as in "all remaining tickets". If a usable worker tool procedure exists and two or more tickets can start together, it runs them in parallel; otherwise, in order.
+- Run several tickets at once, as in "all remaining tickets". If a usable worker tool procedure exists, two or more tickets can start together, and no tickets share an integration branch, it runs them in parallel; otherwise, in order.
 
 ## Prerequisites
 

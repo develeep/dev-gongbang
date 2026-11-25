@@ -63,7 +63,7 @@ The full steps are in [`extras/paseo/register.md`](../../extras/paseo/register.m
    run-ticket의 워커 도구 절차는 Paseo 절차입니다. 여러 티켓을 병렬로 실행하거나 교차 리뷰를 워커에 맡길 때 `<worker-procedure.md 경로>`를 읽고 따릅니다.
    ```
 
-3. **Set the worker models (optional).** To pin the profiles to use, or to set the model for when no profile fits, add worker model lines below the registration text. The lines and the values for this folder's profiles and the omp setup are in "워커 모델 정하기" (Setting worker models) in register.md.
+3. **Set the worker models (optional).** To pin the profiles to use, or to set the model for when the pinned profile is missing, add worker model lines below the registration text. The lines and the values for this folder's profiles and the omp setup are in "워커 모델 정하기" (Setting worker models) in register.md.
 4. **Check.** In a new session, ask "what is run-ticket's worker tool procedure?" and see that the path from step 1 comes back.
 
 If `~/.omp/agent/AGENTS.md` is a link to this repository's `extras/omp/AGENTS.md`, putting the text in that file edits the file in your clone. Keep a copy instead of the link and edit the copy, or put the text in the repo's `AGENTS.md`.

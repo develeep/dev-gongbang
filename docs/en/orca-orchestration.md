@@ -96,7 +96,7 @@ Merging, integration checks, completion records, the cross review, and the integ
 |---|---|---|
 | Unit of execution | One Run per brief, one Task per ticket created when its worker starts | No matching concept. The coordinating session keeps the blocking order itself |
 | Worker | An Orca worker in a child worktree branched from the current branch (local ref) | One worktree-isolated workspace branched from the current branch (local ref) and one agent inside it |
-| Worker model | The worker model line of the registration text (`--model @worker` with the omp setup) | Picked by reading the descriptions of saved agent profiles. Without one, the agent rules; without those, the same provider and model as the coordinating session |
+| Worker model | The worker model line of the registration text (`--model @worker` with the omp setup) | In this order: the profile pinned by the worker model lines of the registration text, the model those lines give for when that profile is missing, the descriptions of saved agent profiles, then the same provider and model as the coordinating session |
 | Detecting completion | The coordinator ends its turn, and Orca wakes it with `worker_done`, `question`, or `escalation` messages | Waits for the completion notification. A session that Paseo did not start waits with `paseo wait` and reads the result with `paseo logs` |
 | Questions, rebase requests | Answer with `reply`; `send` to the same Dispatch | A follow-up prompt to the same agent |
 | Resuming | `run-use` and `worker-list` with the recorded Run ID | The recorded workspace ID, agent ID, and branch per ticket |
