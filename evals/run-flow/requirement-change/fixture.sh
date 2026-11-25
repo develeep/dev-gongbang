@@ -88,7 +88,7 @@ cat > docs/context/run-flow/2026-10-22-greeting.md <<'MD'
 - ADR:
 - 브랜치: `feature/greet`
 - 시작 HEAD:
-- Orca Run:
+- 워커 식별자:
 - PR:
 
 ## 결정
