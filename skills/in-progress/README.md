@@ -10,7 +10,7 @@
 
 - [set-brief](./set-brief/SKILL.md): 구체화 기록이나 세션 결과를 맥락 없는 작업자도 그대로 이어받을 수 있는 작업 지시서로 정리해 GitHub 이슈나 `docs/context/`에 남긴다. 사용자나 다른 스킬이 지시할 때만 쓴다.
 - [set-ticket](./set-ticket/SKILL.md): set-brief 이슈나 문서가 클 때 혼자 검증할 수 있는 티켓으로 나눠 sub-issue나 docs 파일로 남기고 brief에 연결한다. 사용자나 다른 스킬이 지시할 때만 쓴다.
-- [run-ticket](./run-ticket/SKILL.md): set-brief·set-ticket의 brief와 티켓을 새 세션에서 받아 티켓 하나를 구현·리뷰하고 티켓 상태와 brief 체크박스를 갱신한다. 커밋은 하지 않는다. 여러 티켓은 Orca나 Paseo 워커로 worktree를 나눠 병렬 실행한다. 사용자나 다른 스킬이 지시할 때만 쓴다.
+- [run-ticket](./run-ticket/SKILL.md): set-brief·set-ticket의 brief와 티켓을 새 세션에서 받아 티켓 하나를 구현·리뷰하고 티켓 상태와 brief 체크박스를 갱신한다. 커밋은 하지 않는다. 여러 티켓은 워커 도구 절차가 지정돼 있으면 워커로 worktree를 나눠 병렬 실행하고, 없으면 차례로 실행한다. 사용자나 다른 스킬이 지시할 때만 쓴다.
 - [analyzing-requirements](./analyzing-requirements/SKILL.md): 링크나 PDF·PPT·MD로 받은 기획서를 읽고 요구사항과 서비스·개발 영역별 개발 범위를 마크다운 문서로 정리한다. 기획서에 없는 내용은 채우지 않고 묻는다.
 
 ## 설치
