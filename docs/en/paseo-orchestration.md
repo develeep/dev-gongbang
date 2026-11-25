@@ -4,12 +4,15 @@
 
 # Paseo orchestration setup
 
-This guide sets up Paseo tools, agent profiles, a workspace script, and optional playbooks in [Paseo](https://paseo.sh/docs) so run-ticket can run several tickets in parallel with workers. In the Paseo mode, each ticket gets one worktree workspace branched from the current branch and one agent inside it, and the coordinating session keeps the blocking order and does the merges. run-ticket uses Orca first and falls back to Paseo when Orca is not available. After reading it, you can install the files in `extras/paseo/`, check that they work, and use them alongside Orca.
+This guide sets up Paseo tools, agent profiles, a workspace script, and optional playbooks in [Paseo](https://paseo.sh/docs) so run-ticket can run several tickets in parallel with workers. In the Paseo mode, each ticket gets one worktree workspace branched from the current branch and one agent inside it, and the coordinating session keeps the blocking order and does the merges. After reading it, you can install the files in `extras/paseo/`, register the worker procedure, check that they work, and use them alongside Orca.
+
+The Paseo procedure is optional setup outside the skills. The run-ticket skill does not handle any particular worker tool itself; it runs several tickets in parallel only when the repo or agent rules (CLAUDE.md, AGENTS.md) name a worker tool procedure. Without one, it runs them one after another with subagents. So after installing Paseo, register the Paseo procedure document [`extras/paseo/worker-procedure.md`](../../extras/paseo/worker-procedure.md) in a rules file.
 
 ## Contents
 
 - [Files](#files)
 - [Install](#install)
+- [Register the procedure](#register-the-procedure)
 - [Profiles](#profiles)
 - [How Paseo orchestration works](#how-paseo-orchestration-works)
 - [Run one ticket with a playbook](#run-one-ticket-with-a-playbook)
@@ -21,6 +24,8 @@ This guide sets up Paseo tools, agent profiles, a workspace script, and optional
 
 | File | Install location | Role |
 |---|---|---|
+| [`extras/paseo/worker-procedure.md`](../../extras/paseo/worker-procedure.md) | Read by the coordinating session. Its path goes in a rules file | How to create, wait for, judge, resume, and clean up workers with Paseo, and how to start a cross-review worker. Its section names match the "워커 도구 절차" (Worker tool procedure) items in run-ticket's `references/multi-ticket.md` |
+| [`extras/paseo/register.md`](../../extras/paseo/register.md) | Read and followed by you | The registration text to paste into a rules file, worker model lines with the profile and omp setup values, and the text for naming it together with the Orca procedure |
 | [`extras/paseo/config.json`](../../extras/paseo/config.json) | Merge into `~/.paseo/config.json` | The setting that gives Paseo tools to agents (`daemon.mcp.injectIntoAgents`) and 18 agent profiles, one per purpose |
 | [`extras/paseo/playbooks/`](../../extras/paseo/playbooks/) | `.paseo/plugins/playbooks/` in the repo where you use it | The `run-ticket` playbook that runs one ticket, and two roles (`ticket-implementer`, `ticket-reviewer`). Optional, and needs the Playbooks plugin |
 | [`paseo.json`](../../paseo.json) at the repo root | Already in this repo | This repo's workspace script `check` (`python3 scripts/check.py`). For your own repo, create one in the same format |
@@ -42,6 +47,26 @@ This guide sets up Paseo tools, agent profiles, a workspace script, and optional
    ```
 
    List scripts with `paseo script ls` and run it with `paseo script start check`.
+
+5. **Register the procedure**: name the Paseo procedure in a rules file as described in [Register the procedure](#register-the-procedure) below.
+
+## Register the procedure
+
+The full steps are in [`extras/paseo/register.md`](../../extras/paseo/register.md).
+
+1. **Decide the path of the procedure document.** If you cloned this repository, use the absolute path of `<path to dev-gongbang>/extras/paseo/worker-procedure.md`. For a repo your team shares, copy `worker-procedure.md` into that repo, commit it, and use the repo-relative path.
+2. **Paste the registration text into a rules file.** To use it in every project, put it in your user-level rules file (`~/.claude/CLAUDE.md` for Claude Code, `~/.omp/agent/AGENTS.md` for omp, and so on); to use it in one repo, put it in that repo's `CLAUDE.md` or `AGENTS.md`. Write the path as plain text; do not import it with `@<path>`.
+
+   ```markdown
+   ## 워커 도구 절차
+
+   run-ticket의 워커 도구 절차는 Paseo 절차입니다. 여러 티켓을 병렬로 실행하거나 교차 리뷰를 워커에 맡길 때 `<worker-procedure.md 경로>`를 읽고 따릅니다.
+   ```
+
+3. **Set the worker models (optional).** To pin the profiles to use, or to set the model for when no profile fits, add worker model lines below the registration text. The lines and the values for this folder's profiles and the omp setup are in "워커 모델 정하기" (Setting worker models) in register.md.
+4. **Check.** In a new session, ask "what is run-ticket's worker tool procedure?" and see that the path from step 1 comes back.
+
+If `~/.omp/agent/AGENTS.md` is a link to this repository's `extras/omp/AGENTS.md`, putting the text in that file edits the file in your clone. Keep a copy instead of the link and edit the copy, or put the text in the repo's `AGENTS.md`.
 
 ## Profiles
 
@@ -82,21 +107,21 @@ The models match the per-role models in the [omp multi-agent setup](omp-orchestr
 
 ## How Paseo orchestration works
 
-When running several tickets, run-ticket picks a worker tool in the order Orca, then Paseo, and uses the first one that works. If you name a tool, it uses that one. Paseo is used when the session has Paseo's workspace and agent management tools, or `paseo ls` succeeds. The comparison of the two modes is in [Orca orchestration setup](orca-orchestration.md#how-the-two-modes-differ).
+When running several tickets, run-ticket looks at the procedure for the tool named by you or the caller, then the procedures named in the repo or agent rules (in the order listed), and uses the first one whose usage conditions are met. If no procedure can be used, it runs the tickets one after another with subagents. The Paseo procedure's usage condition is that the session has Paseo's workspace and agent management tools, or `paseo ls` succeeds. The comparison of the two modes is in [Orca orchestration setup](orca-orchestration.md#how-the-two-modes-differ).
 
-With Paseo, it works as follows. Merging, integration checks, completion records, the cross review, and the integration review are the same as with Orca.
+With the Paseo procedure, it works as follows. Merging, integration checks, completion records, the cross review, and the integration review are the same as with Orca.
 
 - **Unit of execution**: Paseo has nothing like a Run or Task, so the coordinating session keeps the blocking order itself.
 - **Worker**: per ticket, one worktree-isolated workspace branched from the current branch (local ref) and one agent inside it.
 - **Worker model**: picked by reading the descriptions of saved agent profiles. Without one, the agent rules; without those, the same provider and model as the coordinating session.
 - **Detecting completion**: waits for the completion notification and does not poll status. A session that Paseo did not start gets no notification, so it waits with `paseo wait` and reads the result with `paseo logs`.
 - **Questions, rebase requests**: a follow-up prompt to the same agent.
-- **Resuming**: from the recorded workspace ID, agent ID, and branch per ticket.
+- **Resuming**: from the recorded workspace ID, agent ID, and branch per ticket. In run-flow they go into `- 워커 식별자:` (worker identifier) in the state file in the format `Paseo 01: 워크스페이스 <ID>, 에이전트 <ID>, 브랜치 <브랜치>; 02: …`.
 - **Cleanup**: archive the workspace (Paseo removes the worktree), then delete the branch.
 
-The cross review is done by a model from a different company than the model that implemented the change. It uses the first method that works in this order: the agent set by the agent rules, an Orca worker, then an agent on another company's model started with Paseo. If none works, it skips the cross review. When starting it with Paseo, it uses the `cross-review` profile if the implementing model is Claude, and otherwise picks a model from a different company than the implementing model.
+The cross review is done by a model from a different company than the model that implemented the change. It uses the first method that works in this order: the agent set by the agent rules, then the worker tool procedure's "cross-review worker". If none works, it skips the cross review. When starting it with the Paseo procedure, it uses the `cross-review` profile if the implementing model is Claude, and otherwise picks a model from a different company than the implementing model.
 
-The detailed steps are in [run-ticket](skills/run-ticket.md#running-multiple-tickets).
+The full commands and judgment rules are in [`extras/paseo/worker-procedure.md`](../../extras/paseo/worker-procedure.md), and the parallel-run flow the coordinator follows is in [run-ticket](skills/run-ticket.md#running-multiple-tickets).
 
 ## Run one ticket with a playbook
 
@@ -110,20 +135,22 @@ The playbook does not merge; you do. Running several tickets in parallel is done
 
 ## Using it with Orca
 
-- If both tools are available, Orca is used. To use Paseo, write "with Paseo" in your request or put it in the agent rules.
-- A resumed run uses the tool whose identifiers are in the record.
-- The "워커" (Workers) section of the omp delegation rules ([omp multi-agent setup](omp-orchestration.md)) sets the worker models for both tools.
+- If you register the Orca and Paseo procedures together, the usage conditions are checked in the order of the registration text and the first procedure that works is used. Put the tool to use first at the top. The text is in "Orca 절차와 함께 지정할 때" (Naming it together with the Orca procedure) in [register.md](../../extras/paseo/register.md).
+- If you write "with Paseo" in your request, the Paseo procedure is used regardless of the order.
+- A resumed run uses the procedure of the tool named in the recorded worker identifier.
+- For each tool, the worker model lines of its registration text set the worker models. For Paseo, agent profiles come first. Values that match the [omp multi-agent setup](omp-orchestration.md) are in the table of each register.md.
 
 ## Check the setup
 
+- In a new session, ask "what is run-ticket's worker tool procedure?" and see that the registered `worker-procedure.md` path comes back
 - In a Paseo session, the profile list shows the 18 profiles in the [Profiles](#profiles) table. Ask an agent "show me the Paseo profiles" or check in Settings.
 - `paseo script ls` shows `check`.
 - The Playbooks panel shows "티켓 실행" (Run ticket) without errors.
 
 ## Notes
 
-- **Playbooks are not an official Paseo feature.** They come from a third-party plugin (lerenn/playbooks), and the plugin README warns that the YAML format may break with each minor release before v1.0. That is why the run-ticket skill does not rely on playbooks.
-- **Worktrees branch from a local ref.** Giving a remote ref as the base leaves out commits you have not pushed, so the skill uses the local ref.
+- **Playbooks are not an official Paseo feature.** They come from a third-party plugin (lerenn/playbooks), and the plugin README warns that the YAML format may break with each minor release before v1.0. That is why the Paseo worker procedure does not use playbooks either.
+- **Worktrees branch from a local ref.** Giving a remote ref as the base leaves out commits you have not pushed, so the procedure uses the local ref.
 - **The worktree setup command is read from the base branch.** The worktree setup command in `paseo.json` is read from the version committed on the chosen base branch.
 - **Editing a profile does not change agents already started.**
 - **Injecting Paseo tools is not a security boundary.** An agent that can use a shell can do the same through the CLI.
