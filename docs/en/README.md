@@ -44,5 +44,5 @@ Install `gongbang-dev` to use these.
 - [Customizing skills](customization.md): How to copy, edit, check, and test a skill
 - [omp multi-agent setup](omp-orchestration.md): How to install omp roles, agents, and delegation rules that use a different model at each stage
 - [Orca orchestration setup](orca-orchestration.md): Optional setup that installs Orca and registers its worker procedure in a rules file so run-ticket can run tickets in parallel with Orca workers, and how the orchestration works
-- [Paseo orchestration setup](paseo-orchestration.md): Optional setup that installs the agent profiles and playbooks and registers the worker procedure in a rules file so run-ticket can run tickets in parallel with Paseo workers, and how the orchestration works
+- [Paseo orchestration setup](paseo-orchestration.md): Optional setup that installs the agent profiles and registers the worker procedure in a rules file so run-ticket can run tickets in parallel with Paseo workers, and how the orchestration works. Playbooks are a separate optional feature for running one ticket
 - [Choosing a skill](../../README.en.md#choosing-a-skill): Which skill fits which situation, and how skills chain together

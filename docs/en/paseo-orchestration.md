@@ -74,7 +74,7 @@ If `~/.omp/agent/AGENTS.md` is a link to this repository's `extras/omp/AGENTS.md
 
 **Quality of the result comes first, so do not split where context is lost.** The agent that writes or implements something is responsible for verifying its own output and applying the results to finish it. The cold read of a draft, checking the done criteria of an implementation, and working out the cause of a failed ticket are not split off so that another agent finishes the work. Splitting these makes the second agent rebuild the first agent's context. Checks that need a fresh context, such as a cold read or a screen check, are done by a separate agent, but the agent that made the output takes the results and applies them. When you add a profile, check both that it has one purpose and that splitting it off loses no context.
 
-The session that starts an agent reads each profile's notes and picks the one that fits the purpose of the job. If no profile fits, it looks up the available providers and models, picks one, and tells you what it used.
+If the worker model lines of the registration text set a profile or model, those come first. Otherwise the session that starts an agent reads each profile's notes and picks the one that fits the purpose of the job. If no profile fits, it looks up the available providers and models, picks one, and tells you what it used.
 
 | Profile | Purpose | Edits files | Model · thinking |
 |---|---|---|---|
@@ -136,9 +136,9 @@ The playbook does not merge; you do. Running several tickets in parallel is done
 ## Using it with Orca
 
 - If you register the Orca and Paseo procedures together, the usage conditions are checked in the order of the registration text and the first procedure that works is used. Put the tool to use first at the top. The text is in "Orca 절차와 함께 지정할 때" (Naming it together with the Orca procedure) in [register.md](../../extras/paseo/register.md).
-- If you write "with Paseo" in your request, the Paseo procedure is used regardless of the order.
+- If you write "with Paseo" in your request, the Paseo procedure is checked first regardless of the order. If its usage conditions are not met, the next procedure in the rules is checked.
 - A resumed run uses the procedure of the tool named in the recorded worker identifier.
-- For each tool, the worker model lines of its registration text set the worker models. For Paseo, agent profiles come first. Values that match the [omp multi-agent setup](omp-orchestration.md) are in the table of each register.md.
+- For each tool, the worker model lines of its registration text set the worker models. For Paseo, the order is the pinned profile, then the model set for when it is missing, then the descriptions of saved profiles. Values that match the [omp multi-agent setup](omp-orchestration.md) are in the table of each register.md.
 
 ## Check the setup
 

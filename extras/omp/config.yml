@@ -11,7 +11,7 @@ modelRoles:
   brief: anthropic/claude-opus-5-5:xhigh
 
   # 티켓 구현 워커. Orca 절차를 등록할 때 extras/orca/register.md의 워커 모델 줄 `--model @worker`가 이 역할을 쓴다. task와 같은 값으로 둔다.
-  # Paseo 절차는 extras/paseo/config.json의 ticket-worker 프로필로 띄운다.
+  # Paseo 절차는 등록 문구의 워커 모델 줄을 따른다. 권장 등록값은 extras/paseo/config.json의 ticket-worker 프로필이다.
   worker: anthropic/claude-opus-5-5:xhigh
 
   # 어려운 구현·대규모 리팩터링 (hard-implementer). task가 Opus xhigh라 승격 단계로 Fable을 쓴다.
