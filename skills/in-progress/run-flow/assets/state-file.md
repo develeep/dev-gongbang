@@ -16,8 +16,7 @@
 - ADR:
 - 브랜치:
 - 시작 HEAD:
-- Orca Run:
-- Paseo 워커:
+- 워커 식별자:
 - PR:
 
 ## 결정

@@ -32,7 +32,7 @@ Install `gongbang-dev` to use these.
 
 - [set-brief](skills/set-brief.md): Records what was decided in the conversation as a brief.
 - [set-ticket](skills/set-ticket.md): Splits a large brief into tickets.
-- [run-ticket](skills/run-ticket.md): Implements and reviews one ticket in a new session. Runs several tickets in parallel with Paseo or Orca.
+- [run-ticket](skills/run-ticket.md): Implements and reviews one ticket in a new session. Runs several tickets in parallel with the worker tool procedure named by you or the repo rules, or in order if no usable procedure exists.
 - [analyzing-requirements](skills/analyzing-requirements.md): Turns a planning document into a requirements and development scope document.
 
 ## Mods
@@ -43,5 +43,6 @@ Install `gongbang-dev` to use these.
 
 - [Customizing skills](customization.md): How to copy, edit, check, and test a skill
 - [omp multi-agent setup](omp-orchestration.md): How to install omp roles, agents, and delegation rules that use a different model at each stage
-- [Paseo orchestration setup](paseo-orchestration.md): How to install the agent profiles and playbooks for running tickets in parallel with Paseo workers, and how the orchestration works
+- [Orca orchestration setup](orca-orchestration.md): Optional setup that installs Orca and registers its worker procedure in a rules file so run-ticket can run tickets in parallel with Orca workers, and how the orchestration works
+- [Paseo orchestration setup](paseo-orchestration.md): Optional setup that installs the agent profiles and registers the worker procedure in a rules file so run-ticket can run tickets in parallel with Paseo workers, and how the orchestration works. Playbooks are a separate optional feature for running one ticket
 - [Choosing a skill](../../README.en.md#choosing-a-skill): Which skill fits which situation, and how skills chain together

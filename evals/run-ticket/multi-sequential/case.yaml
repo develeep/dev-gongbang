@@ -9,19 +9,19 @@ execution:
 context:
   scaffold_script: fixture.sh
 graders:
-  # 근거: skills/in-progress/run-ticket/SKILL.md:160
+  # 근거: skills/in-progress/run-ticket/SKILL.md:162
   - name: reads-multi-ticket-reference
     type: tool_used
     tool: Read
     input_match: 'multi-ticket\.md'
     min: 1
-  # 근거: skills/in-progress/run-ticket/references/multi-ticket.md:21-25, :63-77
+  # 근거: skills/in-progress/run-ticket/references/multi-ticket.md:20-34, :86-100
   - name: both-done-in-order
     type: llm
     criteria: |
       PASS: 티켓 01을 먼저, 02를 그다음에 끝내고, 두 티켓의 `- 상태:`가 `done`이며 brief `## 티켓`의 두 줄이 `- [x]`다.
       FAIL: 티켓 하나만 끝내거나, 02를 01보다 먼저 하거나, 상태나 체크박스를 바꾸지 않는다.
-  # 근거: skills/in-progress/run-ticket/references/multi-ticket.md:74
+  # 근거: skills/in-progress/run-ticket/references/multi-ticket.md:97
   - name: one-integrated-review
     type: llm
     criteria: |

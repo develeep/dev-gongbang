@@ -1,0 +1,80 @@
+# Orca 워커 절차
+
+run-ticket 스킬이 쓰는 워커 도구 절차다. 조정자 세션(run-ticket이나 run-flow를 실행하는 세션)이 여러 티켓을 병렬로 실행하거나 교차 리뷰를 워커에 맡길 때 이 문서를 읽고 Orca로 워커를 다룬다. 절 이름은 run-ticket `references/multi-ticket.md`의 "워커 도구 절차" 항목과 같다.
+
+아래에서 "기록" 규칙, 4번의 워커 spec, 5번의 "통과"·"질문"·"실패"는 `references/multi-ticket.md`의 "기록"과 "병렬 실행"에 있는 것이고, 5단계는 run-ticket SKILL.md의 리뷰 단계다.
+
+이 절차를 에이전트 규칙 파일에 지정하는 방법은 [register.md](register.md)에, Orca 설치와 확인 방법은 [Orca 오케스트레이션 설정](../../docs/orca-orchestration.md)에 있다.
+
+## 목차
+
+1. 사용 조건
+2. 워커 만들기
+3. 기다리기
+4. 끝 판정
+5. 같은 워커에 보내기
+6. 이어 받기
+7. 정리
+8. 워커 식별자
+9. 교차 리뷰 워커
+10. worktree와 브랜치 이름
+
+## 사용 조건
+
+`orchestration` 스킬을 불러올 수 있고, 그 스킬이 고른 Orca 실행 파일로 `status`가 성공한다. 둘 중 하나라도 안 되면 이 절차를 쓸 수 없다.
+
+조건을 만족하면 `orchestration` 스킬을 불러와 그 지시를 따른다. 스킬 도구가 없으면 그 스킬의 SKILL.md를 읽는다. 그 스킬이 고른 Orca 실행 파일로 버전에 맞는 안내를 한 번 읽고, 아래 명령은 그 실행 파일의 `orchestration` 하위 명령으로 실행한다. 인자는 안내와 `--help`로 확인한다.
+
+## 워커 만들기
+
+- **Run 만들기**: brief 제목을 목표로 `run-create`로 Run 하나를 만들고, 만든 Run ID를 바로 "기록" 규칙대로 남긴다. Task는 미리 만들지 않고 워커를 띄울 때 만든다. 미리 만든 Task의 spec에는 그 뒤에 내린 결정이 빠지고, 막힘 관계 순서는 deps가 아니라 머지가 정한다.
+- **워커 만들기**: 티켓마다 `worker-start`로 Task와 워커를 함께 만든다. Run ID, 4번의 워커 spec(`--spec-file`로 넘겨 따옴표가 깨지지 않게 한다), 티켓 번호와 제목을 Task 제목으로 준다. 자리는 이 세션의 worktree 아래 새 worktree(`--worktree new-child`)이고, 기준(`--base-branch`)은 현재 브랜치의 로컬 ref(`refs/heads/<현재 브랜치>`)로 준다. 기준을 빼거나 원격 ref를 주면 push하지 않은 커밋(흐름 문서, 앞서 머지한 티켓)이 빠진 worktree가 생긴다. worktree 이름은 티켓 번호로 한다.
+- **워커의 모델**: 에이전트는 이 세션과 같은 Orca 에이전트로 띄우고, 에이전트 규칙이 구현 워커의 모델과 effort를 정해 두었으면 그것으로, 없으면 모델 인자를 빼고 무엇으로 띄웠는지 알린다.
+- **함께 띄우기**: 같은 때에 띄울 워커들은 셸 명령 하나에서 함께 시작한다. 도구 호출을 나누면 차례로 실행돼 워커마다 준비 시간을 기다린다. 방법은 안내의 parallel-start 참고 문서를 따른다. 시작 결과는 워커마다 모두 읽는다. 결과가 없거나 잘렸으면 `worker-list`로 확인하기 전에는 같은 티켓을 다시 시작하지 않는다.
+- **시작 실패**: `worker-start`가 실패하면 그대로 다시 실행하지 않고 결과의 실패 단계와 복구 안내를 따른다. 안내의 recovery-and-cleanup 참고 문서를 읽는다. 같은 Task는 원인이 바뀐 뒤에만 `--retry-of`로 다시 시작한다. 시작이 세 번 실패해 Orca가 그 Task를 막으면 새 Run이나 Task로 돌아가지 않고 그 티켓을 "실패"로 처리한다.
+
+## 기다리기
+
+워커를 띄운 뒤 턴을 끝낸다. Orca가 메시지로 이 세션을 깨운다. 상태를 되풀이해 조회하거나 `check`를 도는 스크립트를 쓰지 않는다. 스크립트가 메시지를 가져가면 Orca가 깨울 것이 없어진다. 깨운 메시지가 `check` 명령을 가리키면 그 명령을 실행해 메시지를 읽는다.
+
+## 끝 판정
+
+깨어나면 메시지 종류로 갈린다. 조용함, 시간 초과, 확인할 수 없는 생존 상태는 워커가 끝났다는 증거가 아니다.
+
+- `worker_done`: 결과가 성공이고, 보고에 브랜치와 커밋 해시가 있고, 그 커밋이 티켓 브랜치에 있을 때만 5번의 "통과"로 처리한다. 그 밖에는 "실패"로 처리한다. 실패로 보고된 Task를 완료로 바꾸지 않는다.
+- `question`: 5번의 "질문"대로 답을 정해 `reply`로 보낸다.
+- `escalation`: 워커가 `worker_done` 없이 멈췄으면(`stopReason`) `send`로 보고를 요청하고, 다시 멈추면 "실패"로 처리한다. 워커가 종료됐거나(`exited`) 사라졌으면(`lost`) "실패"로 처리한다. 권한 요청이면 brief와 티켓 범위 밖의 것은 이유를 붙여 `deny`로 거절하고, 범위 안의 것은 사용자에게 묻는다. Orca는 사용자가 허락한 승인만 받는다.
+
+## 같은 워커에 보내기
+
+질문 답과 리베이스 요청은 새 워커를 띄우지 않고 같은 Dispatch에 `send --to dispatch:<Dispatch ID>`로 보낸다. 끝난 워커에게 보내면 후속 Task가 되어 다시 `worker_done`으로 보고한다. 새 워커는 앞 워커의 대화를 모른다.
+
+## 이어 받기
+
+기록의 Run ID로 `run-use`를 실행해 이 세션을 그 Run의 조정자로 묶는다. `task-list`로 티켓별 Task 상태를, `worker-list`로 워커의 생존 상태와 다음 행동(`next`)을 보고, 끝난 Dispatch의 마지막 보고는 `worker-read`로 읽는다. 놓친 메시지는 `inbox --terminal run:<Run ID>`로 본다. 실행 중인 워커는 다시 띄우지 않고 깨워 줄 때까지 기다린다.
+
+기록에 Run ID가 없으면 `run-list`에서 brief 제목이 같은 Run을 찾아 사용자에게 확인받은 뒤 쓴다. 제목만으로 고르면 다른 실행의 Run을 잡을 수 있다.
+
+## 정리
+
+머지한 뒤 그 Dispatch를 `worker-release`로 놓아준다. 새 worktree에 띄운 워커는 끝나도 열려 있다. 그다음 Orca로 그 worktree를 지우며 머지된 티켓 브랜치도 함께 지운다(`worktree rm --worktree <선택자> --delete-branch`). 브랜치가 남았으면 `git branch -d <티켓 브랜치>`로 지운다. 실패한 티켓과 통합 검증에 실패한 티켓의 워커와 worktree는 남긴다.
+
+## 워커 식별자
+
+Run ID 하나다. `run-create`로 Run을 만들자마자 "기록" 규칙대로 남긴다. 이어 받는 세션이 어느 절차를 쓸지 알 수 있게 도구 이름을 앞에 붙여 `Orca Run <Run ID>`로 적는다. 부른 쪽이 run-flow면 상태 파일 `## 결과물`의 `- 워커 식별자:` 줄에 적는다.
+
+```
+- 워커 식별자: Orca Run <Run ID>
+```
+
+티켓별 Task와 Dispatch는 따로 적지 않는다. 이어 받을 때 Run ID로 `task-list`와 `worker-list`에서 찾는다.
+
+## 교차 리뷰 워커
+
+run-ticket 5단계의 교차 리뷰를 워커에 맡길 때 쓴다. 다른 회사 모델을 쓰는 에이전트(구현한 모델이 Claude면 Codex, 그 밖이면 Claude Code)를 이 worktree(`--worktree current`)의 Orca 워커로 띄워 맡긴다. spec에는 5단계가 정한 diff 범위와 brief를 넣고, 파일은 고치지 말고 지적만 `worker_done`으로 보고하게 한다. 띄운 뒤 턴을 끝내고, Orca가 깨우면 그 보고를 읽는다. 에이전트 규칙이 교차 리뷰 워커의 모델과 effort를 정해 두었으면 그것으로 띄운다.
+
+## worktree와 브랜치 이름
+
+티켓 워커의 worktree 이름은 "워커 만들기"대로 티켓 번호다.
+
+티켓 워커가 아닌 worktree(흐름을 시작할 작업 브랜치용 등)를 Orca로 만들 때는 `--name feature/YYYYMM-<설명> --branch feature/YYYYMM-<설명>`처럼 같은 값을 넘겨 만든다. Orca가 이름의 `/`를 `-`로 바꿔 디렉터리를 `feature-YYYYMM-<설명>`으로 만들고, `--branch`가 Orca의 브랜치 접두사 설정을 건너뛰어 브랜치가 `feature/YYYYMM-<설명>`이 된다.
