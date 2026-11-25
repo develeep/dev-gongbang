@@ -32,7 +32,7 @@ Install `gongbang-dev` to use these.
 
 - [set-brief](skills/set-brief.md): Records what was decided in the conversation as a brief.
 - [set-ticket](skills/set-ticket.md): Splits a large brief into tickets.
-- [run-ticket](skills/run-ticket.md): Implements and reviews one ticket in a new session. Runs several tickets in parallel with the worker tool named in the repo rules, or in order if none is named.
+- [run-ticket](skills/run-ticket.md): Implements and reviews one ticket in a new session. Runs several tickets in parallel with the worker tool procedure named by you or the repo rules, or in order if no usable procedure exists.
 - [analyzing-requirements](skills/analyzing-requirements.md): Turns a planning document into a requirements and development scope document.
 
 ## Mods

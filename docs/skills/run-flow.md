@@ -27,7 +27,7 @@
 ## 준비물
 
 - 단계 스킬: analyzing-requirements, framing-problems, set-brief, set-ticket, run-ticket. `gongbang`과 `gongbang-dev`를 함께 설치하면 모두 있습니다.
-- 여러 티켓을 병렬로 실행하려면 레포·에이전트 규칙(CLAUDE.md, AGENTS.md)에 워커 도구 절차가 지정돼 있어야 합니다. 워커 도구 절차는 워커를 띄우는 도구 하나로 워커를 다루는 방법을 적은 문서입니다. 쓸 수 있는 절차가 없거나 함께 시작할 수 있는 티켓이 둘 이상이 아니면 티켓을 차례로 실행합니다.
+- 여러 티켓을 병렬로 실행하려면 사용자가 워커 도구 절차를 정해 주거나 레포·에이전트 규칙(CLAUDE.md, AGENTS.md)에 지정돼 있어야 합니다. 워커 도구 절차는 워커를 띄우는 도구 하나로 워커를 다루는 방법을 적은 문서입니다. 쓸 수 있는 절차가 없거나 함께 시작할 수 있는 티켓이 둘 이상이 아니면 티켓을 차례로 실행합니다.
 - 선택 설정 예: [Orca 오케스트레이션 설정](../orca-orchestration.md), [Paseo 오케스트레이션 설정](../paseo-orchestration.md). 각 문서에 도구 설치와 절차를 규칙 파일에 등록하는 방법이 있습니다.
 - PR을 만들려면 github.com 원격과 로그인된 `gh` CLI가 있어야 합니다. 없으면 PR 본문만 보여 주고 멈춥니다.
 - 단계마다 모델을 나눠 쓰려면 [omp 멀티에이전트 설정](../omp-orchestration.md)을 설치합니다.

@@ -6,7 +6,7 @@
 
 [Orca](https://orca.dev/docs/cli/orchestration)에서 run-ticket이 여러 티켓을 워커로 병렬 실행하고 교차 리뷰를 다른 회사 모델의 워커에 맡기도록 설정하는 방법을 설명합니다. Orca 방식은 brief 하나에 Orca Run 하나를 만들고, 티켓마다 현재 브랜치에서 갈라진 child worktree에 워커를 띄웁니다. 조정자 세션은 막힘 관계 순서와 머지를 맡고, 워커가 끝나거나 물으면 Orca가 조정자 세션을 깨웁니다. 이 문서는 Orca 1.4.265를 기준으로 합니다.
 
-Orca 절차는 스킬 밖의 선택 설정입니다. run-ticket 스킬은 특정 워커 도구를 직접 다루지 않고, 레포·에이전트 규칙(CLAUDE.md, AGENTS.md)이 지정한 워커 도구 절차가 있을 때만 여러 티켓을 병렬로 실행합니다. 지정된 절차가 없으면 서브에이전트로 차례로 실행합니다. 그래서 Orca를 설치한 뒤 Orca 절차 문서 [`extras/orca/worker-procedure.md`](../extras/orca/worker-procedure.md)를 규칙 파일에 등록해야 합니다. [Paseo](paseo-orchestration.md) 절차와 함께 등록할 수도 있습니다.
+Orca 절차는 스킬 밖의 선택 설정입니다. run-ticket 스킬은 특정 워커 도구를 직접 다루지 않고, 사용자가 정해 준 워커 도구 절차나 레포·에이전트 규칙(CLAUDE.md, AGENTS.md)이 지정한 절차가 있고 그 사용 조건을 만족할 때만 여러 티켓을 병렬로 실행합니다. 그런 절차가 없으면 서브에이전트로 차례로 실행합니다. 그래서 매번 절차를 알려 주지 않으려면 Orca를 설치한 뒤 Orca 절차 문서 [`extras/orca/worker-procedure.md`](../extras/orca/worker-procedure.md)를 규칙 파일에 등록합니다. [Paseo](paseo-orchestration.md) 절차와 함께 등록할 수도 있습니다.
 
 ## 목차
 

@@ -32,7 +32,7 @@ dev-gongbang의 모든 사용 문서 목록입니다. 스킬 페이지에는 언
 
 - [set-brief](skills/set-brief.md): 대화에서 확정한 내용을 작업 지시서(brief)로 남깁니다.
 - [set-ticket](skills/set-ticket.md): 큰 brief를 티켓으로 나눕니다.
-- [run-ticket](skills/run-ticket.md): 티켓 하나를 새 세션에서 구현하고 리뷰합니다. 여러 티켓은 레포 규칙이 지정한 워커 도구로 병렬 실행하고, 지정된 도구가 없으면 차례로 실행합니다.
+- [run-ticket](skills/run-ticket.md): 티켓 하나를 새 세션에서 구현하고 리뷰합니다. 여러 티켓은 사용자나 레포 규칙이 지정한 워커 도구 절차로 병렬 실행하고, 쓸 수 있는 절차가 없으면 차례로 실행합니다.
 - [analyzing-requirements](skills/analyzing-requirements.md): 기획서를 요구사항과 개발 범위 문서로 정리합니다.
 
 ## Mod

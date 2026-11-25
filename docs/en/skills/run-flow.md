@@ -27,7 +27,7 @@ Takes a planning document, a request, or a brief and runs the development stages
 ## Prerequisites
 
 - The stage skills: analyzing-requirements, framing-problems, set-brief, set-ticket, run-ticket. Installing `gongbang` and `gongbang-dev` together provides all of them.
-- To run several tickets in parallel, the repo or agent rules (CLAUDE.md, AGENTS.md) must name a worker tool procedure. A worker tool procedure is a document that describes how to handle workers with one worker tool. If no usable procedure exists, or fewer than two tickets can start together, tickets run in order.
+- To run several tickets in parallel, you must name a worker tool procedure, or the repo or agent rules (CLAUDE.md, AGENTS.md) must name one. A worker tool procedure is a document that describes how to handle workers with one worker tool. If no usable procedure exists, or fewer than two tickets can start together, tickets run in order.
 - Optional setup examples: [Orca orchestration setup](../orca-orchestration.md), [Paseo orchestration setup](../paseo-orchestration.md). Each guide explains how to install the tool and register its procedure in a rules file.
 - To open a PR, you need a github.com remote and a logged-in `gh` CLI. Otherwise it shows the PR description and stops.
 - To use a different model at each stage, install the [omp multi-agent setup](../omp-orchestration.md).

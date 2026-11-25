@@ -92,7 +92,7 @@ claude plugin update gongbang@dev-gongbang
 
 - [set-brief](docs/skills/set-brief.md): 구체화 기록이나 세션 결과를 맥락 없는 작업자도 이어받을 수 있는 작업 지시서(brief)로 정리해 GitHub 이슈나 `docs/context/` 문서로 남깁니다. 요청하거나 run-flow가 지시할 때만 동작합니다. `/gongbang:set-brief [남길 작업 요약]` · [SKILL.md](skills/in-progress/set-brief/SKILL.md)
 - [set-ticket](docs/skills/set-ticket.md): 큰 brief를 혼자 검증할 수 있는 티켓으로 나눠 GitHub sub-issue나 docs 파일로 남기고 brief에 연결합니다. 요청하거나 run-flow가 지시할 때만 동작합니다. `/gongbang:set-ticket [brief 이슈 번호·URL 또는 docs 경로]` · [SKILL.md](skills/in-progress/set-ticket/SKILL.md)
-- [run-ticket](docs/skills/run-ticket.md): 새 세션에서 티켓 하나를 구현·리뷰하고 티켓 상태와 brief 체크박스를 갱신합니다. 커밋은 하지 않습니다. 여러 티켓은 레포 규칙이 지정한 워커 도구로 병렬 실행하고, 지정된 도구가 없으면 차례로 실행합니다. 요청하거나 run-flow가 지시할 때만 동작합니다. `/gongbang:run-ticket [티켓·brief 경로, 이슈 번호·URL] [여러 티켓이면 범위]` · [SKILL.md](skills/in-progress/run-ticket/SKILL.md)
+- [run-ticket](docs/skills/run-ticket.md): 새 세션에서 티켓 하나를 구현·리뷰하고 티켓 상태와 brief 체크박스를 갱신합니다. 커밋은 하지 않습니다. 여러 티켓은 사용자나 레포 규칙이 지정한 워커 도구 절차로 병렬 실행하고, 쓸 수 있는 절차가 없으면 차례로 실행합니다. 요청하거나 run-flow가 지시할 때만 동작합니다. `/gongbang:run-ticket [티켓·brief 경로, 이슈 번호·URL] [여러 티켓이면 범위]` · [SKILL.md](skills/in-progress/run-ticket/SKILL.md)
 - [analyzing-requirements](docs/skills/analyzing-requirements.md): 링크나 PDF·PPT·MD로 받은 기획서를 읽고 요구사항과 서비스·개발 영역별 개발 범위를 마크다운 문서로 정리합니다. `/gongbang:analyzing-requirements [기획서 링크 또는 파일 경로]` · [SKILL.md](skills/in-progress/analyzing-requirements/SKILL.md)
 
 ## Mod

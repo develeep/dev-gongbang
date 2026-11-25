@@ -6,7 +6,7 @@
 
 This guide sets up [Orca](https://orca.dev/docs/cli/orchestration) so run-ticket can run several tickets in parallel with workers and hand the cross review to a worker on another company's model. In the Orca mode, each brief gets one Orca Run, and each ticket gets a worker in a child worktree branched from the current branch. The coordinating session keeps the blocking order and does the merges, and Orca wakes it when a worker finishes or asks something. This guide is based on Orca 1.4.265.
 
-The Orca procedure is optional setup outside the skills. The run-ticket skill does not handle any particular worker tool itself; it runs several tickets in parallel only when the repo or agent rules (CLAUDE.md, AGENTS.md) name a worker tool procedure. Without one, it runs them one after another with subagents. So after installing Orca, register the Orca procedure document [`extras/orca/worker-procedure.md`](../../extras/orca/worker-procedure.md) in a rules file. You can register it together with the [Paseo](paseo-orchestration.md) procedure.
+The Orca procedure is optional setup outside the skills. The run-ticket skill does not handle any particular worker tool itself; it runs several tickets in parallel only when you name a worker tool procedure or the repo or agent rules (CLAUDE.md, AGENTS.md) name one, and its usage conditions are met. Without one, it runs them one after another with subagents. So, to avoid naming the procedure every time, after installing Orca, register the Orca procedure document [`extras/orca/worker-procedure.md`](../../extras/orca/worker-procedure.md) in a rules file. You can register it together with the [Paseo](paseo-orchestration.md) procedure.
 
 ## Contents
 

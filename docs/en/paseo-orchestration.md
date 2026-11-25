@@ -6,7 +6,7 @@
 
 This guide sets up Paseo tools, agent profiles, a workspace script, and optional playbooks in [Paseo](https://paseo.sh/docs) so run-ticket can run several tickets in parallel with workers. In the Paseo mode, each ticket gets one worktree workspace branched from the current branch and one agent inside it, and the coordinating session keeps the blocking order and does the merges. After reading it, you can install the files in `extras/paseo/`, register the worker procedure, check that they work, and use them alongside Orca.
 
-The Paseo procedure is optional setup outside the skills. The run-ticket skill does not handle any particular worker tool itself; it runs several tickets in parallel only when the repo or agent rules (CLAUDE.md, AGENTS.md) name a worker tool procedure. Without one, it runs them one after another with subagents. So after installing Paseo, register the Paseo procedure document [`extras/paseo/worker-procedure.md`](../../extras/paseo/worker-procedure.md) in a rules file.
+The Paseo procedure is optional setup outside the skills. The run-ticket skill does not handle any particular worker tool itself; it runs several tickets in parallel only when you name a worker tool procedure or the repo or agent rules (CLAUDE.md, AGENTS.md) name one, and its usage conditions are met. Without one, it runs them one after another with subagents. So, to avoid naming the procedure every time, after installing Paseo, register the Paseo procedure document [`extras/paseo/worker-procedure.md`](../../extras/paseo/worker-procedure.md) in a rules file.
 
 ## Contents
 
@@ -119,7 +119,7 @@ With the Paseo procedure, it works as follows. Merging, integration checks, comp
 - **Resuming**: from the recorded workspace ID, agent ID, and branch per ticket. In run-flow they go into `- 워커 식별자:` (worker identifier) in the state file in the format `Paseo 01: 워크스페이스 <ID>, 에이전트 <ID>, 브랜치 <브랜치>; 02: …`.
 - **Cleanup**: archive the workspace (Paseo removes the worktree), then delete the branch.
 
-The cross review is done by a model from a different company than the model that implemented the change. It uses the first method that works in this order: the agent set by the agent rules, then the worker tool procedure's "cross-review worker". If none works, it skips the cross review. When starting it with the Paseo procedure, it uses the `cross-review` profile if the implementing model is Claude, and otherwise picks a model from a different company than the implementing model.
+The cross review is done by a model from a different company than the model that implemented the change. It uses the first method that works in this order: the agent set by the agent rules, then the worker tool procedure's "cross-review worker". If none works, it skips the cross review. When starting it with the Paseo procedure, it picks the model in this order: the worker model lines of the registration text (profile, then the model for when the profile is missing), the descriptions of saved profiles, then a lookup of available models. It never uses a model from the same company as the implementing model. With this folder's values, it uses the `cross-review` profile when the implementing model is Claude.
 
 The full commands and judgment rules are in [`extras/paseo/worker-procedure.md`](../../extras/paseo/worker-procedure.md), and the parallel-run flow the coordinator follows is in [run-ticket](skills/run-ticket.md#running-multiple-tickets).
 
