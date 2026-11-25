@@ -47,7 +47,7 @@ mod는 `mods/<플러그인 이름>/`에 두고 `marketplace.json`에 따로 등�
 
 ## Extras
 
-`extras/<이름>/`에는 플러그인에 넣을 수 없어 사용자가 직접 설치하는 파일을 둔다. 지금은 `statusline/`, mod 환경을 한 번에 설정하는 `setup.sh`, omp 역할·에이전트·위임 규칙인 `omp/`, Paseo 에이전트 프로필과 플레이북인 `paseo/`가 있다. mod나 외부 mod 목록이 바뀌면 `setup.sh`도 고친다. 버전을 매기지 않고, 설치 방법과 동작은 `statusline/`과 `setup.sh`는 `docs/mods.md`에, `omp/`는 `docs/omp-orchestration.md`에, `paseo/`는 `docs/paseo-orchestration.md`에 적고 영어판(`docs/en/`)도 함께 고친다. `paseo/playbooks/`를 고치면 `.paseo/plugins/playbooks/`에 복사해 Paseo의 플레이북 검증으로 오류가 없는지 확인한 뒤 복사본을 지운다.
+`extras/<이름>/`에는 플러그인에 넣을 수 없어 사용자가 직접 설치하는 파일을 둔다. 지금은 `statusline/`, mod 환경을 한 번에 설정하는 `setup.sh`, omp 역할·에이전트·위임 규칙인 `omp/`, Orca 워커 절차와 등록 문구인 `orca/`, Paseo 워커 절차·등록 문구·에이전트 프로필·플레이북인 `paseo/`가 있다. 스킬에는 Orca·Paseo 같은 워커 도구 이름을 쓰지 않는다. 도구별 절차는 `extras/<도구>/worker-procedure.md`에 두고, run-ticket `references/multi-ticket.md`의 "워커 도구 절차" 항목을 모두 채운다. mod나 외부 mod 목록이 바뀌면 `setup.sh`도 고친다. 버전을 매기지 않고, 설치 방법과 동작은 `statusline/`과 `setup.sh`는 `docs/mods.md`에, `omp/`는 `docs/omp-orchestration.md`에, `orca/`는 `docs/orca-orchestration.md`에, `paseo/`는 `docs/paseo-orchestration.md`에 적고 영어판(`docs/en/`)도 함께 고친다. `paseo/playbooks/`를 고치면 `.paseo/plugins/playbooks/`에 복사해 Paseo의 플레이북 검증으로 오류가 없는지 확인한 뒤 복사본을 지운다.
 
 ## 릴리스
 
