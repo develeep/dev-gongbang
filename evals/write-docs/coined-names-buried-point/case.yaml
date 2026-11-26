@@ -17,21 +17,21 @@ execution:
 context:
   scaffold_script: fixture.sh
 graders:
-  # 근거: skills/productivity/write-docs/reference/clear-writing.md:24
-  # 근거: skills/productivity/write-docs/SKILL.md:83
+  # 근거: skills/productivity/write-docs/reference/clear-writing.md:25
+  # 근거: skills/productivity/write-docs/SKILL.md:91
   - name: coined-name-fixed
     type: llm
     criteria: |
       PASS: 결과의 "바뀌는 점" 섹션에 "결제 입구 지점"이나 "~에 자리합니다" 같은 지어낸 말이 남지 않고, 서버가 결제 요청을 처리하기 전에(또는 결제 요청을 받으면 먼저) 카드 번호 형식을 확인한다는 것을 누가 무엇을 하는지 드러나는 흔한 말로 쓴다.
       FAIL: "결제 입구 지점"이나 "자리합니다"를 그대로 두거나, "결제 진입 검증 단계"처럼 단어를 이어 붙인 다른 이름으로 바꾸기만 한다.
-  # 근거: skills/productivity/write-docs/reference/clear-writing.md:32
-  # 근거: skills/productivity/write-docs/SKILL.md:84
+  # 근거: skills/productivity/write-docs/reference/clear-writing.md:33
+  # 근거: skills/productivity/write-docs/SKILL.md:92
   - name: point-in-main-clause
     type: llm
     criteria: |
       PASS: 결과의 "일정" 섹션에서 배포가 금요일 오후 2시에 시작되고 약 30분 동안 결제가 멈춘다는 내용이 문장의 주절(주어와 서술어)로 나온다. "~라는 점이 핵심이라고 할 수 있습니다" 같은 빈 주절이 없고, "원활한 업무에 보탬이 되었으면 합니다"처럼 요점이 없는 문장을 지웠거나 독자가 할 일을 담은 문장으로 바꿨다.
       FAIL: 배포 시각과 결제 중단이 "~라는 점", "~라는 사실" 같은 명사절에 묻힌 채 주절이 "핵심이다", "알아 두시기 바랍니다"처럼 비어 있거나, 요점 없는 문장을 그대로 둔다.
-  # 근거: skills/productivity/write-docs/SKILL.md:48
+  # 근거: skills/productivity/write-docs/SKILL.md:49
   # 근거: skills/productivity/write-docs/SKILL.md:12
   - name: facts-and-structure-kept
     type: llm
