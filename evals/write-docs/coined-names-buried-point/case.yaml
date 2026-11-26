@@ -18,14 +18,14 @@ context:
   scaffold_script: fixture.sh
 graders:
   # 근거: skills/productivity/write-docs/reference/clear-writing.md:25
-  # 근거: skills/productivity/write-docs/SKILL.md:91
+  # 근거: skills/productivity/write-docs/SKILL.md:85
   - name: coined-name-fixed
     type: llm
     criteria: |
       PASS: 결과의 "바뀌는 점" 섹션에 "결제 입구 지점"이나 "~에 자리합니다" 같은 지어낸 말이 남지 않고, 서버가 결제 요청을 처리하기 전에(또는 결제 요청을 받으면 먼저) 카드 번호 형식을 확인한다는 것을 누가 무엇을 하는지 드러나는 흔한 말로 쓴다.
       FAIL: "결제 입구 지점"이나 "자리합니다"를 그대로 두거나, "결제 진입 검증 단계"처럼 단어를 이어 붙인 다른 이름으로 바꾸기만 한다.
   # 근거: skills/productivity/write-docs/reference/clear-writing.md:33
-  # 근거: skills/productivity/write-docs/SKILL.md:92
+  # 근거: skills/productivity/write-docs/SKILL.md:86
   - name: point-in-main-clause
     type: llm
     criteria: |

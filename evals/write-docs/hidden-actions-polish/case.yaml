@@ -21,7 +21,7 @@ context:
   scaffold_script: fixture.sh
 graders:
   # 근거: skills/productivity/write-docs/SKILL.md:55
-  # 근거: skills/productivity/write-docs/SKILL.md:90
+  # 근거: skills/productivity/write-docs/SKILL.md:84
   # 근거: skills/productivity/write-docs/reference/clear-writing.md:25
   - name: unclear-sentence-ratio
     type: llm

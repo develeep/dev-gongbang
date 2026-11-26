@@ -18,7 +18,7 @@ context:
   scaffold_script: fixture.sh
 graders:
   # 근거: skills/productivity/write-docs/SKILL.md:55
-  # 근거: skills/productivity/write-docs/SKILL.md:90
+  # 근거: skills/productivity/write-docs/SKILL.md:84
   # 근거: skills/productivity/write-docs/reference/clear-writing.md:25
   - name: unclear-sentence-ratio
     type: llm
@@ -35,10 +35,11 @@ graders:
   - name: conclusion-first
     type: llm
     criteria: |
-      PASS: 보고 본문의 첫 문장(인사말 한 마디는 빼고)이 실험의 결론, 곧 B안(개인화 추천 위젯)을 전체에 적용하지 않고 보류한다는 결정이나 클릭률은 올랐지만 전환율 차이는 확인되지 않았다는 결과를 말한다. 다음 할 일(민지 님의 캐시 적용 후 2주 재실험)과 데이터팀에 바라는 일(재실험 전에 전환 윈도 7일·14일 중 지표 정의 검토)이 본문에 행동으로 나온다.
+      PASS: 보고 본문의 첫 문장("*추천 위젯 A/B 실험 결과*"나 "#growth 채널용 초안" 같은 제목·머리글 한 줄과 인사말 한 마디는 빼고)이 실험의 결론, 곧 B안(개인화 추천 위젯)을 전체에 적용하지 않고 보류한다는 결정이나 클릭률은 올랐지만 전환율 차이는 확인되지 않았다는 결과를 말한다. 다음 할 일(민지 님의 캐시 적용 후 2주 재실험)과 데이터팀에 바라는 일(재실험 전에 전환 윈도 7일·14일 중 지표 정의 검토)이 본문에 행동으로 나온다.
       FAIL: 실험 기간·대상 같은 배경이나 "실험 결과 공유드립니다"처럼 내용 없는 문장으로 시작해 결론이 첫 문장에 없거나, 데이터팀에 무엇을 해 달라는지 빠진다.
   # 근거: skills/productivity/write-docs/SKILL.md:48
   # 근거: skills/productivity/write-docs/SKILL.md:12
+  # 근거: skills/productivity/write-docs/reference/clear-writing.md:43
   - name: facts-kept
     type: llm
     criteria: |
