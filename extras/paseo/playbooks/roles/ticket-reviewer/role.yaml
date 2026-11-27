@@ -1,3 +1,0 @@
-title: 교차 리뷰
-readonly: true
-agent: { provider: omp, model: openai-codex/gpt-6.2-sol, thinking: high, mode: full }
