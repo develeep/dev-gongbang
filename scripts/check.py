@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check repo invariants from CLAUDE.md. Run after changing a skill or a mod. Needs PyYAML."""
+"""Check repo invariants from AGENTS.md. Run after changing a skill or a mod. Needs PyYAML."""
 import json, shutil, subprocess, sys, tempfile
 from pathlib import Path
 

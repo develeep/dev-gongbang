@@ -118,7 +118,7 @@ This creates a link for each skill in `~/.claude/skills/`. To link only some ski
 
 ## Contributing
 
-To make your edits available to everyone, fork the repository and send a PR. Rules to follow when adding or moving a skill are in [.claude/CLAUDE.md](../../.claude/CLAUDE.md). After making changes, run `scripts/check.py` and make it pass.
+To make your edits available to everyone, fork the repository and send a PR. Rules to follow when adding or moving a skill are in [AGENTS.md](../../AGENTS.md). After making changes, run `scripts/check.py` and make it pass.
 
 ---
 
