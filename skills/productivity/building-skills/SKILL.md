@@ -1,8 +1,7 @@
 ---
 name: building-skills
-description: Claude 공식 skill best practice와 Agent Skills 명세에 맞춰 스킬을 완성한다. prompt-builder가 만든 SKILL.md 초안을 이어받아 검증·보완하거나, 대화 기록·런북·코드 같은 실제 자료에서 스킬을 새로 만든다. 정적 검사, 실행 테스트, 사람 리뷰, 수정 반복까지 맡는다.
+description: Claude 공식 skill best practice와 Agent Skills 명세에 맞춰 스킬을 완성한다. 스킬(SKILL.md)을 새로 만들거나, SKILL.md 초안이나 기존 스킬을 검증·테스트·개선해 달라는 요청일 때 쓴다. prompt-builder가 만든 초안을 이어받거나 대화 기록·런북·코드 같은 실제 자료에서 스킬을 만들고, 정적 검사, 실행 테스트, 사람 리뷰, 수정 반복까지 맡는다. 비용이 드는 검증은 비용을 알리고 사용자가 고를 때만 한다. CLAUDE.md, AGENTS.md, 시스템 프롬프트 작성에는 쓰지 않는다.
 argument-hint: "[스킬 폴더 경로, SKILL.md 초안, 또는 만들 스킬 설명]"
-disable-model-invocation: true
 ---
 
 # Building Skills
