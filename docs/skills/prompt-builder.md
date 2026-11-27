@@ -94,4 +94,4 @@
 
 ---
 
-[문서 목록](../README.md) · 다음: [building-skills](building-skills.md) →
+[문서 목록](../README.md) · 다음: [set-guidelines](set-guidelines.md) →

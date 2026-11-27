@@ -75,12 +75,12 @@ claude plugin update gongbang@dev-gongbang
 ### User-invoked
 
 - [prompt-builder](docs/skills/prompt-builder.md): Claude·GPT 모델별 가이드에 맞춰 시스템·에이전트 프롬프트, CLAUDE.md, SKILL.md를 인터뷰로 설계하거나, 기존 초안을 고치고 리뷰합니다. `/gongbang:prompt-builder [초안 경로 또는 만들 프롬프트 설명]` · [SKILL.md](skills/productivity/prompt-builder/SKILL.md)
-- [building-skills](docs/skills/building-skills.md): Claude 공식 skill best practice와 Agent Skills 명세에 맞춰, SKILL.md 초안이나 대화 기록·런북·코드 같은 자료로 스킬을 완성하고 정적 검사·실행 테스트·사람 리뷰·수정을 반복합니다. `/gongbang:building-skills [스킬 폴더 경로, SKILL.md 초안, 또는 만들 스킬 설명]` · [SKILL.md](skills/productivity/building-skills/SKILL.md)
-- [write-docs](docs/skills/write-docs.md): 분야·독자·목적·톤·자료를 질문으로 정한 뒤 글 초안을 쓰거나, 가져온 초안과 기존 문서를 고칩니다. 업무 메시지는 결론부터 쓰고, 기술 문서는 토스 테크니컬 라이팅 가이드의 문서 유형과 원칙을 따릅니다. `/gongbang:write-docs [쓰거나 고칠 글에 대한 요청]` · [SKILL.md](skills/productivity/write-docs/SKILL.md)
 - [set-guidelines](docs/skills/set-guidelines.md): awesome-guidelines에서 레포의 언어·프레임워크에 맞는 가이드와 도구를 골라, `.claude/rules/` 규칙 파일, CLAUDE.md/AGENTS.md, 린터·포매터 설정 중 고른 것을 작성합니다. `/gongbang:set-guidelines` · [SKILL.md](skills/engineering/set-guidelines/SKILL.md)
 
 ### Model-invoked
 
+- [building-skills](docs/skills/building-skills.md): Claude 공식 skill best practice와 Agent Skills 명세에 맞춰, SKILL.md 초안이나 대화 기록·런북·코드 같은 자료로 스킬을 완성하고 정적 검사·실행 테스트·사람 리뷰·수정을 반복합니다. 스킬을 만들거나 검증·개선해 달라고 하면 동작합니다. `/gongbang:building-skills [스킬 폴더 경로, SKILL.md 초안, 또는 만들 스킬 설명]` · [SKILL.md](skills/productivity/building-skills/SKILL.md)
+- [write-docs](docs/skills/write-docs.md): 분야·독자·목적·톤·자료를 질문으로 정한 뒤 글 초안을 쓰거나, 가져온 초안과 기존 문서를 고칩니다. 업무 메시지는 결론부터 쓰고, 기술 문서는 토스 테크니컬 라이팅 가이드의 문서 유형과 원칙을 따릅니다. 문서나 업무 메시지를 쓰거나 다듬어 달라고 하면 동작합니다. `/gongbang:write-docs [쓰거나 고칠 글에 대한 요청]` · [SKILL.md](skills/productivity/write-docs/SKILL.md)
 - [framing-problems](docs/skills/framing-problems.md): 바로 실행하지 않고 의도·원인·제약을 정리한 구체화 기록을 사용자와 확정한 뒤, 그 기록에 따라 작업합니다. 사용자가 구체화를 요청하거나 프롬프트·다른 스킬이 지시할 때만 동작합니다. `/gongbang:framing-problems [구체화할 요청]` · [SKILL.md](skills/productivity/framing-problems/SKILL.md)
 - [check-guidelines](docs/skills/check-guidelines.md): 규칙 파일, CLAUDE.md/AGENTS.md, 린터·포매터 설정을 기준으로 고른 범위의 코드를 검사해 규칙별로 보고하고, 고른 위반을 고친 뒤 다시 검사합니다. `/gongbang:check-guidelines [all | diff | branch | 경로]` · [SKILL.md](skills/engineering/check-guidelines/SKILL.md)
 
@@ -88,12 +88,9 @@ claude plugin update gongbang@dev-gongbang
 
 `gongbang-dev`를 설치하면 쓸 수 있습니다. 동작이 자주 바뀝니다.
 
-### User-invoked
-
-- [run-flow](docs/skills/run-flow.md): 기획서, 요청, brief 중 하나로 요구사항 정리부터 PR 생성까지 단계 스킬을 차례로 불러 진행합니다. 사용자는 각 단계 스킬이 묻는 확인과 질문에만 답합니다. 인자 없이 실행하면 진행 중인 흐름을 이어 가고, `status`를 주면 끝나지 않은 흐름을 보여 줍니다. `/gongbang:run-flow [기획서 경로·링크 | 요청 | brief 경로·이슈 번호 | 상태 파일 | status]` · [SKILL.md](skills/in-progress/run-flow/SKILL.md)
-
 ### Model-invoked
 
+- [run-flow](docs/skills/run-flow.md): 기획서, 요청, brief 중 하나로 요구사항 정리부터 PR 생성까지 단계 스킬을 차례로 불러 진행합니다. 사용자는 각 단계 스킬이 묻는 확인과 질문에만 답합니다. 기획서를 받아 개발하거나 요구사항 정리부터 티켓 분할·구현·리뷰까지 거칠 큰 작업을 맡기면 동작하고, 이름으로 직접 부를 수도 있습니다. 인자 없이 실행하면 진행 중인 흐름을 이어 가고, `status`를 주면 끝나지 않은 흐름을 보여 줍니다. `/gongbang:run-flow [기획서 경로·링크 | 요청 | brief 경로·이슈 번호 | 상태 파일 | status]` · [SKILL.md](skills/in-progress/run-flow/SKILL.md)
 - [set-brief](docs/skills/set-brief.md): 구체화 기록이나 세션 결과를, 맥락 없는 작업자가 그것만 읽고 같은 결과를 낼 수 있는 작업 지시서(brief)로 정리해 GitHub 이슈나 `docs/context/` 문서로 남깁니다. 요청하거나 run-flow 같은 다른 스킬이 지시할 때만 동작합니다. `/gongbang:set-brief [남길 작업 요약]` · [SKILL.md](skills/in-progress/set-brief/SKILL.md)
 - [set-ticket](docs/skills/set-ticket.md): set-brief로 남긴 brief가 한 번에 작업하기에 클 때, 혼자 검증할 수 있는 티켓으로 나눠 GitHub sub-issue나 docs 파일로 남기고 brief에 연결합니다. 요청하거나 run-flow 같은 다른 스킬이 지시할 때만 동작합니다. `/gongbang:set-ticket [brief 이슈 번호·URL 또는 docs 경로]` · [SKILL.md](skills/in-progress/set-ticket/SKILL.md)
 - [run-ticket](docs/skills/run-ticket.md): brief와 티켓 문서를 받아 티켓 하나를 이 세션이 직접 구현·리뷰하고, 티켓 상태와 brief 체크박스를 갱신합니다. 직접 실행할 때는 커밋하지 않습니다. 여러 티켓은 차례로 실행하고, 사용자가 워커 도구 절차를 지정했거나 레포·에이전트 규칙에 등록해 둔 때만 워커로 병렬 실행합니다. 요청하거나 run-flow 같은 다른 스킬이 지시할 때만 동작합니다. `/gongbang:run-ticket [티켓·brief 경로, 이슈 번호·URL] [여러 티켓이면 범위]` · [SKILL.md](skills/in-progress/run-ticket/SKILL.md)

@@ -71,4 +71,4 @@ CLAUDE.md와 AGENTS.md를 둘 다 만들면 CLAUDE.md에 `@AGENTS.md` 줄을 넣
 
 ---
 
-← 이전: [write-docs](write-docs.md) · [문서 목록](../README.md) · 다음: [framing-problems](framing-problems.md) →
+← 이전: [prompt-builder](prompt-builder.md) · [문서 목록](../README.md) · 다음: [building-skills](building-skills.md) →

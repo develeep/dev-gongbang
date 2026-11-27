@@ -13,12 +13,12 @@ dev-gongbang의 사용 문서 목록입니다. 쓸 스킬의 사용법, mod 설�
 ### User-invoked
 
 - [prompt-builder](skills/prompt-builder.md): Claude·GPT 모델별 가이드에 맞춰 시스템·에이전트 프롬프트, CLAUDE.md, SKILL.md를 인터뷰로 설계하거나, 기존 초안을 고치고 리뷰합니다.
-- [building-skills](skills/building-skills.md): SKILL.md 초안이나 대화 기록·런북·코드 같은 자료로 스킬을 완성하고, 정적 검사·실행 테스트·사람 리뷰·수정을 반복합니다.
-- [write-docs](skills/write-docs.md): 분야·독자·목적·톤·자료를 질문으로 정한 뒤 글 초안을 쓰거나, 가져온 초안과 기존 문서를 고칩니다.
 - [set-guidelines](skills/set-guidelines.md): awesome-guidelines에서 레포의 언어·프레임워크에 맞는 가이드를 골라, `.claude/rules/` 규칙 파일, CLAUDE.md/AGENTS.md, 린터·포매터 설정 중 고른 것을 작성합니다.
 
 ### Model-invoked
 
+- [building-skills](skills/building-skills.md): SKILL.md 초안이나 대화 기록·런북·코드 같은 자료로 스킬을 완성하고, 정적 검사·실행 테스트·사람 리뷰·수정을 반복합니다. 스킬을 만들거나 검증·개선해 달라고 하면 동작합니다.
+- [write-docs](skills/write-docs.md): 분야·독자·목적·톤·자료를 질문으로 정한 뒤 글 초안을 쓰거나, 가져온 초안과 기존 문서를 고칩니다. 문서나 업무 메시지를 쓰거나 다듬어 달라고 하면 동작합니다.
 - [framing-problems](skills/framing-problems.md): 작업 전에 의도·원인·제약을 정리한 구체화 기록을 사용자와 확정합니다.
 - [check-guidelines](skills/check-guidelines.md): 레포의 규칙 파일과 린터·포매터 설정으로 고른 범위의 코드를 검사하고, 고른 위반을 고칩니다.
 
@@ -26,12 +26,9 @@ dev-gongbang의 사용 문서 목록입니다. 쓸 스킬의 사용법, mod 설�
 
 `gongbang-dev`를 설치해야 쓸 수 있습니다. 동작이 자주 바뀝니다.
 
-### User-invoked
-
-- [run-flow](skills/run-flow.md): 기획서, 요청, brief 중 하나로 요구사항 정리부터 PR 생성까지 단계 스킬을 차례로 불러 진행합니다.
-
 ### Model-invoked
 
+- [run-flow](skills/run-flow.md): 기획서, 요청, brief 중 하나로 요구사항 정리부터 PR 생성까지 단계 스킬을 차례로 불러 진행합니다. 기획서를 받아 개발하거나 요구사항 정리부터 티켓 분할·구현·리뷰까지 거칠 큰 작업을 맡기면 동작합니다.
 - [set-brief](skills/set-brief.md): 구체화 기록이나 세션 결과를 맥락 없는 작업자도 이어받을 수 있는 작업 지시서(brief)로 남깁니다.
 - [set-ticket](skills/set-ticket.md): 큰 brief를 혼자 검증할 수 있는 티켓으로 나눕니다.
 - [run-ticket](skills/run-ticket.md): brief와 티켓 문서를 받아 티켓 하나를 구현·리뷰합니다. 여러 티켓은 차례로 실행하고, 워커 도구 절차가 지정되거나 등록돼 있을 때만 워커로 병렬 실행합니다.

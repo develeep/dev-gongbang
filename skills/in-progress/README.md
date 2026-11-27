@@ -2,12 +2,9 @@
 
 만드는 중인 스킬. 플러그인에 포함되지 않는다. 다듬어지면 `engineering/`이나 `productivity/`로 옮긴다.
 
-## User-invoked
-
-- [run-flow](./run-flow/SKILL.md): 기획서, 요청, brief 중 하나를 받아 요구사항 정리부터 PR 생성까지 단계 스킬을 차례로 불러 이어서 진행한다. 사용자는 각 스킬의 확인과 질문에만 답한다.
-
 ## Model-invoked
 
+- [run-flow](./run-flow/SKILL.md): 기획서, 요청, brief 중 하나를 받아 요구사항 정리부터 PR 생성까지 단계 스킬을 차례로 불러 이어서 진행한다. 사용자는 각 스킬의 확인과 질문에만 답한다. 기획서를 받아 개발하거나 요구사항 정리부터 티켓 분할·구현·리뷰까지 거칠 큰 작업을 맡길 때 쓴다.
 - [set-brief](./set-brief/SKILL.md): 구체화 기록이나 세션 결과를 맥락 없는 작업자도 그대로 이어받을 수 있는 작업 지시서로 정리해 GitHub 이슈나 `docs/context/`에 남긴다. 사용자나 다른 스킬이 지시할 때만 쓴다.
 - [set-ticket](./set-ticket/SKILL.md): set-brief 이슈나 문서가 클 때 혼자 검증할 수 있는 티켓으로 나눠 sub-issue나 docs 파일로 남기고 brief에 연결한다. 사용자나 다른 스킬이 지시할 때만 쓴다.
 - [run-ticket](./run-ticket/SKILL.md): set-brief·set-ticket의 brief와 티켓 문서를 기준으로 티켓 하나를 구현·리뷰하고 티켓 상태와 brief 체크박스를 갱신한다. 커밋은 하지 않는다. 여러 티켓은 워커 도구 절차가 지정돼 있으면 워커로 worktree를 나눠 병렬 실행하고, 없으면 차례로 실행한다. 사용자나 다른 스킬이 지시할 때만 쓴다.

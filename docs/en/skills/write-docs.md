@@ -9,7 +9,7 @@ Settle the field, audience, purpose, tone, and material of a text first, and get
 | Field | Value |
 |---|---|
 | Bucket | productivity |
-| Invocation | User-invoked |
+| Invocation | Model-invoked (when you ask to write or polish a document or a work message) |
 | Command | `/gongbang:write-docs [request for the text to write or revise]` |
 | Source | [SKILL.md](../../../skills/productivity/write-docs/SKILL.md) |
 
@@ -82,4 +82,4 @@ There is no flow that connects to other skills.
 
 ---
 
-← Previous: [building-skills](building-skills.md) · [All docs](../README.md) · Next: [set-guidelines](set-guidelines.md) →
+← Previous: [building-skills](building-skills.md) · [All docs](../README.md) · Next: [framing-problems](framing-problems.md) →

@@ -9,7 +9,7 @@
 | 항목 | 값 |
 |---|---|
 | 버킷 | productivity |
-| 호출 방식 | User-invoked |
+| 호출 방식 | Model-invoked (문서나 업무 메시지를 쓰거나 다듬어 달라고 할 때) |
 | 호출 | `/gongbang:write-docs [쓰거나 고칠 글에 대한 요청]` |
 | 원문 | [SKILL.md](../../skills/productivity/write-docs/SKILL.md) |
 
@@ -82,4 +82,4 @@
 
 ---
 
-← 이전: [building-skills](building-skills.md) · [문서 목록](../README.md) · 다음: [set-guidelines](set-guidelines.md) →
+← 이전: [building-skills](building-skills.md) · [문서 목록](../README.md) · 다음: [framing-problems](framing-problems.md) →
