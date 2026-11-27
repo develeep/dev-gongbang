@@ -76,7 +76,11 @@ python3 scripts/protected_paths.py close --state <상태 파일>
 
 ### 0. 시작 단계 고르기
 
-인자를 아래 표의 위 행부터 차례로 맞춰 보고 처음 맞는 행의 단계를 고른다. 고른 단계와 근거를 한 줄로, 체크리스트와 함께 알린 뒤 바로 시작한다. 상태 파일, brief, 티켓도 MD 문서라 기획서 행보다 먼저 맞춰 본다.
+먼저 저장소 루트에서 아래 스크립트를 실행한다. 경로는 이 스킬 폴더 기준이고, 레포 규칙이나 상태 파일 `## 결정`이 완료 표시를 `done`과 다르게 정했으면 `--done <값>`으로 준다. 스크립트는 저장소의 docs 문서만 보고 아래 표의 규칙대로 판정해 JSON 한 줄을 낸다. `stage`가 있으면 그 단계로 시작하고, `state_file`이 있으면 그 상태 파일을 이어 쓰고, `candidates`가 있으면 그 목록을 보여 주고 고르게 한다. `stage`가 null이면 `reason`을 보고 아래 표로 이 세션이 정한다. 요청 문장, 링크, GitHub 이슈와 티켓, `## 티켓`이 없는 brief의 크기 판단이 그렇다. 고른 단계와 근거를 한 줄로, 체크리스트와 함께 알린 뒤 바로 시작한다.
+
+```bash
+python3 scripts/start_stage.py [<인자>] [--done <완료 값>]
+```
 
 - brief는 `- 작성일: YYYY-MM-DD` 줄이 있는 문서이고, 티켓은 brief의 `## 티켓` 섹션 링크가 가리키는 문서다.
 - docs 티켓은 `- 상태: done`이면, GitHub 티켓은 closed이면 끝난 것이다. 레포 규칙이나 상태 파일 `## 결정`이 완료 표시를 다른 값으로 정했으면 그 값도 끝난 것이다. `## 티켓` 섹션이 없는 brief는 "남은 일"에 빈 체크박스가 없으면 끝난 것이다.
@@ -98,7 +102,7 @@ python3 scripts/protected_paths.py close --state <상태 파일>
 - `## 구체화 기록`이 있고 brief가 없는 흐름은, 기록에 `(확정 전)`이 없으면 3단계부터 이어 가며 그 기록을 set-brief에 넘긴다. `(확정 전)`이 있으면 2단계부터 이어 가며, 적힌 칸을 사용자가 이미 확정한 칸이라고 알려 framing-problems에 넘긴다.
 - 진행 중인 흐름에서 요구사항이 바뀌었다는 요청을 받으면 [references/requirement-change.md](references/requirement-change.md)를 읽고 그 절차로 이어 간다.
 
-인자가 없거나 `status`일 때 상태 파일은 `command grep -RlE --include='*.md' --exclude-dir=.git --exclude-dir=node_modules '^- 현재 단계: ' .`로 찾는다. 사용자가 상태 파일을 `docs/context/run-flow/` 밖(brief 옆 등)에 두기로 할 수 있다. brief는 docs에서 `command grep -RlE --include='*.md' --exclude-dir=.git --exclude-dir=node_modules '^- 작성일: [0-9]{4}-[0-9]{2}-[0-9]{2}' .`로, GitHub에서 `git remote -v`에 github.com이 있고 `gh auth status`가 성공하면 `gh issue list --label context --state open`으로 찾는다. `-R`은 `.scratch`처럼 심볼릭 링크로 붙인 폴더도 따라간다.
+GitHub brief는 `git remote -v`에 github.com이 있고 `gh auth status`가 성공하면 `gh issue list --label context --state open`으로 찾는다. 스크립트는 `.scratch`처럼 심볼릭 링크로 붙인 폴더도 따라가고, 사용자가 `docs/context/run-flow/` 밖(brief 옆 등)에 둔 상태 파일도 `- 현재 단계:` 줄로 찾는다.
 
 ### 1. 요구사항 정리
 
