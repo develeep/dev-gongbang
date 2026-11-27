@@ -38,7 +38,7 @@ Run a copy without the `gongbang:` prefix. If the plugin is also installed, the 
    git clone https://github.com/develeep/dev-gongbang.git
    ```
 
-2. Copy the whole skill folder you want to edit. Bundled files (`reference/`, `templates/`, `scripts/`) must come along too. The command below copies write-docs as a user skill.
+2. Copy the whole skill folder you want to edit. Skills have bundled folders such as `reference/` or `references/`, `templates/`, `assets/`, `scripts/`, and `agents/`, and these must come along too. The command below copies write-docs as a user skill.
 
    ```bash
    cp -r dev-gongbang/skills/productivity/write-docs ~/.claude/skills/
@@ -50,7 +50,7 @@ Run a copy without the `gongbang:` prefix. If the plugin is also installed, the 
 
 ## Files to edit per skill
 
-Paths are relative to the skill folder. Details are in the "Customize" section of each skill page.
+Paths are relative to the skill folder. Skills are in the same order as in the [README](../../README.en.md#skills). Details are in the "Customize" section of each skill page.
 
 | Skill | File to edit | What changes |
 |---|---|---|
@@ -62,22 +62,24 @@ Paths are relative to the skill folder. Details are in the "Customize" section o
 | | `reference/clear-writing.md` | Principles applied to every field |
 | [set-guidelines](skills/set-guidelines.md) | `reference/guides-index.md` | List of guides and tools to recommend |
 | | `templates/rule.md`, `templates/agent-instructions.md` | Rule file and CLAUDE.md/AGENTS.md templates |
-| [check-guidelines](skills/check-guidelines.md) | `templates/report.md` | Report template |
 | [framing-problems](skills/framing-problems.md) | `SKILL.md` | Items to fill (R1–R6) and question format |
-| [analyzing-requirements](skills/analyzing-requirements.md) | `SKILL.md` | Document template |
+| [check-guidelines](skills/check-guidelines.md) | `templates/report.md` | Report template |
+| [run-flow](skills/run-flow.md) | `SKILL.md` | Starting stage per argument, state file rules, protected list rules, links between stages |
+| | `assets/state-file.md` | State file format |
+| | `references/adr.md` | Conditions for proposing an ADR, where it is saved, the ADR template |
+| | `references/brief-stage.md`, `references/merge-stage.md`, `references/pr-stage.md` | Procedures for stage 3 (brief), stage 6 (merge/PR decision), and stage 7 (opening the PR) |
+| | `references/requirement-change.md` | Procedure for going back to stage 1 when requirements change during a flow |
+| | `scripts/code_fingerprint.sh` | Fingerprint used to compare the reviewed code with the current code |
+| | `scripts/start_stage.py` | Rules for deciding the starting stage from docs files in stage 0 |
+| | `scripts/protected_paths.py` | Test file rules for the protected list, the pre-write decision, the check before acceptance. If you edit it in the repository, make the same edit to `mods/gongbang-mods/hooks/protected_paths.py`, the copy gongbang-mods uses for its decision |
 | [set-brief](skills/set-brief.md) | `SKILL.md` | Brief template, save path |
 | [set-ticket](skills/set-ticket.md) | `SKILL.md` | Ticket template, splitting criteria |
 | [run-ticket](skills/run-ticket.md) | `SKILL.md` | Ticket selection rules, review order, completion record |
-| | `scripts/cross_review.py` | Cross-review code fingerprint, the format of the completion record's `- 교차 리뷰:` line, and the gate that refuses completion without it |
+| | `scripts/cross_review.py` | Cross-review code fingerprint, the format of the completion record's `- 교차 리뷰:` (Cross-review) line, and the gate that refuses completion without it |
 | | `references/multi-ticket.md` | Running multiple tickets: choosing the method, parallel run, items a worker tool procedure fills in, sequential run. The parallel run is an optional path used only when you name or register a worker tool procedure, and worker models follow your settings. Registering a procedure is covered in the [Orca](orca-orchestration.md) and [Paseo](paseo-orchestration.md) setup docs |
-| [run-flow](skills/run-flow.md) | `SKILL.md` | Starting stage per argument, state file rules, links between stages |
-| | `assets/state-file.md` | State file format |
-| | `references/adr.md`, `references/brief-stage.md`, `references/pr-stage.md` | ADR criteria, procedures for stages 3 and 7 |
-| | `scripts/code_fingerprint.sh` | Fingerprint used to compare the reviewed code with the current code |
-| | `scripts/start_stage.py` | Rules for deciding the starting stage from docs files in stage 0 |
-| | `scripts/protected_paths.py` | Test file rules for the protected list, the pre-write decision, the check before acceptance. Keep `mods/gongbang-mods/hooks/protected_paths.py` identical |
+| [analyzing-requirements](skills/analyzing-requirements.md) | `SKILL.md` | Document template |
 
-set-brief, set-ticket, and run-ticket exchange the same format. If you change the brief section names, the `- 작성일:` (Date written) line, or the ticket's `- 상태:` (Status) line, edit all three skills together.
+set-brief, set-ticket, run-ticket, and run-flow exchange the same format. If you change the brief section names, the `- 작성일:` (Date written) line, or the ticket's `- 상태:` (Status) line, edit all four skills together. In run-flow, edit `SKILL.md`, the documents in `references/`, and `scripts/start_stage.py`, which uses these lines to find briefs and finished tickets.
 
 ## Change the invocation type
 
@@ -86,7 +88,9 @@ The invocation type is set in the `SKILL.md` frontmatter.
 - **Change to User-invoked**: Add `disable-model-invocation: true`. The skill runs only when the user types its name.
 - **Change to Model-invoked**: Delete that line. Claude picks skills by reading `description`, so state specifically in `description` when to use the skill.
 
-Another skill cannot load a User-invoked skill. That is why set-brief, set-ticket, and run-ticket, which run-flow loads in turn, are Model-invoked with a description saying they run only when the user or another skill asks.
+To get the same invocation type in Codex, also update `agents/openai.yaml` in the skill folder. When you change to User-invoked, add `policy.allow_implicit_invocation: false` so Codex does not invoke the skill on its own. When you change to Model-invoked, remove that setting. Inside this repository, `scripts/check.py` reports an error when the two settings disagree.
+
+Another skill cannot load a User-invoked skill. That is why analyzing-requirements, framing-problems, set-brief, set-ticket, and run-ticket, which run-flow loads stage by stage, are all Model-invoked. Of these, framing-problems, set-brief, set-ticket, and run-ticket say in `description` that they run only when the user or another skill asks, so Claude does not pick them for ordinary requests.
 
 ## Check a modified skill
 
@@ -97,7 +101,7 @@ pip install pyyaml
 python3 dev-gongbang/scripts/validate.py ~/.claude/skills/write-docs
 ```
 
-The result is JSON. If `errors` is empty, the check passes. For `warnings`, decide whether to fix each one or confirm a reason to leave it.
+The result is JSON. If the `errors` of each skill entry are empty and the exit code is 0, the check passes. For `warnings`, decide whether to fix each one or confirm a reason to leave it.
 
 ## Test a modified skill
 
@@ -121,7 +125,7 @@ This creates a link for each skill in `~/.claude/skills/`. To link only some ski
 
 ## Contributing
 
-To make your edits available to everyone, fork the repository and send a PR. Rules to follow when adding or moving a skill are in [AGENTS.md](../../AGENTS.md). After making changes, run `scripts/check.py` and make it pass.
+To make your edits available to everyone, fork the repository and send a PR. Rules to follow when adding or moving a skill are in [AGENTS.md](../../AGENTS.md). After making changes, run `scripts/check.py` and make it pass. It requires PyYAML and the Claude Code CLI.
 
 ---
 

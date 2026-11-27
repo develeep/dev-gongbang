@@ -12,7 +12,7 @@
 
 <p align="center"><a href="./README.md">한국어</a> · <b>English</b></p>
 
-These Claude Code skills help you frame requests, build prompts and skills, write docs, and set and check code rules. You install them as one plugin, and you can copy a skill and edit it to fit your situation. The skill files are written in Korean.
+These Claude Code skills help you frame requests, build prompts and skills, write docs, and set and check code rules. Skills that carry a planning document or request through the development stages to a PR are being built in `gongbang-dev`. You install them as plugins, and you can copy a skill and edit it to fit your situation. The skill files are written in Korean.
 
 **Contents**: [Installation](#installation) · [Skills](#skills) · [In-progress skills](#in-progress-skills) · [Mods](#mods) · [Choosing a skill](#choosing-a-skill) · [Customize](#customize) · [Contributing](#contributing) · [All docs](docs/en/README.md)
 
@@ -48,6 +48,8 @@ codex plugin marketplace add develeep/dev-gongbang
 
 In Codex, run a skill with `$<skill-name>`. User-invoked skills ship an `agents/openai.yaml` so Codex does not invoke them on its own.
 
+To install the OMP agents for cross-review and brief cold reads, the delegation rules, and the protected path extension, see [omp multi-agent setup](docs/en/omp-orchestration.md).
+
 ### Updating
 
 The plugin updates only when `version` in `plugin.json` changes. See [Releases](https://github.com/develeep/dev-gongbang/releases) for what changed in each version. Update the marketplace, update the plugin, then restart Claude Code.
@@ -56,6 +58,8 @@ The plugin updates only when `version` in `plugin.json` changes. See [Releases](
 claude plugin marketplace update dev-gongbang
 claude plugin update gongbang@dev-gongbang
 ```
+
+If you installed `gongbang-dev`, also run `claude plugin update gongbang-dev@dev-gongbang`. `gongbang-mods` has its own version; how to update it is in the [Mods doc](docs/en/mods.md#turning-it-off-and-updating).
 
 ## Skills
 
@@ -68,14 +72,14 @@ Click a skill name to open its usage page. Click `SKILL.md` to open the skill so
 
 ### User-invoked
 
-- [prompt-builder](docs/en/skills/prompt-builder.md): Designs system prompts, CLAUDE.md, and SKILL.md through an interview that follows per-model guides, or revises a draft. `/gongbang:prompt-builder [draft path or description]` · [SKILL.md](skills/productivity/prompt-builder/SKILL.md)
-- [building-skills](docs/en/skills/building-skills.md): Completes a skill from a SKILL.md draft or from material such as conversation logs, runbooks, or code, then repeats static checks, test runs, human review, and fixes. `/gongbang:building-skills [skill folder path, SKILL.md draft, or description of the skill to build]` · [SKILL.md](skills/productivity/building-skills/SKILL.md)
-- [write-docs](docs/en/skills/write-docs.md): Sets field, audience, purpose, tone, and material through questions, then drafts the text or revises a draft or existing document you bring. `/gongbang:write-docs [request for the text to write or revise]` · [SKILL.md](skills/productivity/write-docs/SKILL.md)
-- [set-guidelines](docs/en/skills/set-guidelines.md): Picks guides and tools that fit the repo from awesome-guidelines, then writes the ones you choose: `.claude/rules/` rule files, CLAUDE.md/AGENTS.md, and linter/formatter config. `/gongbang:set-guidelines` · [SKILL.md](skills/engineering/set-guidelines/SKILL.md)
+- [prompt-builder](docs/en/skills/prompt-builder.md): Designs system and agent prompts, CLAUDE.md, and SKILL.md through an interview that follows the Claude and GPT per-model guides, or revises and reviews an existing draft. `/gongbang:prompt-builder [draft path or description of the prompt to build]` · [SKILL.md](skills/productivity/prompt-builder/SKILL.md)
+- [building-skills](docs/en/skills/building-skills.md): Following Claude's official skill best practices and the Agent Skills spec, completes a skill from a SKILL.md draft or from material such as conversation logs, runbooks, or code, then repeats static checks, test runs, human review, and fixes. `/gongbang:building-skills [skill folder path, SKILL.md draft, or description of the skill to build]` · [SKILL.md](skills/productivity/building-skills/SKILL.md)
+- [write-docs](docs/en/skills/write-docs.md): Sets field, audience, purpose, tone, and material through questions, then drafts the text or revises a draft or existing document you bring. Work messages lead with the conclusion, and technical documents follow the document types and principles of the Toss technical writing guide. `/gongbang:write-docs [request for the text to write or revise]` · [SKILL.md](skills/productivity/write-docs/SKILL.md)
+- [set-guidelines](docs/en/skills/set-guidelines.md): Picks guides and tools from awesome-guidelines that fit the repo's languages and frameworks, then writes the ones you choose: `.claude/rules/` rule files, CLAUDE.md/AGENTS.md, and linter/formatter config. `/gongbang:set-guidelines` · [SKILL.md](skills/engineering/set-guidelines/SKILL.md)
 
 ### Model-invoked
 
-- [framing-problems](docs/en/skills/framing-problems.md): Does not act right away. First confirms with you a framing record of intent, cause, and constraints, then works. Runs only when explicitly requested. `/gongbang:framing-problems [request]` · [SKILL.md](skills/productivity/framing-problems/SKILL.md)
+- [framing-problems](docs/en/skills/framing-problems.md): Does not act right away. First confirms with you a framing record of intent, cause, and constraints, then works from that record. Runs only when you ask for framing or a prompt or another skill tells it to. `/gongbang:framing-problems [request to frame]` · [SKILL.md](skills/productivity/framing-problems/SKILL.md)
 - [check-guidelines](docs/en/skills/check-guidelines.md): Checks code in the chosen scope against rule files, CLAUDE.md/AGENTS.md, and linter/formatter config, reports by rule, fixes the violations you choose, then checks again. `/gongbang:check-guidelines [all | diff | branch | path]` · [SKILL.md](skills/engineering/check-guidelines/SKILL.md)
 
 ## In-progress skills
@@ -84,28 +88,28 @@ Available when you install `gongbang-dev`. Their behavior changes often.
 
 ### User-invoked
 
-- [run-flow](docs/en/skills/run-flow.md): Takes a planning document, a request, or a brief and loads the stage skills in order, from organizing requirements to opening a PR. You only answer each stage's confirmations and questions. `/gongbang:run-flow [planning doc path/link | request | brief path/issue number]` · [SKILL.md](skills/in-progress/run-flow/SKILL.md)
+- [run-flow](docs/en/skills/run-flow.md): Takes a planning document, a request, or a brief and loads the stage skills in order, from organizing requirements to opening a PR. You only answer the confirmations and questions each stage skill asks. Run it with no argument to continue the flow in progress, or with `status` to list unfinished flows. `/gongbang:run-flow [planning doc path/link | request | brief path/issue number | state file | status]` · [SKILL.md](skills/in-progress/run-flow/SKILL.md)
 
 ### Model-invoked
 
-- [set-brief](docs/en/skills/set-brief.md): Turns a framing record or session result into a brief that a worker with no context can pick up, and saves it as a GitHub issue or a `docs/context/` document. Runs only when you ask or run-flow tells it to. `/gongbang:set-brief [summary of the work to record]` · [SKILL.md](skills/in-progress/set-brief/SKILL.md)
-- [set-ticket](docs/en/skills/set-ticket.md): Splits a large brief into tickets that can each be verified on their own, saves them as GitHub sub-issues or docs files, and links them to the brief. Runs only when you ask or run-flow tells it to. `/gongbang:set-ticket [brief issue number/URL or docs path]` · [SKILL.md](skills/in-progress/set-ticket/SKILL.md)
-- [run-ticket](docs/en/skills/run-ticket.md): Implements and reviews one ticket from the brief and ticket documents, then updates the ticket status and the brief checkbox. Does not commit. Runs several tickets in parallel with the worker tool procedure named by you or the repo rules, or in order if no usable procedure exists. Runs only when you ask or run-flow tells it to. `/gongbang:run-ticket [ticket/brief path, issue number/URL] [range, for multiple tickets]` · [SKILL.md](skills/in-progress/run-ticket/SKILL.md)
-- [analyzing-requirements](docs/en/skills/analyzing-requirements.md): Reads a planning document received as a link or as PDF/PPT/MD, and organizes requirements and development scope by service and development area into a Markdown document. `/gongbang:analyzing-requirements [planning document link or file path]` · [SKILL.md](skills/in-progress/analyzing-requirements/SKILL.md)
+- [set-brief](docs/en/skills/set-brief.md): Turns a framing record or session result into a brief that a worker with no context can read alone and produce the same result from, and saves it as a GitHub issue or a `docs/context/` document. Runs only when you ask or another skill such as run-flow tells it to. `/gongbang:set-brief [summary of the work to record]` · [SKILL.md](skills/in-progress/set-brief/SKILL.md)
+- [set-ticket](docs/en/skills/set-ticket.md): When a brief saved by set-brief is too large to work on in one go, splits it into tickets that can each be verified on their own, saves them as GitHub sub-issues or docs files, and links them to the brief. Runs only when you ask or another skill such as run-flow tells it to. `/gongbang:set-ticket [brief issue number/URL or docs path]` · [SKILL.md](skills/in-progress/set-ticket/SKILL.md)
+- [run-ticket](docs/en/skills/run-ticket.md): Takes the brief and ticket documents, has the current session implement and review one ticket itself, then updates the ticket status and the brief checkbox. It does not commit when it runs a ticket itself. Several tickets run in order, and run in parallel on workers only when you name a worker tool procedure or one is registered in the repo or agent rules. Runs only when you ask or another skill such as run-flow tells it to. `/gongbang:run-ticket [ticket/brief path, issue number/URL] [range, for multiple tickets]` · [SKILL.md](skills/in-progress/run-ticket/SKILL.md)
+- [analyzing-requirements](docs/en/skills/analyzing-requirements.md): Reads a planning document received as a link such as SharePoint or OneDrive, or as a PDF/PPT/MD file, and organizes requirements and development scope by service and development area into a Markdown document. It does not fill in what the document leaves out, and asks about anything ambiguous. `/gongbang:analyzing-requirements [planning document link or file path]` · [SKILL.md](skills/in-progress/analyzing-requirements/SKILL.md)
 
 ## Mods
 
-`gongbang-mods` is a bundle of mods that restyle the Claude Code terminal. Install it separately from the skills plugin.
+`gongbang-mods` is a bundle of mods that restyle the Claude Code terminal and block writes to run-flow protected paths. Install it separately from the skills plugin.
 
 ```bash
 claude plugin install gongbang-mods@dev-gongbang
 ```
 
-- [gongbang-mods](docs/en/mods.md): Folds tool calls to one line, splits your messages and replies into cards, and shows the session goal and context usage in a side pane. During a run-flow flow it blocks write tools from editing tests on the protected list. `/session-pane` · `/where` · [code](mods/gongbang-mods/hooks/register.tsx)
+- [gongbang-mods](docs/en/mods.md): Folds tool calls to one line, splits your messages and replies into cards, and shows the session goal and context usage in a side pane. `/session-pane` opens that pane, and `/where` recaps the session so far in a few lines. During a run-flow flow it blocks write tools from editing tests on the protected list. [code](mods/gongbang-mods/hooks/register.tsx)
 
 Outside mods that pair well are listed in the [Mods doc](docs/en/mods.md#outside-mods-that-pair-well). A [status line script](docs/en/mods.md#status-line) showing the model, branch and plan usage is installed separately. [code](extras/statusline/statusline.py)
 
-To get the same environment on another computer, run `extras/setup.sh`. [details](docs/en/mods.md#same-setup-on-another-computer)
+To set up the same mod environment (gongbang-mods, outside mods, status line) on another computer in one go, run `extras/setup.sh`. [details](docs/en/mods.md#same-setup-on-another-computer)
 
 ## Choosing a skill
 
@@ -126,8 +130,8 @@ Skills chain together as follows.
 - **Building a prompt**: Frame the task first with `/gongbang:framing-problems`, then pass the confirmed framing record to `/gongbang:prompt-builder` as a draft. You can make an agent prompt that talks to people, or a reusable template, call framing-problems every time it runs.
 - **Building a skill**: Create a SKILL.md draft with `/gongbang:prompt-builder`, then pass the result to `/gongbang:building-skills` to test and refine it.
 - **Code rules**: Create rules with `/gongbang:set-guidelines`, then check code with `/gongbang:check-guidelines`.
-- **Handing off large work**: Save the result framed with framing-problems using `/gongbang:set-brief`. If it is large, split it with `/gongbang:set-ticket`, then run the tickets one at a time with `/gongbang:run-ticket`. If you register a worker tool procedure in the repo rules (for example, [Orca](docs/en/orca-orchestration.md) or [Paseo](docs/en/paseo-orchestration.md)), ask for "all remaining tickets" to run them in parallel.
-- **Handing over the whole run**: Run `/gongbang:run-flow <planning document or request>` and it goes through analyzing-requirements and framing-problems, the flow above, and opening the PR, in order. To continue a stopped run, run `/gongbang:run-flow` again.
+- **Handing off large work**: Save the result framed with framing-problems using `/gongbang:set-brief`. If it is large, split it with `/gongbang:set-ticket`, then run the tickets with `/gongbang:run-ticket`. Give a range such as "all remaining tickets" to run several tickets in order. If a worker tool procedure is registered in the repo or agent rules (for example, [Orca](docs/en/orca-orchestration.md) or [Paseo](docs/en/paseo-orchestration.md)), they run in parallel on workers.
+- **Handing over the whole run**: Run `/gongbang:run-flow <planning document or request>`. It starts from analyzing-requirements for a planning document or from framing-problems for a request, goes through the flow above, and continues to the stage where you choose whether to open a PR. It opens the PR only if you choose to at that stage. To continue a stopped run, run `/gongbang:run-flow` again with no argument. To list unfinished runs, run `/gongbang:run-flow status`.
 
 ## Customize
 
@@ -137,9 +141,9 @@ How to copy and edit a skill, which files to edit for each skill, and how to tes
 
 For issues, PRs, and commit rules, see the [contributing guide](CONTRIBUTING.en.md). Everyone who takes part in this project follows the [code of conduct](CODE_OF_CONDUCT.en.md). Report security problems privately as described in the [security policy](SECURITY.en.md).
 
-Rules to follow when adding or moving a skill are in [AGENTS.md](AGENTS.md). After making changes, run `scripts/check.py` and make it pass. It requires PyYAML.
+Rules to follow when adding or moving a skill are in [AGENTS.md](AGENTS.md). After making changes, run `scripts/check.py` and make it pass. It requires PyYAML and the Claude Code CLI.
 
-Run skill evals with these commands.
+Run skill evals with these commands. Evals call the models for real.
 
 ```bash
 claude plugin eval . --scaffold --allow-tools Bash Write Edit WebSearch WebFetch --no-publish

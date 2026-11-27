@@ -14,7 +14,7 @@
     <b>한국어</b> · <a href="./README.en.md">English</a>
 </p>
 
-요청을 구체화하고, 프롬프트와 스킬을 만들고, 문서를 쓰고, 코드 규칙을 정하고 검사하는 일을 Claude Code 스킬로 돕습니다. 플러그인 하나로 설치하고, 필요하면 스킬을 복사해 내 상황에 맞게 고쳐 쓸 수 있습니다. 스킬 파일은 한국어로 쓰여 있습니다.
+요청을 구체화하고, 프롬프트와 스킬을 만들고, 문서를 쓰고, 코드 규칙을 정하고 검사하는 일을 Claude Code 스킬로 돕습니다. 기획서나 요청에서 PR까지 개발 단계를 이어 가는 스킬은 `gongbang-dev`에 넣어 만들고 있습니다. 플러그인으로 설치하고, 필요하면 스킬을 복사해 내 상황에 맞게 고쳐 쓸 수 있습니다. 스킬 파일은 한국어로 쓰여 있습니다.
 
 **목차**: [설치](#설치) · [스킬](#스킬) · [만드는 중인 스킬](#만드는-중인-스킬) · [Mod](#mod) · [상황별로 고르기](#상황별로-고르기) · [커스텀](#커스텀) · [기여](#기여) · [전체 문서 목록](docs/README.md)
 
@@ -50,6 +50,8 @@ codex plugin marketplace add develeep/dev-gongbang
 
 Codex에서는 `$<스킬 이름>`으로 부릅니다. User-invoked 스킬은 `agents/openai.yaml`로 Codex가 알아서 부르지 않게 막아 둡니다.
 
+OMP에서 교차 리뷰와 brief 냉독을 맡을 에이전트, 위임 규칙, 보호 경로 차단 extension을 설치하려면 [omp 멀티에이전트 설정](docs/omp-orchestration.md)을 보세요.
+
 ### 업데이트
 
 플러그인은 `plugin.json`의 `version`이 바뀔 때만 갱신됩니다. 버전마다 바뀐 내용은 [Releases](https://github.com/develeep/dev-gongbang/releases)에서 볼 수 있습니다. 마켓플레이스를 갱신한 뒤 플러그인을 업데이트하고 Claude Code를 다시 시작하세요.
@@ -58,6 +60,8 @@ Codex에서는 `$<스킬 이름>`으로 부릅니다. User-invoked 스킬은 `ag
 claude plugin marketplace update dev-gongbang
 claude plugin update gongbang@dev-gongbang
 ```
+
+`gongbang-dev`를 설치했으면 `claude plugin update gongbang-dev@dev-gongbang`도 실행하세요. `gongbang-mods`는 버전을 따로 매기고, 업데이트 방법은 [Mod 문서](docs/mods.md#끄기와-업데이트)에 있습니다.
 
 ## 스킬
 
@@ -70,14 +74,14 @@ claude plugin update gongbang@dev-gongbang
 
 ### User-invoked
 
-- [prompt-builder](docs/skills/prompt-builder.md): 모델별 가이드에 맞춰 시스템 프롬프트, CLAUDE.md, SKILL.md를 인터뷰로 설계하거나 초안을 고칩니다. `/gongbang:prompt-builder [초안 경로 또는 설명]` · [SKILL.md](skills/productivity/prompt-builder/SKILL.md)
-- [building-skills](docs/skills/building-skills.md): SKILL.md 초안이나 대화 기록·런북·코드 같은 자료로 스킬을 완성하고, 정적 검사·실행 테스트·사람 리뷰·수정을 반복합니다. `/gongbang:building-skills [스킬 폴더 경로, SKILL.md 초안, 또는 만들 스킬 설명]` · [SKILL.md](skills/productivity/building-skills/SKILL.md)
-- [write-docs](docs/skills/write-docs.md): 분야·독자·목적·톤·자료를 질문으로 정한 뒤 글 초안을 쓰거나, 가져온 초안과 기존 문서를 고칩니다. `/gongbang:write-docs [쓰거나 고칠 글에 대한 요청]` · [SKILL.md](skills/productivity/write-docs/SKILL.md)
-- [set-guidelines](docs/skills/set-guidelines.md): awesome-guidelines에서 레포에 맞는 가이드와 도구를 골라 `.claude/rules/` 규칙 파일, CLAUDE.md/AGENTS.md, 린터·포매터 설정 중 고른 것을 작성합니다. `/gongbang:set-guidelines` · [SKILL.md](skills/engineering/set-guidelines/SKILL.md)
+- [prompt-builder](docs/skills/prompt-builder.md): Claude·GPT 모델별 가이드에 맞춰 시스템·에이전트 프롬프트, CLAUDE.md, SKILL.md를 인터뷰로 설계하거나, 기존 초안을 고치고 리뷰합니다. `/gongbang:prompt-builder [초안 경로 또는 만들 프롬프트 설명]` · [SKILL.md](skills/productivity/prompt-builder/SKILL.md)
+- [building-skills](docs/skills/building-skills.md): Claude 공식 skill best practice와 Agent Skills 명세에 맞춰, SKILL.md 초안이나 대화 기록·런북·코드 같은 자료로 스킬을 완성하고 정적 검사·실행 테스트·사람 리뷰·수정을 반복합니다. `/gongbang:building-skills [스킬 폴더 경로, SKILL.md 초안, 또는 만들 스킬 설명]` · [SKILL.md](skills/productivity/building-skills/SKILL.md)
+- [write-docs](docs/skills/write-docs.md): 분야·독자·목적·톤·자료를 질문으로 정한 뒤 글 초안을 쓰거나, 가져온 초안과 기존 문서를 고칩니다. 업무 메시지는 결론부터 쓰고, 기술 문서는 토스 테크니컬 라이팅 가이드의 문서 유형과 원칙을 따릅니다. `/gongbang:write-docs [쓰거나 고칠 글에 대한 요청]` · [SKILL.md](skills/productivity/write-docs/SKILL.md)
+- [set-guidelines](docs/skills/set-guidelines.md): awesome-guidelines에서 레포의 언어·프레임워크에 맞는 가이드와 도구를 골라, `.claude/rules/` 규칙 파일, CLAUDE.md/AGENTS.md, 린터·포매터 설정 중 고른 것을 작성합니다. `/gongbang:set-guidelines` · [SKILL.md](skills/engineering/set-guidelines/SKILL.md)
 
 ### Model-invoked
 
-- [framing-problems](docs/skills/framing-problems.md): 바로 실행하지 않고 의도·원인·제약을 정리한 구체화 기록을 사용자와 확정한 뒤 작업합니다. 명시적으로 요청할 때만 동작합니다. `/gongbang:framing-problems [요청]` · [SKILL.md](skills/productivity/framing-problems/SKILL.md)
+- [framing-problems](docs/skills/framing-problems.md): 바로 실행하지 않고 의도·원인·제약을 정리한 구체화 기록을 사용자와 확정한 뒤, 그 기록에 따라 작업합니다. 사용자가 구체화를 요청하거나 프롬프트·다른 스킬이 지시할 때만 동작합니다. `/gongbang:framing-problems [구체화할 요청]` · [SKILL.md](skills/productivity/framing-problems/SKILL.md)
 - [check-guidelines](docs/skills/check-guidelines.md): 규칙 파일, CLAUDE.md/AGENTS.md, 린터·포매터 설정을 기준으로 고른 범위의 코드를 검사해 규칙별로 보고하고, 고른 위반을 고친 뒤 다시 검사합니다. `/gongbang:check-guidelines [all | diff | branch | 경로]` · [SKILL.md](skills/engineering/check-guidelines/SKILL.md)
 
 ## 만드는 중인 스킬
@@ -86,28 +90,28 @@ claude plugin update gongbang@dev-gongbang
 
 ### User-invoked
 
-- [run-flow](docs/skills/run-flow.md): 기획서, 요청, brief 중 하나로 요구사항 정리부터 PR 생성까지 단계 스킬을 차례로 불러 진행합니다. 사용자는 각 단계의 확인과 질문에만 답합니다. `/gongbang:run-flow [기획서 경로·링크 | 요청 | brief 경로·이슈 번호]` · [SKILL.md](skills/in-progress/run-flow/SKILL.md)
+- [run-flow](docs/skills/run-flow.md): 기획서, 요청, brief 중 하나로 요구사항 정리부터 PR 생성까지 단계 스킬을 차례로 불러 진행합니다. 사용자는 각 단계 스킬이 묻는 확인과 질문에만 답합니다. 인자 없이 실행하면 진행 중인 흐름을 이어 가고, `status`를 주면 끝나지 않은 흐름을 보여 줍니다. `/gongbang:run-flow [기획서 경로·링크 | 요청 | brief 경로·이슈 번호 | 상태 파일 | status]` · [SKILL.md](skills/in-progress/run-flow/SKILL.md)
 
 ### Model-invoked
 
-- [set-brief](docs/skills/set-brief.md): 구체화 기록이나 세션 결과를 맥락 없는 작업자도 이어받을 수 있는 작업 지시서(brief)로 정리해 GitHub 이슈나 `docs/context/` 문서로 남깁니다. 요청하거나 run-flow가 지시할 때만 동작합니다. `/gongbang:set-brief [남길 작업 요약]` · [SKILL.md](skills/in-progress/set-brief/SKILL.md)
-- [set-ticket](docs/skills/set-ticket.md): 큰 brief를 혼자 검증할 수 있는 티켓으로 나눠 GitHub sub-issue나 docs 파일로 남기고 brief에 연결합니다. 요청하거나 run-flow가 지시할 때만 동작합니다. `/gongbang:set-ticket [brief 이슈 번호·URL 또는 docs 경로]` · [SKILL.md](skills/in-progress/set-ticket/SKILL.md)
-- [run-ticket](docs/skills/run-ticket.md): 티켓 하나를 구현·리뷰하고 티켓 상태와 brief 체크박스를 갱신합니다. 커밋은 하지 않습니다. 여러 티켓은 사용자나 레포 규칙이 지정한 워커 도구 절차로 병렬 실행하고, 쓸 수 있는 절차가 없으면 차례로 실행합니다. 요청하거나 run-flow가 지시할 때만 동작합니다. `/gongbang:run-ticket [티켓·brief 경로, 이슈 번호·URL] [여러 티켓이면 범위]` · [SKILL.md](skills/in-progress/run-ticket/SKILL.md)
-- [analyzing-requirements](docs/skills/analyzing-requirements.md): 링크나 PDF·PPT·MD로 받은 기획서를 읽고 요구사항과 서비스·개발 영역별 개발 범위를 마크다운 문서로 정리합니다. `/gongbang:analyzing-requirements [기획서 링크 또는 파일 경로]` · [SKILL.md](skills/in-progress/analyzing-requirements/SKILL.md)
+- [set-brief](docs/skills/set-brief.md): 구체화 기록이나 세션 결과를, 맥락 없는 작업자가 그것만 읽고 같은 결과를 낼 수 있는 작업 지시서(brief)로 정리해 GitHub 이슈나 `docs/context/` 문서로 남깁니다. 요청하거나 run-flow 같은 다른 스킬이 지시할 때만 동작합니다. `/gongbang:set-brief [남길 작업 요약]` · [SKILL.md](skills/in-progress/set-brief/SKILL.md)
+- [set-ticket](docs/skills/set-ticket.md): set-brief로 남긴 brief가 한 번에 작업하기에 클 때, 혼자 검증할 수 있는 티켓으로 나눠 GitHub sub-issue나 docs 파일로 남기고 brief에 연결합니다. 요청하거나 run-flow 같은 다른 스킬이 지시할 때만 동작합니다. `/gongbang:set-ticket [brief 이슈 번호·URL 또는 docs 경로]` · [SKILL.md](skills/in-progress/set-ticket/SKILL.md)
+- [run-ticket](docs/skills/run-ticket.md): brief와 티켓 문서를 받아 티켓 하나를 이 세션이 직접 구현·리뷰하고, 티켓 상태와 brief 체크박스를 갱신합니다. 직접 실행할 때는 커밋하지 않습니다. 여러 티켓은 차례로 실행하고, 사용자가 워커 도구 절차를 지정했거나 레포·에이전트 규칙에 등록해 둔 때만 워커로 병렬 실행합니다. 요청하거나 run-flow 같은 다른 스킬이 지시할 때만 동작합니다. `/gongbang:run-ticket [티켓·brief 경로, 이슈 번호·URL] [여러 티켓이면 범위]` · [SKILL.md](skills/in-progress/run-ticket/SKILL.md)
+- [analyzing-requirements](docs/skills/analyzing-requirements.md): SharePoint·OneDrive 같은 링크나 PDF·PPT·MD 파일로 받은 기획서를 읽고, 요구사항과 서비스·개발 영역별 개발 범위를 마크다운 문서로 정리합니다. 기획서에 없는 내용은 채우지 않고 모호한 부분은 묻습니다. `/gongbang:analyzing-requirements [기획서 링크 또는 파일 경로]` · [SKILL.md](skills/in-progress/analyzing-requirements/SKILL.md)
 
 ## Mod
 
-`gongbang-mods`는 Claude Code 터미널 화면을 꾸미는 mod 묶음입니다. 스킬 플러그인과 따로 설치합니다.
+`gongbang-mods`는 Claude Code 터미널 화면을 꾸미고 run-flow의 보호 경로 쓰기를 막는 mod 묶음입니다. 스킬 플러그인과 따로 설치합니다.
 
 ```bash
 claude plugin install gongbang-mods@dev-gongbang
 ```
 
-- [gongbang-mods](docs/mods.md): 도구 호출을 한 줄로 접고, 메시지와 답변을 카드로 나누고, 세션 목표와 컨텍스트 사용량을 우측 패널에 보여 줍니다. run-flow 흐름 중에는 보호 목록의 테스트를 쓰기 도구로 고치지 못하게 막습니다. `/session-pane` · `/where` · [코드](mods/gongbang-mods/hooks/register.tsx)
+- [gongbang-mods](docs/mods.md): 도구 호출을 한 줄로 접고, 메시지와 답변을 카드로 나누고, 세션 목표와 컨텍스트 사용량을 우측 패널에 보여 줍니다. `/session-pane`은 그 패널을 열고, `/where`는 지금까지의 세션을 몇 줄로 요약합니다. run-flow 흐름 중에는 보호 목록의 테스트를 쓰기 도구로 고치지 못하게 막습니다. [코드](mods/gongbang-mods/hooks/register.tsx)
 
 함께 쓰면 좋은 외부 mod는 [Mod 문서](docs/mods.md#함께-쓰면-좋은-외부-mod)에 정리했습니다. 모델·브랜치·요금제 사용량을 보여 주는 [상태줄 스크립트](docs/mods.md#상태줄)는 따로 설치합니다. [코드](extras/statusline/statusline.py)
 
-다른 컴퓨터에서 같은 환경을 만들려면 `extras/setup.sh`를 실행하세요. [설명](docs/mods.md#다른-컴퓨터에-똑같이-설정하기)
+다른 컴퓨터에 같은 mod 환경(gongbang-mods, 외부 mod, 상태줄)을 한 번에 설정하려면 `extras/setup.sh`를 실행하세요. [설명](docs/mods.md#다른-컴퓨터에-똑같이-설정하기)
 
 ## 상황별로 고르기
 
@@ -128,8 +132,8 @@ claude plugin install gongbang-mods@dev-gongbang
 - **프롬프트 만들기**: `/gongbang:framing-problems`로 작업을 먼저 구체화하고, 확정된 구체화 기록을 초안으로 `/gongbang:prompt-builder`에 넘기세요. 사람과 대화하는 에이전트 프롬프트나 재사용 템플릿은 실행할 때마다 framing-problems를 호출하게 만들 수 있습니다.
 - **스킬 만들기**: `/gongbang:prompt-builder`로 SKILL.md 초안을 만들고, 그 결과를 `/gongbang:building-skills`에 넘겨 테스트하고 다듬으세요.
 - **코드 규칙**: `/gongbang:set-guidelines`로 규칙을 만들고, `/gongbang:check-guidelines`로 코드를 검사하세요.
-- **큰 작업 넘기기**: framing-problems로 구체화한 결과를 `/gongbang:set-brief`로 남기고, 크면 `/gongbang:set-ticket`으로 나눈 뒤, `/gongbang:run-ticket`으로 티켓을 하나씩 실행하세요. 레포 규칙에 워커 도구 절차를 등록하면(예: [Orca](docs/orca-orchestration.md), [Paseo](docs/paseo-orchestration.md)) "남은 티켓 전부"로 병렬 실행할 수 있습니다.
-- **처음부터 끝까지 맡기기**: `/gongbang:run-flow <기획서나 요청>`을 실행하면 analyzing-requirements, framing-problems부터 위 흐름과 PR 생성까지 차례로 이어 갑니다. 멈춘 흐름은 `/gongbang:run-flow`를 다시 실행해 이어 가세요.
+- **큰 작업 넘기기**: framing-problems로 구체화한 결과를 `/gongbang:set-brief`로 남기고, 크면 `/gongbang:set-ticket`으로 나눈 뒤, `/gongbang:run-ticket`으로 티켓을 실행하세요. "남은 티켓 전부"처럼 범위를 주면 여러 티켓을 차례로 실행합니다. 레포·에이전트 규칙에 워커 도구 절차를 등록해 두면(예: [Orca](docs/orca-orchestration.md), [Paseo](docs/paseo-orchestration.md)) 워커로 병렬 실행합니다.
+- **처음부터 끝까지 맡기기**: `/gongbang:run-flow <기획서나 요청>`을 실행하세요. 기획서면 analyzing-requirements부터, 요청이면 framing-problems부터 시작해 위 흐름을 거쳐 PR을 만들지 고르는 단계까지 이어 갑니다. PR은 그 단계에서 사용자가 고를 때만 만듭니다. 멈춘 흐름은 `/gongbang:run-flow`를 인자 없이 다시 실행해 이어 가고, 끝나지 않은 흐름 목록은 `/gongbang:run-flow status`로 봅니다.
 
 ## 커스텀
 
@@ -139,9 +143,9 @@ claude plugin install gongbang-mods@dev-gongbang
 
 이슈, PR, 커밋 규칙은 [기여 가이드](CONTRIBUTING.md)를 보세요. 이 프로젝트에 참여하는 모든 사람은 [행동 강령](CODE_OF_CONDUCT.md)을 따르고, 보안 문제는 [보안 정책](SECURITY.md)에 따라 비공개로 알려 주세요.
 
-스킬을 추가하거나 옮길 때 지킬 규칙은 [AGENTS.md](AGENTS.md)에 있습니다. 변경한 뒤 `scripts/check.py`를 실행해 통과시키세요. PyYAML이 필요합니다.
+스킬을 추가하거나 옮길 때 지킬 규칙은 [AGENTS.md](AGENTS.md)에 있습니다. 변경한 뒤 `scripts/check.py`를 실행해 통과시키세요. PyYAML과 Claude Code CLI가 필요합니다.
 
-스킬 eval은 다음 명령으로 실행합니다.
+스킬 eval은 다음 명령으로 실행합니다. eval은 모델을 실제로 호출합니다.
 
 ```bash
 claude plugin eval . --scaffold --allow-tools Bash Write Edit WebSearch WebFetch --no-publish
