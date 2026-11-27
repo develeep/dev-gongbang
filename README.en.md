@@ -137,7 +137,7 @@ How to copy and edit a skill, which files to edit for each skill, and how to tes
 
 For issues, PRs, and commit rules, see the [contributing guide](CONTRIBUTING.en.md). Everyone who takes part in this project follows the [code of conduct](CODE_OF_CONDUCT.en.md). Report security problems privately as described in the [security policy](SECURITY.en.md).
 
-Rules to follow when adding or moving a skill are in [.claude/CLAUDE.md](.claude/CLAUDE.md). After making changes, run `scripts/check.py` and make it pass. It requires PyYAML.
+Rules to follow when adding or moving a skill are in [AGENTS.md](AGENTS.md). After making changes, run `scripts/check.py` and make it pass. It requires PyYAML.
 
 Run skill evals with these commands.
 

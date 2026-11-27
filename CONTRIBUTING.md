@@ -32,7 +32,7 @@ pip install pyyaml
 
 ## 스킬 고치기와 추가하기
 
-스킬을 추가·이동·이름 변경할 때 지킬 규칙은 [.claude/CLAUDE.md](.claude/CLAUDE.md)에 있습니다. 버킷, 호출 방식, 사용 문서, 커밋 규칙이 모두 이 파일에 있습니다. 이 저장소에서 Claude Code로 작업하면 Claude Code가 이 파일을 읽고 규칙을 따릅니다.
+스킬을 추가·이동·이름 변경할 때 지킬 규칙은 [AGENTS.md](AGENTS.md)에 있습니다. 버킷, 호출 방식, 사용 문서, 커밋 규칙이 모두 이 파일에 있습니다. 이 저장소에서 Claude Code, Codex, OMP 같은 코딩 에이전트로 작업하면 에이전트가 이 파일을 읽고 규칙을 따릅니다. Claude Code는 `.claude/CLAUDE.md`를 거쳐 이 파일을 가져옵니다.
 
 자주 놓치는 것은 다음과 같습니다.
 
@@ -74,7 +74,7 @@ fix: check-guidelines에서 paths 없는 규칙 파일 누락 수정
 - paths가 없는 규칙 파일을 모든 대상 파일에 적용
 ```
 
-유형은 `feature`, `fix`, `docs`, `refactor`, `eval`, `chore` 중 하나입니다. 커밋 하나에는 유형 하나만 담습니다. 유형별 뜻과 세부 형식은 [.claude/CLAUDE.md](.claude/CLAUDE.md)의 "커밋" 절에 있습니다.
+유형은 `feature`, `fix`, `docs`, `refactor`, `eval`, `chore` 중 하나입니다. 커밋 하나에는 유형 하나만 담습니다. 유형별 뜻과 세부 형식은 [AGENTS.md](AGENTS.md)의 "커밋" 절에 있습니다.
 
 ## PR 보내기
 

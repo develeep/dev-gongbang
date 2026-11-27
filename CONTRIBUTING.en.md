@@ -32,7 +32,7 @@ pip install pyyaml
 
 ## Changing and adding skills
 
-The rules for adding, moving, or renaming a skill are in [.claude/CLAUDE.md](.claude/CLAUDE.md). That file covers buckets, invocation types, usage docs, and commit rules. It is written in Korean. When you work in this repository with Claude Code, Claude Code reads the file and follows its rules.
+The rules for adding, moving, or renaming a skill are in [AGENTS.md](AGENTS.md). That file covers buckets, invocation types, usage docs, and commit rules. It is written in Korean. When you work in this repository with a coding agent such as Claude Code, Codex, or OMP, the agent reads the file and follows its rules. Claude Code imports it through `.claude/CLAUDE.md`.
 
 Commonly missed steps:
 
@@ -74,7 +74,7 @@ fix: include rule files without paths in check-guidelines
 - Apply rule files without paths to every target file
 ```
 
-The type is one of `feature`, `fix`, `docs`, `refactor`, `eval`, `chore`. Keep one type per commit. The meaning of each type and the detailed format are in the "커밋" (Commits) section of [.claude/CLAUDE.md](.claude/CLAUDE.md).
+The type is one of `feature`, `fix`, `docs`, `refactor`, `eval`, `chore`. Keep one type per commit. The meaning of each type and the detailed format are in the "커밋" (Commits) section of [AGENTS.md](AGENTS.md).
 
 ## Sending a PR
 

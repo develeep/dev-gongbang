@@ -118,7 +118,7 @@ dev-gongbang/scripts/link-in-progress.sh
 
 ## 저장소에 기여하기
 
-고친 내용을 모두가 쓰게 하려면 저장소를 포크해 PR을 보내세요. 스킬을 추가하거나 옮길 때 지킬 규칙은 [.claude/CLAUDE.md](../.claude/CLAUDE.md)에 있습니다. 변경한 뒤 `scripts/check.py`를 실행해 통과시키세요.
+고친 내용을 모두가 쓰게 하려면 저장소를 포크해 PR을 보내세요. 스킬을 추가하거나 옮길 때 지킬 규칙은 [AGENTS.md](../AGENTS.md)에 있습니다. 변경한 뒤 `scripts/check.py`를 실행해 통과시키세요.
 
 ---
 
