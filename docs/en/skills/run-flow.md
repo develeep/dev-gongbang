@@ -137,7 +137,7 @@ Behavior inside a stage is changed in that stage's skill. To copy and modify the
 
 ## Related skills
 
-- **analyzing-requirements**, **framing-problems**, **set-brief**, **set-ticket**, **run-ticket**: the skills it loads at each stage. set-brief, set-ticket, and run-ticket are Model-invoked so that run-flow can load them, and they run only when you or another skill asks for them.
+- **analyzing-requirements**, **framing-problems**, **set-brief**, **set-ticket**, **run-ticket**: the skills it loads at each stage. All five are Model-invoked so that run-flow can load them, and framing-problems, set-brief, set-ticket, and run-ticket run only when you or another skill asks for them.
 
 ---
 

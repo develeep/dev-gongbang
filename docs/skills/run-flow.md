@@ -137,7 +137,7 @@
 
 ## 함께 쓰는 스킬
 
-- **analyzing-requirements**, **framing-problems**, **set-brief**, **set-ticket**, **run-ticket**: 단계마다 불러오는 스킬입니다. set-brief, set-ticket, run-ticket은 run-flow가 불러올 수 있도록, 사용자나 다른 스킬이 지시할 때만 쓰는 Model-invoked입니다.
+- **analyzing-requirements**, **framing-problems**, **set-brief**, **set-ticket**, **run-ticket**: 단계마다 불러오는 스킬입니다. run-flow가 불러올 수 있도록 다섯 스킬 모두 Model-invoked이고, 이 가운데 framing-problems, set-brief, set-ticket, run-ticket은 사용자나 다른 스킬이 지시할 때만 쓰입니다.
 
 ---
 
