@@ -21,7 +21,7 @@ With `gongbang-mods` installed, the Claude Code terminal folds each tool call to
 
 ## Installation
 
-Needs Claude Code 2.1.287 or later. [확인 필요: source of the minimum version. It is not in the repository sources; the hook code comments describe behavior checked on Claude Code 2.1.332] Add the marketplace, install `gongbang-mods`, and restart Claude Code.
+Add the marketplace, install `gongbang-mods`, and restart Claude Code.
 
 ```bash
 claude plugin marketplace add develeep/dev-gongbang

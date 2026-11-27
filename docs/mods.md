@@ -21,7 +21,7 @@
 
 ## 설치
 
-Claude Code 2.1.287 이상이 필요합니다. [확인 필요: 최소 버전의 근거. 저장소 원본에는 없고, hook 코드 주석은 Claude Code 2.1.332에서 확인한 동작을 적었습니다] 마켓플레이스를 추가하고 `gongbang-mods`를 설치한 뒤 Claude Code를 다시 시작하세요.
+마켓플레이스를 추가하고 `gongbang-mods`를 설치한 뒤 Claude Code를 다시 시작하세요.
 
 ```bash
 claude plugin marketplace add develeep/dev-gongbang
