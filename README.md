@@ -92,7 +92,7 @@ claude plugin update gongbang@dev-gongbang
 
 - [set-brief](docs/skills/set-brief.md): 구체화 기록이나 세션 결과를 맥락 없는 작업자도 이어받을 수 있는 작업 지시서(brief)로 정리해 GitHub 이슈나 `docs/context/` 문서로 남깁니다. 요청하거나 run-flow가 지시할 때만 동작합니다. `/gongbang:set-brief [남길 작업 요약]` · [SKILL.md](skills/in-progress/set-brief/SKILL.md)
 - [set-ticket](docs/skills/set-ticket.md): 큰 brief를 혼자 검증할 수 있는 티켓으로 나눠 GitHub sub-issue나 docs 파일로 남기고 brief에 연결합니다. 요청하거나 run-flow가 지시할 때만 동작합니다. `/gongbang:set-ticket [brief 이슈 번호·URL 또는 docs 경로]` · [SKILL.md](skills/in-progress/set-ticket/SKILL.md)
-- [run-ticket](docs/skills/run-ticket.md): 새 세션에서 티켓 하나를 구현·리뷰하고 티켓 상태와 brief 체크박스를 갱신합니다. 커밋은 하지 않습니다. 여러 티켓은 사용자나 레포 규칙이 지정한 워커 도구 절차로 병렬 실행하고, 쓸 수 있는 절차가 없으면 차례로 실행합니다. 요청하거나 run-flow가 지시할 때만 동작합니다. `/gongbang:run-ticket [티켓·brief 경로, 이슈 번호·URL] [여러 티켓이면 범위]` · [SKILL.md](skills/in-progress/run-ticket/SKILL.md)
+- [run-ticket](docs/skills/run-ticket.md): 티켓 하나를 구현·리뷰하고 티켓 상태와 brief 체크박스를 갱신합니다. 커밋은 하지 않습니다. 여러 티켓은 사용자나 레포 규칙이 지정한 워커 도구 절차로 병렬 실행하고, 쓸 수 있는 절차가 없으면 차례로 실행합니다. 요청하거나 run-flow가 지시할 때만 동작합니다. `/gongbang:run-ticket [티켓·brief 경로, 이슈 번호·URL] [여러 티켓이면 범위]` · [SKILL.md](skills/in-progress/run-ticket/SKILL.md)
 - [analyzing-requirements](docs/skills/analyzing-requirements.md): 링크나 PDF·PPT·MD로 받은 기획서를 읽고 요구사항과 서비스·개발 영역별 개발 범위를 마크다운 문서로 정리합니다. `/gongbang:analyzing-requirements [기획서 링크 또는 파일 경로]` · [SKILL.md](skills/in-progress/analyzing-requirements/SKILL.md)
 
 ## Mod
@@ -103,7 +103,7 @@ claude plugin update gongbang@dev-gongbang
 claude plugin install gongbang-mods@dev-gongbang
 ```
 
-- [gongbang-mods](docs/mods.md): 도구 호출을 한 줄로 접고, 메시지와 답변을 카드로 나누고, 세션 목표와 컨텍스트 사용량을 우측 패널에 보여 줍니다. `/session-pane` · `/where` · [코드](mods/gongbang-mods/hooks/register.tsx)
+- [gongbang-mods](docs/mods.md): 도구 호출을 한 줄로 접고, 메시지와 답변을 카드로 나누고, 세션 목표와 컨텍스트 사용량을 우측 패널에 보여 줍니다. run-flow 흐름 중에는 보호 목록의 테스트를 쓰기 도구로 고치지 못하게 막습니다. `/session-pane` · `/where` · [코드](mods/gongbang-mods/hooks/register.tsx)
 
 함께 쓰면 좋은 외부 mod는 [Mod 문서](docs/mods.md#함께-쓰면-좋은-외부-mod)에 정리했습니다. 모델·브랜치·요금제 사용량을 보여 주는 [상태줄 스크립트](docs/mods.md#상태줄)는 따로 설치합니다. [코드](extras/statusline/statusline.py)
 
@@ -128,7 +128,7 @@ claude plugin install gongbang-mods@dev-gongbang
 - **프롬프트 만들기**: `/gongbang:framing-problems`로 작업을 먼저 구체화하고, 확정된 구체화 기록을 초안으로 `/gongbang:prompt-builder`에 넘기세요. 사람과 대화하는 에이전트 프롬프트나 재사용 템플릿은 실행할 때마다 framing-problems를 호출하게 만들 수 있습니다.
 - **스킬 만들기**: `/gongbang:prompt-builder`로 SKILL.md 초안을 만들고, 그 결과를 `/gongbang:building-skills`에 넘겨 테스트하고 다듬으세요.
 - **코드 규칙**: `/gongbang:set-guidelines`로 규칙을 만들고, `/gongbang:check-guidelines`로 코드를 검사하세요.
-- **큰 작업 넘기기**: framing-problems로 구체화한 결과를 `/gongbang:set-brief`로 남기고, 크면 `/gongbang:set-ticket`으로 나눈 뒤, 새 세션에서 `/gongbang:run-ticket`으로 티켓을 하나씩 실행하세요. 레포 규칙에 워커 도구 절차를 등록하면(예: [Orca](docs/orca-orchestration.md), [Paseo](docs/paseo-orchestration.md)) "남은 티켓 전부"로 병렬 실행할 수 있습니다.
+- **큰 작업 넘기기**: framing-problems로 구체화한 결과를 `/gongbang:set-brief`로 남기고, 크면 `/gongbang:set-ticket`으로 나눈 뒤, `/gongbang:run-ticket`으로 티켓을 하나씩 실행하세요. 레포 규칙에 워커 도구 절차를 등록하면(예: [Orca](docs/orca-orchestration.md), [Paseo](docs/paseo-orchestration.md)) "남은 티켓 전부"로 병렬 실행할 수 있습니다.
 - **처음부터 끝까지 맡기기**: `/gongbang:run-flow <기획서나 요청>`을 실행하면 analyzing-requirements, framing-problems부터 위 흐름과 PR 생성까지 차례로 이어 갑니다. 멈춘 흐름은 `/gongbang:run-flow`를 다시 실행해 이어 가세요.
 
 ## 커스텀
@@ -144,7 +144,7 @@ claude plugin install gongbang-mods@dev-gongbang
 스킬 eval은 다음 명령으로 실행합니다.
 
 ```bash
-claude plugin eval . --scaffold --allow-tools Edit WebSearch WebFetch --no-publish
+claude plugin eval . --scaffold --allow-tools Bash Write Edit WebSearch WebFetch --no-publish
 claude plugin eval . --eval-dir evals-trigger --ablation none --no-publish
 ```
 

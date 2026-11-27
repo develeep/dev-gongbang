@@ -32,17 +32,17 @@ dev-gongbang의 모든 사용 문서 목록입니다. 스킬 페이지에는 언
 
 - [set-brief](skills/set-brief.md): 대화에서 확정한 내용을 작업 지시서(brief)로 남깁니다.
 - [set-ticket](skills/set-ticket.md): 큰 brief를 티켓으로 나눕니다.
-- [run-ticket](skills/run-ticket.md): 티켓 하나를 새 세션에서 구현하고 리뷰합니다. 여러 티켓은 사용자나 레포 규칙이 지정한 워커 도구 절차로 병렬 실행하고, 쓸 수 있는 절차가 없으면 차례로 실행합니다.
+- [run-ticket](skills/run-ticket.md): 티켓 하나를 구현하고 리뷰합니다. 대화가 아니라 brief와 티켓 문서를 기준으로 삼습니다. 여러 티켓은 사용자나 레포 규칙이 지정한 워커 도구 절차로 병렬 실행하고, 쓸 수 있는 절차가 없으면 차례로 실행합니다.
 - [analyzing-requirements](skills/analyzing-requirements.md): 기획서를 요구사항과 개발 범위 문서로 정리합니다.
 
 ## Mod
 
-- [gongbang-mods](mods.md): 도구 호출 접기, 카드형 메시지와 마크다운, 세션 목표와 컨텍스트 우측 패널
+- [gongbang-mods](mods.md): 도구 호출 접기, 카드형 메시지와 마크다운, 세션 목표와 컨텍스트 우측 패널, run-flow 보호 경로 쓰기 차단
 
 ## 가이드
 
 - [스킬 커스텀하기](customization.md): 스킬을 복사해 고치고, 검사하고, 시험하는 방법
-- [omp 멀티에이전트 설정](omp-orchestration.md): 단계마다 모델을 나눠 쓰는 omp 역할·에이전트·위임 규칙 설치 방법
+- [omp 멀티에이전트 설정](omp-orchestration.md): 교차 리뷰·냉독 에이전트와 위임 규칙을 설치하고 모델을 고르는 omp 설정 방법
 - [Orca 오케스트레이션 설정](orca-orchestration.md): run-ticket이 Orca 워커로 티켓을 병렬 실행하도록 Orca를 설치하고 워커 절차를 규칙 파일에 등록하는 선택 설정과 오케스트레이션 방식
-- [Paseo 오케스트레이션 설정](paseo-orchestration.md): run-ticket이 Paseo 워커로 티켓을 병렬 실행하도록 에이전트 프로필을 설치하고 워커 절차를 규칙 파일에 등록하는 선택 설정과 오케스트레이션 방식. 플레이북은 티켓 하나를 실행하는 별도 선택 기능입니다
+- [Paseo 오케스트레이션 설정](paseo-orchestration.md): run-ticket이 Paseo 워커로 티켓을 병렬 실행하도록 에이전트 프로필을 설치하고 워커 절차를 규칙 파일에 등록하는 선택 설정과 오케스트레이션 방식. 티켓 하나를 실행하던 플레이북은 지웠고 run-ticket 스킬이 대신합니다
 - [상황별로 고르기](../README.md#상황별로-고르기): 상황에 맞는 스킬과 스킬을 이어 쓰는 흐름

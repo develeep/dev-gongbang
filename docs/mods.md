@@ -4,12 +4,13 @@
 
 # Mod
 
-`gongbang-mods`는 Claude Code 터미널 화면을 꾸미는 mod 묶음입니다. mod는 Claude Code의 화면과 동작에 hook을 거는 플러그인입니다. 이 문서를 읽으면 `gongbang-mods`가 화면을 어떻게 바꾸는지, 설치하고 끄는 방법, 함께 쓰면 좋은 외부 mod, 따로 설치하는 상태줄 스크립트를 알 수 있습니다.
+`gongbang-mods`는 Claude Code 터미널 화면을 꾸미고 run-flow의 보호 경로 쓰기를 막는 mod 묶음입니다. mod는 Claude Code의 화면과 동작에 hook을 거는 플러그인입니다. 이 문서를 읽으면 `gongbang-mods`가 화면을 어떻게 바꾸는지, 설치하고 끄는 방법, 함께 쓰면 좋은 외부 mod, 따로 설치하는 상태줄 스크립트를 알 수 있습니다.
 
 ## 목차
 
 - [설치](#설치)
 - [바뀌는 화면](#바뀌는-화면)
+- [run-flow 보호 경로 차단](#run-flow-보호-경로-차단)
 - [알아 둘 점](#알아-둘-점)
 - [끄기와 업데이트](#끄기와-업데이트)
 - [함께 쓰면 좋은 외부 mod](#함께-쓰면-좋은-외부-mod)
@@ -69,6 +70,16 @@ claude plugin install gongbang-mods@dev-gongbang
 |---|---|
 | `/session-pane` | Session 패널을 엽니다 |
 | `/where` | 지금까지의 세션을 몇 줄로 요약합니다 |
+
+## run-flow 보호 경로 차단
+
+run-flow 흐름이 켜져 있는 저장소에서 Write, Edit, NotebookEdit가 보호 목록의 파일(5단계를 시작한 HEAD의 테스트, 판정용 사례, 수락한 테스트, 목록 파일 자체)을 고치려 하면 도구가 실행되기 전에 막고 이유를 돌려줍니다. 서브에이전트의 호출도 같습니다. 목록과 켜지는 조건은 [run-flow의 보호 목록](skills/run-flow.md#보호-목록)에 있습니다.
+
+- 대상 경로가 들어가는 저장소에 켜진 목록이 없으면 아무것도 하지 않습니다. 켜진 목록은 `docs/context/run-flow/*.protected` 가운데 상태 파일의 `- 현재 단계:`가 `완료`가 아닌 것입니다. 흐름 밖의 작업, 끝난 흐름, run-flow를 쓰지 않는 저장소에는 영향이 없고 `python3`도 실행하지 않습니다.
+- 켜진 목록이 있으면 mod에 함께 들어 있는 `hooks/protected_paths.py`를 `python3`로 실행해 판정합니다. 상대 경로, 절대 경로, 심볼릭 링크, 저장소 안의 git worktree 경로를 실제 경로로 풀어 비교합니다. 새 파일과 목록 밖의 파일은 그대로 씁니다.
+- 판정하지 못하면(`python3`가 없거나 목록을 읽지 못하면) 그 쓰기를 막습니다.
+- Bash 같은 셸 명령으로 쓰는 것은 막지 않습니다. run-flow가 티켓을 수락하기 전에 `protected_paths.py verify`로 잡습니다.
+- 확인 방법(이 저장소에서): `claude plugin test mods/gongbang-mods`, `python3 scripts/test_protected_paths.py`
 
 ## 알아 둘 점
 

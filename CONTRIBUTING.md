@@ -60,7 +60,7 @@ PR을 올리면 GitHub Actions가 `test_validate.py`와 `validate.py`를 자동�
 스킬의 동작을 바꿨다면 eval도 실행해 보세요. eval은 모델을 실제로 호출합니다.
 
 ```bash
-claude plugin eval . --scaffold --allow-tools Edit WebSearch WebFetch --no-publish
+claude plugin eval . --scaffold --allow-tools Bash Write Edit WebSearch WebFetch --no-publish
 claude plugin eval . --eval-dir evals-trigger --ablation none --no-publish
 ```
 
