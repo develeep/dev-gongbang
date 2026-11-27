@@ -5,9 +5,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 rules = subprocess.run([sys.executable, ROOT / "scripts/validate.py"], cwd=ROOT)
-protected = subprocess.run([sys.executable, ROOT / "scripts/test_protected_paths.py"], cwd=ROOT)
+selftests = [subprocess.run([sys.executable, ROOT / "scripts" / t], cwd=ROOT).returncode
+             for t in ("test_protected_paths.py", "test_cross_review.py", "test_start_stage.py")]
 plugin = subprocess.run(["claude", "plugin", "validate", str(ROOT), "--strict"])
-codes = [rules.returncode, protected.returncode, plugin.returncode]
+codes = [rules.returncode, *selftests, plugin.returncode]
 # omp extension 테스트는 bun이 있어야 돈다. CI는 bun을 설치해 늘 돌린다.
 if shutil.which("bun"):
     codes.append(subprocess.run(["bun", "test", "extras/omp/extensions"], cwd=ROOT).returncode)
