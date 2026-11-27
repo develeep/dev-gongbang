@@ -4,12 +4,13 @@
 
 # Mods
 
-`gongbang-mods` is a bundle of mods that restyle the Claude Code terminal. A mod is a plugin that hooks into Claude Code's screen and behavior. This page covers how `gongbang-mods` changes the screen, how to install and turn it off, which outside mods pair well with it, and the status line script installed separately.
+`gongbang-mods` is a bundle of mods that restyle the Claude Code terminal and block writes to run-flow protected paths. A mod is a plugin that hooks into Claude Code's screen and behavior. This page covers how `gongbang-mods` changes the screen, how to install and turn it off, which outside mods pair well with it, and the status line script installed separately.
 
 ## Contents
 
 - [Installation](#installation)
 - [What changes on screen](#what-changes-on-screen)
+- [run-flow protected path blocking](#run-flow-protected-path-blocking)
 - [Good to know](#good-to-know)
 - [Turning it off and updating](#turning-it-off-and-updating)
 - [Outside mods that pair well](#outside-mods-that-pair-well)
@@ -69,6 +70,16 @@ Both fill in after the first turn.
 |---|---|
 | `/session-pane` | Opens the Session pane |
 | `/where` | Recaps the session so far in a few lines |
+
+## run-flow protected path blocking
+
+In a repository with an active run-flow flow, when Write, Edit, or NotebookEdit targets a file on the protected list (tests at the HEAD where stage 5 started, judge cases, accepted tests, the list file itself), the call is refused before the tool runs and the reason goes back to the model. Subagent calls are covered the same way. The list and when it is on are described in [run-flow's protected list](skills/run-flow.md#protected-list).
+
+- If the repository the target lands in has no active list, it does nothing. An active list is a `docs/context/run-flow/*.protected` whose state file's `- 현재 단계:` (current stage) is not `완료` (done). Work outside a flow, finished flows, and repositories that do not use run-flow are not affected, and `python3` is not run.
+- If an active list exists, it runs the bundled `hooks/protected_paths.py` with `python3` to decide. Relative paths, absolute paths, symlinks, and paths in git worktrees inside the repository are resolved to their real path before comparing. New files and files off the list are written as usual.
+- If it cannot decide (no `python3`, or the list cannot be read), it refuses the write.
+- Writes through shell commands such as Bash are not blocked. run-flow catches them with `protected_paths.py verify` before it accepts a ticket.
+- How to check (in this repository): `claude plugin test mods/gongbang-mods`, `python3 scripts/test_protected_paths.py`
 
 ## Good to know
 

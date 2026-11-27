@@ -4,8 +4,9 @@ description: 티켓을 끝내면 상태를 done으로, brief 체크박스를 [x]
 tags: [status]
 execution:
   prompt: /run-ticket docs/context/2026-10-22-greeting/01-exclaim.md
-  max_turns: 30
-  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+  max_turns: 40
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill, Agent]
 context:
   scaffold_script: fixture.sh
 graders:
@@ -19,8 +20,9 @@ graders:
     criteria: |
       PASS: 티켓에 `## 완료 기록`을 붙이고 커밋하지 않았다는 사실과 바꾼 파일을 적으며, git commit을 실행하지 않는다.
       FAIL: 완료 기록이 없거나, 커밋 여부가 없거나, git commit을 실행한다.
+  # 근거: 계획서 P0-3 (교차 리뷰나 같은 회사 대체 기록)
   - name: reviewed
     type: llm
     criteria: |
-      PASS: 완료 기록 전에 리뷰 스킬을 호출하거나 diff를 직접 리뷰했다고 밝힌다.
-      FAIL: 리뷰 없이 끝낸다.
+      PASS: 완료 기록 전에 리뷰 스킬을 호출하거나 diff를 직접 리뷰했다고 밝히고, 교차 리뷰를 했거나 같은 회사 새 컨텍스트 리뷰로 대체했다고 기록한다(수행 모델 포함).
+      FAIL: 리뷰 없이 끝내거나, 교차 리뷰를 건너뛰고 대체 기록도 없이 done으로 바꾼다.

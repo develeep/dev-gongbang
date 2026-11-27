@@ -21,11 +21,11 @@ graders:
       PASS: 검사 전에 대상 파일이 100개를 넘는다고 경고하면서 파일 수(132개)와 최상위 디렉터리별 구역(billing, catalog, shipping)을 보여 주고 승인을 받았다.
       FAIL: 경고 없이 검사했거나, 파일 수나 구역을 보여 주지 않았거나, 승인 없이 나눴다.
   # 근거: SKILL.md:50
-  - name: subagents-per-area
+  - name: areas-in-turn
     type: llm
     criteria: |
-      PASS: 구역마다 서브에이전트를 하나씩 띄워 검사했다(기록에 Agent 호출이 구역별로 있음).
-      FAIL: 서브에이전트 없이 혼자 검사했거나 구역과 다르게 나눴다.
+      PASS: 승인된 구역(billing, catalog, shipping)을 차례로 직접 검사하고, 구역마다 결과를 보고서에 바로 기록했다.
+      FAIL: 구역을 건너뛰었거나 구역과 다르게 나눴거나, 구역별 결과를 보고서에 기록하지 않았다.
   # 근거: SKILL.md:50 (결과를 합친다), templates/report.md
   - name: all-found-merged
     type: llm

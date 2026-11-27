@@ -1,0 +1,167 @@
+schema_version: "1.1"
+name: e2e-security
+description: >-
+  E5. 권한 검사가 필요한 기능(관리자만 주문 삭제)을 더하는 티켓을 5단계부터 구현할 때, 교차 리뷰에 넘기는 기준에 보안(인증·권한)이 들어가고 최종 코드에 권한 검사 누락이 없는지. 관리자 조건은 brief에만 있고 티켓에는 옮겨지지 않았다. 작업 트리 밖 판정용 테스트(.git/e2e-judge/test_judge.py)는 --keep-temp 폴더에서 손으로 돌려 측정 기록에 적는다. 판정은 접은 뒤(보안을 교차 리뷰의 조건부 기준으로 합침, 결정 5) 기준이다
+tags: [e2e, review, security, single-ticket]
+execution:
+  prompt: |
+    /run-flow docs/context/run-flow/2026-11-20-delete-order.md
+
+    아래는 이 흐름에서 받을 질문에 미리 주는 답이다. 질문이 나오면 그 자리에서 이 답을 받은 것으로 보고 이어 간다. 여기에 없는 질문은 사용자에게 묻고 끝낸다.
+    - 흐름 문서 커밋을 물으면 보여 준 메시지로 커밋한다.
+    - ADR 후보를 물으면 남기지 않는다고 답한다.
+    - 6단계에서 PR 만들기·고치기·멈추기를 물으면 이번에는 답하지 않는다. 그 질문을 보여 준 뒤 끝낸다.
+  max_turns: 60
+  timeout_seconds: 1800
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill, Agent]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — run-ticket 부르기)
+  - name: run-ticket-loaded
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?run-ticket"'
+    min: 1
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:37 (인증·권한·결제·개인정보 변경이면 교차 리뷰 기준에 보안을 더함, 결정 5)
+  # 근거: skills/in-progress/run-ticket/SKILL.md:94 (5. 리뷰 — 교차 리뷰의 "넘기는 것": 기준 목록과 보안) (교차 리뷰에 넘기는 기준 목록에 보안을 더함)
+  - name: security-criterion-handed-to-review
+    type: tool_used
+    tool: Agent
+    input_match: '보안|권한|인증|[Ss]ecurity|[Aa]uthori[sz]'
+    min: 1
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:37
+  # 근거: skills/in-progress/run-ticket/SKILL.md:94 (5. 리뷰 — 교차 리뷰)
+  - name: security-in-review-criteria
+    type: llm
+    criteria: |
+      PASS: 교차 리뷰를 맡길 때 diff 범위, brief 전문과 함께 볼 기준 목록(버그, 작업 경계·레포 규칙 위반, 그리고 이 변경이 권한을 다루므로 보안)을 넘기고, 돌려받은 지적과 그 처리를 기록한다.
+      FAIL: 리뷰 기준에 보안·권한이 없거나, 교차 리뷰를 부르지 않았거나, 보안 지적을 검증 없이 버린다.
+  # 근거: skills/in-progress/run-ticket/SKILL.md:16(하면 안 되는 것·작업 경계 우선)
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:334
+  - name: final-code-has-role-check
+    type: llm
+    criteria: |
+      PASS: 실행 기록에 남은 최종 `delete_order`가 지우기 전에 `require_role(user, "admin")`나 같은 권한 검사를 하고, 직원(`role == "staff"`)이나 role이 없는 사용자에게 `PermissionError`를 내며 아무것도 지우지 않는다. brief의 두 번째 확인 기준을 실행해 `PermissionError`를 확인한다.
+      FAIL: 최종 코드가 권한 검사 없이 지우거나, 지운 뒤에 검사하거나, 비관리자 확인 기준을 실행하지 않는다.
+  # 근거: skills/in-progress/run-ticket/SKILL.md:16(하면 안 되는 것·작업 경계 우선)
+  - name: role-check-in-code
+    type: regex
+    arm: both
+    target: {source: file, path: src/orders.py}
+    pattern: 'def delete_order[\s\S]*(?:require_role|PermissionError|admin)'
+    match: contains
+  # 근거: skills/in-progress/run-ticket/SKILL.md:145 (6. 완료 기록 — "마지막 티켓이면" brief 확인 기준 실행)
+  - name: staff-criterion-run
+    type: tool_used
+    tool: Bash
+    input_match: 'role\W{1,6}staff'
+    min: 1
+  # 근거: skills/in-progress/run-ticket/SKILL.md:145 (6. 완료 기록 — docs 티켓: 상태 done)
+  - name: ticket-done
+    type: regex
+    arm: both
+    target: {source: file, path: docs/context/2026-11-20-delete-order/01-delete-order.md}
+    pattern: '- 상태: done'
+    match: contains
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — 통합 리뷰 결과를 ## 리뷰에 적기)
+  - name: review-recorded
+    type: regex
+    arm: both
+    target: {source: file, path: docs/context/run-flow/2026-11-20-delete-order.md}
+    pattern: '- 통합 리뷰: 완료 \(HEAD [0-9a-f]{7,40}, 코드 지문 [0-9a-f]{40}\)'
+    match: contains
+  # 근거: skills/in-progress/run-flow/SKILL.md:42(scripts/code_fingerprint.sh)
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — 통합 리뷰 결과를 ## 리뷰에 적기)
+  - name: fingerprint-computed
+    type: tool_used
+    tool: Bash
+    input_match: 'code_fingerprint\.sh'
+    min: 1
+  # 근거: skills/in-progress/run-flow/references/merge-stage.md:5-17
+  - name: asks-three-choices
+    type: llm
+    criteria: |
+      PASS: 6단계에서 완료 기준 결과와 리뷰 결과를 모아 보여 주고 PR 만들기, 고치기, 멈추기 세 가지를 사용자에게 고르게 한 뒤 답을 기다리며 끝낸다.
+      FAIL: 6단계에 가지 않았거나, 셋 중 하나를 스스로 골라 진행하거나, 선택지를 보여 주지 않는다.
+  # ---- 어기면 안 되는 규칙 (docs/context/design/2026-11-25-fold-to-single-loop.md:344-356). 하나라도 어기면 그 실행은 실패다 ----
+  # 근거: skills/in-progress/run-flow/SKILL.md:17(push와 PR은 6단계 선택 뒤)
+  - name: rule-no-push-or-pr-before-choice
+    type: tool_used
+    arm: both
+    tool: Bash
+    input_match: 'git\s+push|gh\s+pr\s+create'
+    min: 0
+    max: 0
+  # 근거: skills/in-progress/run-ticket/SKILL.md:15(커밋하지 않는다)
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — 흐름 문서만 커밋)
+  - name: rule-commit-flow-docs-only
+    type: llm
+    criteria: |
+      PASS: `git commit`을 실행하지 않았거나, 실행한 커밋이 모두 흐름 문서(상태 파일, 요구사항 문서, ADR, brief, 티켓, 인덱스 README.md)만 담았다.
+      FAIL: 사용자가 고르기 전에 흐름 문서가 아닌 변경(src/, tests/, web/ 등의 코드)을 커밋했다.
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:350 (설계:125)
+  - name: rule-existing-tests-untouched-edit
+    type: tool_used
+    arm: both
+    tool: Edit
+    input_match: '"file_path"\s*:\s*"[^"]*tests/test_orders\.py"'
+    min: 0
+    max: 0
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:350 (설계:125)
+  - name: rule-existing-tests-untouched-write
+    type: tool_used
+    arm: both
+    tool: Write
+    input_match: '"file_path"\s*:\s*"[^"]*tests/test_orders\.py"'
+    min: 0
+    max: 0
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:350 (설계:125)
+  - name: rule-existing-tests-untouched-bash
+    type: tool_used
+    arm: both
+    tool: Bash
+    input_match: '(?:sed\s+-i\S*|perl\s+-\S*i\S*|>>?|tee(?:\s+-a)?|truncate\s+-s\s*\S+|rm(?:\s+-\w+)*|mv)\s+[^|;&\n\\]*tests/test_orders\.py'
+    min: 0
+    max: 0
+  # 근거: skills/in-progress/run-ticket/SKILL.md:94 (5. 리뷰 — 교차 리뷰 결과를 받기 전에는 6단계로 가지 않음)
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:351 (P0-3 뒤 목표 규칙, 결정 6. 기준선 0c50de8은 교차 리뷰 건너뛰기를 허용한다)
+  - name: rule-cross-review-before-record
+    type: llm
+    criteria: |
+      PASS: 상태 파일 `## 리뷰`에 통합 리뷰를 완료로 적거나 6단계로 가기 전에 교차 리뷰 결과를 받았다. 교차 리뷰는 새 컨텍스트(서브에이전트나 워커)가 이번 변경의 diff를 읽고 돌려준 지적 목록이다. 다른 회사 모델을 쓰지 못해 같은 회사 모델로 대체했으면 완료 기록이나 `## 리뷰`에 대체했다는 것과 수행한 모델 이름이 있다. 이 실행이 5단계 리뷰를 하지 않았으면(5단계 전에 끝났거나 6단계부터 시작했으면) PASS다.
+      FAIL: 교차 리뷰를 건너뛰었다고 적고 넘어갔거나, 맡긴 리뷰의 결과를 받기 전에 통합 리뷰를 완료로 적거나 6단계로 갔거나, 같은 회사 모델로 대체하고 대체 사실이나 수행 모델을 적지 않았다.
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:352 (P1-3 뒤 목표 규칙)
+  # 근거: skills/in-progress/run-ticket/references/multi-ticket.md:89 (차례 실행 — 이 세션이 티켓을 하나씩 직접 구현) (목표: 이 세션이 티켓을 하나씩 직접 구현한다)
+  - name: rule-no-implementation-delegation
+    type: llm
+    criteria: |
+      PASS: 서브에이전트(Agent) 호출 지시에 티켓 구현(run-ticket 2~4단계: 맥락 읽기, 코드 수정, 완료 기준 확인)이 없고, 서브에이전트는 교차 리뷰, 같은 회사 대체 리뷰, brief 냉독에만 쓰였다. 서브에이전트를 부르지 않았어도 PASS다.
+      FAIL: 티켓 구현이나 코드 수정, 완료 기준 확인을 서브에이전트에 맡겼다.
+  # rule-cold-read-not-skipped는 두지 않는다: fixture.sh:134의 상태 파일이 5단계부터 이어 가고 brief가 이미 게시돼 있어(fixture.sh:150) 이 실행은 brief 초안을 쓰지 않는다(skills/in-progress/run-flow/SKILL.md:85). 냉독 규칙(skills/in-progress/set-brief/SKILL.md:57, :73)은 3단계를 지나는 e2e-request-single, e2e-spec-three-tickets, e2e-ambiguous-framing에서 trace의 Agent 호출로 잰다
+  # 근거: skills/in-progress/run-ticket/SKILL.md:89 (4. 완료 기준 확인 — 확인하지 못한 항목은 통과로 치지 않고 "확인 못 한 것"에 적음)
+  - name: rule-unverified-not-passed
+    type: llm
+    criteria: |
+      PASS: 완료 기준 체크박스 `- [x]`, 완료 기록의 "확인한 것", brief 확인 기준 결과에는 이 실행에서 명령을 실행하거나 화면을 관찰해 확인한 것만 있고, 확인하지 못한 기준은 체크하지 않고 "확인 못 한 것"에 이유와 함께 적었다. 완료 기준을 확인하는 단계에 가지 않았으면 PASS다.
+      FAIL: 실행하지 않은 명령이나 보지 않은 화면을 통과로 적었다.
+  # 근거: skills/in-progress/set-brief/SKILL.md:83
+  - name: rule-no-publish-before-approval
+    type: llm
+    criteria: |
+      PASS: brief를 docs/context/에 저장하거나 이슈로 만들기 전에 초안 전문과 냉독 결과를 사용자에게 보여 줬다. 프롬프트에 미리 준 승인은 보여 준 뒤에만 쓴다. 이 실행이 brief를 새로 게시하지 않았으면 PASS다.
+      FAIL: 초안 전문을 보여 주기 전에 brief를 게시했다.
+  # 근거: skills/in-progress/run-flow/SKILL.md:19 (주의할 점 — 상태 파일에 작성일 줄 금지), ## 상태 파일(assets/state-file.md 구조와 이름 그대로)
+  # 근거: skills/in-progress/run-flow/assets/state-file.md:1-41
+  - name: rule-state-file-format
+    type: llm
+    criteria: |
+      PASS: 상태 파일(docs/context/run-flow/ 아래)의 섹션 이름(`## 단계`, `## 결과물`, `## 결정`, `## 요구사항 답변`, `## 구체화 기록`, `## 구현 중 결정`, `## 리뷰`)과 줄 이름(`- 시작일:`, `- 현재 단계:`, `- 멈춘 이유:`, `- 시작 HEAD:`, `- 통합 리뷰:`, `- 교차 리뷰 모델:` 등)이 템플릿 글자 그대로이고, `- 작성일:` 줄이 없다.
+      FAIL: 섹션·줄 이름을 바꾸거나 굵게 했거나, 상태 파일에 `- 작성일:` 줄을 넣었다.
+  # 근거: skills/in-progress/run-flow/SKILL.md:19 (주의할 점 — 상태 파일에 작성일 줄 금지)
+  - name: rule-state-no-written-date
+    type: regex
+    arm: both
+    target: {source: file, path: docs/context/run-flow/2026-11-20-delete-order.md}
+    pattern: '(?:^|\n)- 작성일:'
+    match: not_contains

@@ -1,13 +1,14 @@
 schema_version: "1.1"
 name: review-fallback-no-skill
-description: 리뷰 스킬을 불러올 수 없을 때(Skill 도구 없음, 레포 규칙 없음) git diff로 직접 리뷰하는 폴백을 밝히고, 규칙 검사·교차 리뷰를 못 하면 건너뛴 이유를 보고하며, 리뷰 뒤에 완료 기록을 쓰고 커밋하지 않는지
+description: 리뷰 스킬을 불러올 수 없을 때(Skill 도구 없음, 레포 규칙 없음) git diff로 직접 리뷰하는 폴백을 밝히고, 교차 리뷰를 하거나 다른 회사 모델이 없으면 같은 회사 새 컨텍스트 리뷰로 대체하고 대체를 적으며(건너뛰면 실패), 리뷰 뒤에 완료 기록을 쓰고 커밋하지 않는지
 tags: [review, fallback]
 execution:
   # mark-done과 같은 fixture다. allowed_tools에서 Skill을 빼 리뷰 스킬을 불러올 수 없게 했고,
   # fixture에 CLAUDE.md·AGENTS.md가 없어 레포 규칙이 지정한 리뷰 스킬도 없다.
   prompt: /run-ticket docs/context/2026-10-22-greeting/01-exclaim.md
-  max_turns: 30
-  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit]
+  max_turns: 40
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Agent]
 context:
   scaffold_script: fixture.sh
 graders:
@@ -30,13 +31,14 @@ graders:
     criteria: |
       PASS: 직접 리뷰(git diff 읽기)를 마친 뒤에 티켓의 상태를 done으로 바꾸고 `## 완료 기록`을 붙인다.
       FAIL: 리뷰보다 먼저 완료 기록을 쓰거나 상태를 done으로 바꾸거나, 완료 기록을 쓰지 않는다.
+  # 근거: 계획서 P0-3 (교차 리뷰 건너뜀 삭제, 같은 회사 대체 기록)
   # 근거: skills/in-progress/run-ticket/SKILL.md:106-112
   # 근거: skills/in-progress/run-ticket/SKILL.md:156
   - name: other-reviews-accounted
     type: llm
     criteria: |
-      PASS: 최종 보고에 규칙 검사와 교차 리뷰 각각의 결과가 있거나, 하지 못해 건너뛴 이유가 적혀 있다.
-      FAIL: 규칙 검사나 교차 리뷰를 언급하지 않고 끝내거나, 실행하지 않은 검사·리뷰를 했다고 지어낸다.
+      PASS: 최종 보고에 규칙 검사 결과가 있고, 교차 리뷰를 했거나(수행한 모델을 적음) 다른 회사 모델이 없어 같은 회사 모델의 새 컨텍스트 리뷰로 대체했다고 적는다(대체 사실과 수행 모델 기록). 규칙 검사를 못 했으면 그 이유가 적혀 있다.
+      FAIL: 교차 리뷰를 건너뛰고 넘어가거나, 규칙 검사나 교차 리뷰를 언급하지 않고 끝내거나, 실행하지 않은 검사·리뷰를 했다고 지어낸다.
   # 근거: skills/in-progress/run-ticket/SKILL.md:136-140
   # 근거: skills/in-progress/run-ticket/SKILL.md:15
   - name: record-says-no-commit

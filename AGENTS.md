@@ -47,7 +47,7 @@ mod는 `mods/<플러그인 이름>/`에 두고 `marketplace.json`에 따로 등�
 
 ## Extras
 
-`extras/<이름>/`에는 플러그인에 넣을 수 없어 사용자가 직접 설치하는 파일을 둔다. 지금은 `statusline/`, mod 환경을 한 번에 설정하는 `setup.sh`, omp 역할·에이전트·위임 규칙인 `omp/`, Orca 워커 절차와 등록 문구인 `orca/`, Paseo 워커 절차·등록 문구·에이전트 프로필·플레이북인 `paseo/`가 있다. 스킬에는 Orca·Paseo 같은 워커 도구 이름을 쓰지 않는다. 도구별 절차는 `extras/<도구>/worker-procedure.md`에 두고, run-ticket `references/multi-ticket.md`의 "워커 도구 절차" 항목을 모두 채운다. mod나 외부 mod 목록이 바뀌면 `setup.sh`도 고친다. 버전을 매기지 않고, 설치 방법과 동작은 `statusline/`과 `setup.sh`는 `docs/mods.md`에, `omp/`는 `docs/omp-orchestration.md`에, `orca/`는 `docs/orca-orchestration.md`에, `paseo/`는 `docs/paseo-orchestration.md`에 적고 영어판(`docs/en/`)도 함께 고친다. `paseo/playbooks/`를 고치면 `.paseo/plugins/playbooks/`에 복사해 Paseo의 플레이북 검증으로 오류가 없는지 확인한 뒤 복사본을 지운다.
+`extras/<이름>/`에는 플러그인에 넣을 수 없어 사용자가 직접 설치하는 파일을 둔다. 지금은 `statusline/`, mod 환경을 한 번에 설정하는 `setup.sh`, omp 역할·에이전트·위임 규칙인 `omp/`, Orca 워커 절차와 등록 문구인 `orca/`, Paseo 워커 절차·등록 문구·에이전트 프로필 예시인 `paseo/`가 있다. 스킬에는 Orca·Paseo 같은 워커 도구 이름을 쓰지 않는다. 도구별 절차는 `extras/<도구>/worker-procedure.md`에 두고, run-ticket `references/multi-ticket.md`의 "워커 도구 절차" 항목을 모두 채운다. mod나 외부 mod 목록이 바뀌면 `setup.sh`도 고친다. 버전을 매기지 않고, 설치 방법과 동작은 `statusline/`과 `setup.sh`는 `docs/mods.md`에, `omp/`는 `docs/omp-orchestration.md`에, `orca/`는 `docs/orca-orchestration.md`에, `paseo/`는 `docs/paseo-orchestration.md`에 적고 영어판(`docs/en/`)도 함께 고친다.
 
 ## 릴리스
 
@@ -121,11 +121,12 @@ feature: prompt-builder에 Opus 5.5 모델 가이드 추가
 
 PyYAML이 있는 Python으로 실행한다. 확인은 2026-11-26에 PyYAML을 설치한 venv에서 했다.
 
-- `python3 scripts/check.py`: 스킬이나 mod를 고친 뒤 실행한다. `validate.py`, `claude plugin validate --strict`, mod마다 `claude plugin validate`·`claude plugin test`를 돌린다. Claude Code CLI가 필요하다. 확인함(exit 0, 2026-11-26)
+- `python3 scripts/check.py`: 스킬이나 mod를 고친 뒤 실행한다. `validate.py`, `test_protected_paths.py`, `test_cross_review.py`, `test_start_stage.py`, `claude plugin validate --strict`, mod마다 `claude plugin validate`·`claude plugin test`, bun이 있으면 `bun test extras/omp/extensions`를 돌린다. Claude Code CLI가 필요하다. 확인함(exit 0, 2026-11-27)
 - `python3 scripts/test_validate.py`: `scripts/validate.py`를 고쳤을 때 실행한다. 확인함(exit 0, 2026-11-26)
+- `python3 scripts/test_protected_paths.py`, `test_cross_review.py`, `test_start_stage.py`: run-flow·run-ticket 스크립트의 자체 시험. 확인함(exit 0, 2026-11-27)
 - eval 명령(`README.md`, `CONTRIBUTING.md`의 `claude plugin eval ...`): 모델을 실제로 호출한다. 확인하지 않음
 
-CI(`.github/workflows/check.yml`)는 `test_validate.py`, `validate.py`만 돌리고 `claude plugin validate`는 돌리지 않는다. 그 검사는 로컬의 `check.py`로만 걸린다.
+CI(`.github/workflows/check.yml`)는 `test_validate.py`, 위 자체 시험 셋, `bun test extras/omp/extensions`, `validate.py`만 돌리고 `claude plugin validate`는 돌리지 않는다. 그 검사는 로컬의 `check.py`로만 걸린다.
 
 ## 생성 파일
 
@@ -138,5 +139,7 @@ CI(`.github/workflows/check.yml`)는 `test_validate.py`, `validate.py`만 돌리
 
 - PyYAML이 없는 `python3`로 `scripts/check.py`를 돌리면 exit 2로 끝나 규칙 위반처럼 보인다. 원인은 import 실패다. PyYAML을 설치한 환경에서 다시 돌린다.
 - `claude plugin eval`에 `--case`를 여러 번 주면 마지막 것만 남는다. 여러 케이스는 `--tag`를 쓰거나 케이스마다 따로 돌린다. 모르고 돌리면 한 케이스 결과만 남아 재실행해야 한다.
-- eval 트레이스는 실행이 끝나면 지워진다. 출력은 `--json` 결과의 `graders[].evidence`에서 읽는다.
+- eval 트레이스는 실행이 끝나면 지워진다. `--keep-temp`를 주면 결과 JSON의 `tracePath`(`<임시 폴더>/out/trace.jsonl`)에 남는다. 주지 않았으면 출력은 `--json` 결과의 `graders[].evidence`에서 읽는다.
+- Bash를 허용한 eval은 `~/.docker` 안에 심볼릭 링크가 있으면 0턴으로 끝난다(`error`에 Docker credential store 문구). WSL의 `~/.docker/contexts` 링크가 그렇다. `DOCKER_CONFIG`를 바꿔도 같다.
+- 이 머신(WSL, root로 실행)에서 eval의 Bash 샌드박스는 작업 폴더와 `.git`을 읽기 전용으로 뒀다(2026-11-27 확인, 원인은 확인하지 않음). 브랜치 만들기, `protected_paths.py init`처럼 Bash로 쓰는 e2e 사례는 5단계에서 멈춘다. Write·Edit로만 쓰는 run-ticket 사례는 돈다.
 <!-- omh:agent-instructions:end -->

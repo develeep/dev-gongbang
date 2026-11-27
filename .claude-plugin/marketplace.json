@@ -25,9 +25,9 @@
     {
       "name": "gongbang-mods",
       "source": "./mods/gongbang-mods",
-      "description": "Claude Code 터미널 화면을 꾸미는 mod 묶음. 도구 호출 한 줄 접기, 카드형 메시지와 마크다운, 세션 목표와 컨텍스트 우측 패널.",
+      "description": "Claude Code 터미널 화면을 꾸미는 mod 묶음. 도구 호출 한 줄 접기, 카드형 메시지와 마크다운, 세션 목표와 컨텍스트 우측 패널, run-flow 보호 경로 쓰기 차단.",
       "category": "productivity",
-      "version": "0.2.1",
+      "version": "0.3.0",
       "author": {
         "name": "Develeep",
         "url": "https://github.com/develeep"

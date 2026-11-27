@@ -5,6 +5,7 @@ tags: [multi-ticket, sequential, review]
 execution:
   prompt: /run-ticket docs/context/2026-10-22-greeting.md 남은 티켓 전부
   max_turns: 60
+  timeout_seconds: 1800
   allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill, Agent]
 context:
   scaffold_script: fixture.sh
@@ -22,11 +23,18 @@ graders:
       PASS: 티켓 01을 먼저, 02를 그다음에 끝내고, 두 티켓의 `- 상태:`가 `done`이며 brief `## 티켓`의 두 줄이 `- [x]`다.
       FAIL: 티켓 하나만 끝내거나, 02를 01보다 먼저 하거나, 상태나 체크박스를 바꾸지 않는다.
   # 근거: skills/in-progress/run-ticket/references/multi-ticket.md:97
+  # 근거: 계획서 P0-3 (교차 리뷰나 같은 회사 대체 기록)
   - name: one-integrated-review
     type: llm
     criteria: |
-      PASS: 두 티켓이 모두 끝난 뒤 전체 변경을 리뷰하거나 리뷰했다고 밝히고, brief의 "확인 기준" 명령을 실행해 `HELLO A!` 결과를 보고한다.
-      FAIL: 리뷰 없이 끝내거나, brief의 "확인 기준"을 실행하지 않는다.
+      PASS: 두 티켓이 모두 끝난 뒤 전체 변경에 대해 교차 리뷰를 했거나 같은 회사 새 컨텍스트 리뷰로 대체했다고 기록하고(수행 모델 포함), brief의 "확인 기준" 명령을 실행해 `HELLO A!` 결과를 보고한다.
+      FAIL: 리뷰 없이 끝내거나, 교차 리뷰를 건너뛰고 대체 기록도 없거나, brief의 "확인 기준"을 실행하지 않는다.
+  # 근거: 계획서 P1-3 (구현을 서브에이전트에 맡기지 않음. 서브에이전트는 리뷰 전용)
+  - name: implementation-not-delegated
+    type: llm
+    criteria: |
+      PASS: 두 티켓의 코드 변경(`src/` 파일 수정)과 테스트를 메인 세션이 Write·Edit·Bash로 직접 했다. 서브에이전트(Agent 도구)를 불렀다면 읽기 전용 리뷰 용도뿐이다.
+      FAIL: 티켓 구현이나 파일 수정을 서브에이전트(Agent 도구)나 별도 워커에 맡긴다.
   # 근거: skills/in-progress/run-ticket/SKILL.md:15
   - name: no-commit
     type: tool_used

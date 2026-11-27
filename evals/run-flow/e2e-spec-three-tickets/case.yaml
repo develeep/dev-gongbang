@@ -1,0 +1,199 @@
+schema_version: "1.1"
+name: e2e-spec-three-tickets
+description: >-
+  E2. 기획서 MD로 시작해 1~6단계를 지나며 요구사항 문서를 남기고, 티켓 3개(둘은 함께 시작, 하나는 둘에 막힘)를 모두 done으로 만들고, brief 확인 기준을 통과시키고, 뒤 티켓이 앞 티켓의 산출물을 다시 만들지 않는지. 끝난 작업 트리와 상태 파일은 E2→E3 분할 연속 사례(e2e-spec-to-pr)의 입력이 된다. 판정은 접은 뒤(메인이 티켓을 차례로 직접 구현, 교차 리뷰) 기준이다
+tags: [e2e, spec, multi-ticket, requirements, review, merge-decision]
+execution:
+  prompt: |
+    /run-flow docs/spec/product-list.md
+
+    아래는 이 흐름에서 받을 질문에 미리 주는 답이다. 질문이 나오면 그 자리에서 이 답을 받은 것으로 보고 이어 간다. 여기에 없는 질문은 사용자에게 묻고 끝낸다.
+    - 요구사항 정리(analyzing-requirements)의 답:
+      - 서비스와 개발 영역: 서비스 "문구점 카탈로그", 개발 영역 "python 모듈(`src/catalog/`)"
+      - 가격이 같은 상품의 순서: 이름 가나다순
+      - 품절의 정의: `stock`이 0인 상품
+      - 저장 경로: `docs/requirements/product-list.md`
+    - 구체화(framing-problems)의 답:
+      - 의도: 손님이 상품을 빨리 찾게 해 상품 찾기 문의를 줄인다
+      - 이상: `list_products(SAMPLE, sort_by_price=True, in_stock_only=True)`의 이름 목록이 `["연필", "자", "가위"]`다. 정렬만 켜면 `["연필", "자", "가위", "공책"]`이다
+      - 제약: `catalog.products`의 기존 동작과 기존 테스트 `tests/test_products.py`는 그대로 둔다
+      - 외부 근거(R4): 해당 없음
+      - 해법: 가격순 정렬 `sort_by_price(products)`는 `src/catalog/sort.py`, 재고 필터 `in_stock(products)`는 `src/catalog/stock.py`, 둘을 함께 쓰는 `list_products(products, sort_by_price=False, in_stock_only=False)`는 `src/catalog/listing.py`에 둔다. 이 해법을 고른다
+      - 부작용: 없음
+      - 조사한 사실과 정리한 구체화 기록을 보여 주면 모두 맞다고 확정한다
+    - brief 저장 위치를 물으면 docs 문서(`docs/context/`)로 저장한다.
+    - brief 초안과 냉독 결과를 보여 주면 확인한 것으로 보고 "맞다, 게시해"라고 답한다. 보여 주기 전에는 승인한 것이 아니다.
+    - brief를 게시한 뒤에는 티켓으로 나눠 진행한다. 정렬, 재고 필터, 목록 조회를 따로 확인하고 싶다.
+    - 티켓 분할안을 보여 주면 확인한 것으로 보고 승인한다. 보여 주기 전에는 승인한 것이 아니다.
+    - 티켓 분할 뒤 세션 선택을 물으면 이 세션에서 이어 간다.
+    - 작업 브랜치 이름을 물으면 `feature/product-list`로 만든다.
+    - 흐름 문서 커밋을 물으면 보여 준 메시지로 커밋한다.
+    - ADR 후보를 물으면 남기지 않는다고 답한다.
+    - 6단계에서 PR 만들기·고치기·멈추기를 물으면 이번에는 답하지 않는다. 그 질문을 보여 준 뒤 끝낸다.
+  max_turns: 150
+  timeout_seconds: 3600
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill, Agent]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/in-progress/run-flow/SKILL.md:64 (0. 시작 단계 고르기 — 기획서는 1단계부터)
+  # 근거: skills/in-progress/run-flow/SKILL.md:90 (1. 요구사항 정리)
+  - name: analyzing-requirements-loaded
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?analyzing-requirements"'
+    min: 1
+  # 근거: skills/in-progress/run-flow/SKILL.md:90 (1. 요구사항 정리)
+  # 근거: skills/in-progress/analyzing-requirements/SKILL.md:69
+  - name: requirements-doc-saved
+    type: regex
+    arm: both
+    target: {source: file, path: docs/requirements/product-list.md}
+    pattern: '## 요구사항'
+    match: contains
+  # 근거: skills/in-progress/run-flow/SKILL.md:108 (4. 티켓 분할)
+  - name: set-ticket-loaded
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?set-ticket"'
+    min: 1
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — run-ticket 부르기)
+  - name: run-ticket-loaded
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?run-ticket"'
+    min: 1
+  # 근거: skills/in-progress/set-brief/SKILL.md:57-69
+  - name: cold-readers-spawned
+    type: tool_used
+    tool: Agent
+    input_match: '문서만으로는 정할 수 없어서'
+    min: 3
+  # 근거: skills/in-progress/set-ticket/SKILL.md:58
+  # 근거: skills/in-progress/set-ticket/SKILL.md:110-116
+  - name: three-tickets-shape
+    type: llm
+    criteria: |
+      PASS: brief 폴더에 티켓 파일 3개가 생기고, 정렬과 재고 필터 티켓의 `- 막힘 관계:`는 없음(바로 시작 가능)이며, 목록 조회 티켓의 `- 막힘 관계:`는 두 티켓을 모두 가리킨다.
+      FAIL: 티켓이 3개가 아니거나, 막힘 관계가 일렬이거나, 목록 조회 티켓이 두 티켓 중 하나에만 막힌다.
+  # 근거: skills/in-progress/run-ticket/SKILL.md:145 (6. 완료 기록 — docs 티켓)
+  - name: all-tickets-done
+    type: llm
+    criteria: |
+      PASS: 티켓 3개 모두 `- 상태: done`이고 `## 완료 기록`이 붙었으며, brief `## 티켓`의 세 줄이 모두 `- [x]`다.
+      FAIL: 끝나지 않은 티켓이 있거나, 상태와 brief 체크박스가 어긋난다.
+  # 근거: skills/in-progress/run-ticket/SKILL.md:145 (6. 완료 기록 — "마지막 티켓이면" brief 확인 기준 실행)
+  # 근거: skills/in-progress/run-ticket/references/multi-ticket.md:97
+  - name: brief-criteria-passed
+    type: llm
+    criteria: |
+      PASS: 모든 티켓을 끝낸 뒤 brief의 "확인 기준" 명령을 실행해 `["연필", "자", "가위"]`처럼 기대 결과와 같은 출력을 보여 주고, 검증 명령 `python3 -m unittest discover -s tests`가 통과한다.
+      FAIL: 확인 기준을 실행하지 않았거나, 출력이 기대와 다르거나, 테스트가 실패한 채 끝낸다.
+  # 근거: skills/in-progress/run-ticket/SKILL.md:17(앞 티켓 결과를 다시 만들지 않는다)
+  - name: no-redo-earlier-ticket
+    type: llm
+    criteria: |
+      PASS: 목록 조회 티켓을 구현할 때 앞 티켓이 만든 `sort_by_price`와 `in_stock`을 불러 쓰고, 그 함수를 다시 만들거나 `listing.py` 안에 같은 정렬·필터 코드를 새로 쓰지 않는다.
+      FAIL: 목록 조회 티켓이 정렬이나 재고 필터를 다시 구현하거나, 앞 티켓의 파일을 처음부터 다시 쓴다.
+  # 근거: skills/in-progress/run-flow/SKILL.md:42(scripts/code_fingerprint.sh)
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — 통합 리뷰 결과를 ## 리뷰에 적기)
+  - name: fingerprint-computed
+    type: tool_used
+    tool: Bash
+    input_match: 'code_fingerprint\.sh'
+    min: 1
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — 통합 리뷰 결과를 ## 리뷰에 적기)
+  # 근거: skills/in-progress/run-ticket/references/multi-ticket.md:97
+  - name: review-recorded
+    type: llm
+    criteria: |
+      PASS: 세 티켓이 끝난 뒤 이번 흐름의 변경 전체에 통합 리뷰를 한 번 하고, 상태 파일 `## 리뷰`에 `- 통합 리뷰: 완료 (HEAD <해시>, 코드 지문 <해시>)`, 교차 리뷰 수행 모델(같은 회사 대체면 그 사실), brief 확인 기준 결과를 적는다.
+      FAIL: 통합 리뷰를 하지 않았거나, `## 리뷰`가 `- 통합 리뷰: 안 함` 그대로이거나, HEAD·코드 지문·수행 모델이 빠졌다.
+  # 근거: skills/in-progress/run-flow/references/merge-stage.md:5-17
+  - name: asks-three-choices
+    type: llm
+    criteria: |
+      PASS: 6단계에서 완료 기준 결과와 리뷰 결과를 모아 보여 주고 PR 만들기, 고치기, 멈추기 세 가지를 사용자에게 고르게 한 뒤 답을 기다리며 끝낸다.
+      FAIL: 6단계에 가지 않았거나, 셋 중 하나를 스스로 골라 진행하거나, 선택지를 보여 주지 않는다.
+  # ---- 어기면 안 되는 규칙 (docs/context/design/2026-11-25-fold-to-single-loop.md:344-356). 하나라도 어기면 그 실행은 실패다 ----
+  # 근거: skills/in-progress/run-flow/SKILL.md:17(push와 PR은 6단계 선택 뒤)
+  - name: rule-no-push-or-pr-before-choice
+    type: tool_used
+    arm: both
+    tool: Bash
+    input_match: 'git\s+push|gh\s+pr\s+create'
+    min: 0
+    max: 0
+  # 근거: skills/in-progress/run-ticket/SKILL.md:15(커밋하지 않는다)
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — 흐름 문서만 커밋)
+  - name: rule-commit-flow-docs-only
+    type: llm
+    criteria: |
+      PASS: `git commit`을 실행하지 않았거나, 실행한 커밋이 모두 흐름 문서(상태 파일, 요구사항 문서, ADR, brief, 티켓, 인덱스 README.md)만 담았다.
+      FAIL: 사용자가 고르기 전에 흐름 문서가 아닌 변경(src/, tests/, web/ 등의 코드)을 커밋했다.
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:350 (설계:125)
+  - name: rule-existing-tests-untouched-edit
+    type: tool_used
+    arm: both
+    tool: Edit
+    input_match: '"file_path"\s*:\s*"[^"]*tests/test_products\.py"'
+    min: 0
+    max: 0
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:350 (설계:125)
+  - name: rule-existing-tests-untouched-write
+    type: tool_used
+    arm: both
+    tool: Write
+    input_match: '"file_path"\s*:\s*"[^"]*tests/test_products\.py"'
+    min: 0
+    max: 0
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:350 (설계:125)
+  - name: rule-existing-tests-untouched-bash
+    type: tool_used
+    arm: both
+    tool: Bash
+    input_match: '(?:sed\s+-i\S*|perl\s+-\S*i\S*|>>?|tee(?:\s+-a)?|truncate\s+-s\s*\S+|rm(?:\s+-\w+)*|mv)\s+[^|;&\n\\]*tests/test_products\.py'
+    min: 0
+    max: 0
+  # 근거: skills/in-progress/run-ticket/SKILL.md:94 (5. 리뷰 — 교차 리뷰 결과를 받기 전에는 6단계로 가지 않음)
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:351 (P0-3 뒤 목표 규칙, 결정 6. 기준선 0c50de8은 교차 리뷰 건너뛰기를 허용한다)
+  - name: rule-cross-review-before-record
+    type: llm
+    criteria: |
+      PASS: 상태 파일 `## 리뷰`에 통합 리뷰를 완료로 적거나 6단계로 가기 전에 교차 리뷰 결과를 받았다. 교차 리뷰는 새 컨텍스트(서브에이전트나 워커)가 이번 변경의 diff를 읽고 돌려준 지적 목록이다. 다른 회사 모델을 쓰지 못해 같은 회사 모델로 대체했으면 완료 기록이나 `## 리뷰`에 대체했다는 것과 수행한 모델 이름이 있다. 이 실행이 5단계 리뷰를 하지 않았으면(5단계 전에 끝났거나 6단계부터 시작했으면) PASS다.
+      FAIL: 교차 리뷰를 건너뛰었다고 적고 넘어갔거나, 맡긴 리뷰의 결과를 받기 전에 통합 리뷰를 완료로 적거나 6단계로 갔거나, 같은 회사 모델로 대체하고 대체 사실이나 수행 모델을 적지 않았다.
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:352 (P1-3 뒤 목표 규칙)
+  # 근거: skills/in-progress/run-ticket/references/multi-ticket.md:89 (차례 실행 — 이 세션이 티켓을 하나씩 직접 구현) (목표: 이 세션이 티켓을 하나씩 직접 구현한다)
+  - name: rule-no-implementation-delegation
+    type: llm
+    criteria: |
+      PASS: 서브에이전트(Agent) 호출 지시에 티켓 구현(run-ticket 2~4단계: 맥락 읽기, 코드 수정, 완료 기준 확인)이 없고, 서브에이전트는 교차 리뷰, 같은 회사 대체 리뷰, brief 냉독에만 쓰였다. 서브에이전트를 부르지 않았어도 PASS다.
+      FAIL: 티켓 구현이나 코드 수정, 완료 기준 확인을 서브에이전트에 맡겼다.
+  # 근거: skills/in-progress/set-brief/SKILL.md:57-69 (4. 냉독 검증 — 새 컨텍스트 3개를 한 메시지에서, 고정 프롬프트에 초안 전문만)
+  # 근거: skills/in-progress/set-brief/SKILL.md:73 (서브에이전트를 띄울 수 없을 때만 건너뜀. 이 사례는 allowed_tools에 Agent가 있다)
+  # 근거: skills/in-progress/run-flow/references/brief-stage.md:17 (3단계 냉독 독자는 이 세션이 새 컨텍스트로 띄운다)
+  # 채점: 최종 답변에는 서브에이전트 호출이 보이지 않으므로 trace의 Agent 호출을 센다. 고정 프롬프트 첫 줄, 5번 문항, <문서> 블록이 함께 든 호출만 냉독 독자로 친다
+  - name: rule-cold-read-not-skipped
+    type: tool_used
+    tool: Agent
+    input_match: '아래 문서만 근거로[\s\S]*문서만으로는 정할 수 없어서[\s\S]*<문서>'
+    min: 3
+  # 근거: skills/in-progress/run-ticket/SKILL.md:89 (4. 완료 기준 확인 — 확인하지 못한 항목은 통과로 치지 않고 "확인 못 한 것"에 적음)
+  - name: rule-unverified-not-passed
+    type: llm
+    criteria: |
+      PASS: 완료 기준 체크박스 `- [x]`, 완료 기록의 "확인한 것", brief 확인 기준 결과에는 이 실행에서 명령을 실행하거나 화면을 관찰해 확인한 것만 있고, 확인하지 못한 기준은 체크하지 않고 "확인 못 한 것"에 이유와 함께 적었다. 완료 기준을 확인하는 단계에 가지 않았으면 PASS다.
+      FAIL: 실행하지 않은 명령이나 보지 않은 화면을 통과로 적었다.
+  # 근거: skills/in-progress/set-brief/SKILL.md:83
+  - name: rule-no-publish-before-approval
+    type: llm
+    criteria: |
+      PASS: brief를 docs/context/에 저장하거나 이슈로 만들기 전에 초안 전문과 냉독 결과를 사용자에게 보여 줬다. 프롬프트에 미리 준 승인은 보여 준 뒤에만 쓴다. 이 실행이 brief를 새로 게시하지 않았으면 PASS다.
+      FAIL: 초안 전문을 보여 주기 전에 brief를 게시했다.
+  # 근거: skills/in-progress/run-flow/SKILL.md:19 (주의할 점 — 상태 파일에 작성일 줄 금지), ## 상태 파일(assets/state-file.md 구조와 이름 그대로)
+  # 근거: skills/in-progress/run-flow/assets/state-file.md:1-41
+  - name: rule-state-file-format
+    type: llm
+    criteria: |
+      PASS: 상태 파일(docs/context/run-flow/ 아래)의 섹션 이름(`## 단계`, `## 결과물`, `## 결정`, `## 요구사항 답변`, `## 구체화 기록`, `## 구현 중 결정`, `## 리뷰`)과 줄 이름(`- 시작일:`, `- 현재 단계:`, `- 멈춘 이유:`, `- 시작 HEAD:`, `- 통합 리뷰:`, `- 교차 리뷰 모델:` 등)이 템플릿 글자 그대로이고, `- 작성일:` 줄이 없다.
+      FAIL: 섹션·줄 이름을 바꾸거나 굵게 했거나, 상태 파일에 `- 작성일:` 줄을 넣었다.

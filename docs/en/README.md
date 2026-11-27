@@ -32,17 +32,17 @@ Install `gongbang-dev` to use these.
 
 - [set-brief](skills/set-brief.md): Records what was decided in the conversation as a brief.
 - [set-ticket](skills/set-ticket.md): Splits a large brief into tickets.
-- [run-ticket](skills/run-ticket.md): Implements and reviews one ticket in a new session. Runs several tickets in parallel with the worker tool procedure named by you or the repo rules, or in order if no usable procedure exists.
+- [run-ticket](skills/run-ticket.md): Implements and reviews one ticket, relying on the brief and ticket documents rather than the conversation. Runs several tickets in parallel with the worker tool procedure named by you or the repo rules, or in order if no usable procedure exists.
 - [analyzing-requirements](skills/analyzing-requirements.md): Turns a planning document into a requirements and development scope document.
 
 ## Mods
 
-- [gongbang-mods](mods.md): Folded tool calls, card-style messages and Markdown, and a side pane with the session goal and context
+- [gongbang-mods](mods.md): Folded tool calls, card-style messages and Markdown, a side pane with the session goal and context, and blocking of writes to run-flow protected paths
 
 ## Guides
 
 - [Customizing skills](customization.md): How to copy, edit, check, and test a skill
-- [omp multi-agent setup](omp-orchestration.md): How to install omp roles, agents, and delegation rules that use a different model at each stage
+- [omp multi-agent setup](omp-orchestration.md): How to install the omp cross-review and cold-read agents and delegation rules, and choose your own models
 - [Orca orchestration setup](orca-orchestration.md): Optional setup that installs Orca and registers its worker procedure in a rules file so run-ticket can run tickets in parallel with Orca workers, and how the orchestration works
-- [Paseo orchestration setup](paseo-orchestration.md): Optional setup that installs the agent profiles and registers the worker procedure in a rules file so run-ticket can run tickets in parallel with Paseo workers, and how the orchestration works. Playbooks are a separate optional feature for running one ticket
+- [Paseo orchestration setup](paseo-orchestration.md): Optional setup that installs the agent profiles and registers the worker procedure in a rules file so run-ticket can run tickets in parallel with Paseo workers, and how the orchestration works. The playbook that ran one ticket was removed; the run-ticket skill replaces it
 - [Choosing a skill](../../README.en.md#choosing-a-skill): Which skill fits which situation, and how skills chain together

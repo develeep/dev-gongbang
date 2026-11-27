@@ -68,11 +68,14 @@ Paths are relative to the skill folder. Details are in the "Customize" section o
 | [set-brief](skills/set-brief.md) | `SKILL.md` | Brief template, save path |
 | [set-ticket](skills/set-ticket.md) | `SKILL.md` | Ticket template, splitting criteria |
 | [run-ticket](skills/run-ticket.md) | `SKILL.md` | Ticket selection rules, review order, completion record |
-| | `references/multi-ticket.md` | Running multiple tickets: choosing the method, parallel run, items a worker tool procedure fills in, sequential run |
+| | `scripts/cross_review.py` | Cross-review code fingerprint, the format of the completion record's `- 교차 리뷰:` line, and the gate that refuses completion without it |
+| | `references/multi-ticket.md` | Running multiple tickets: choosing the method, parallel run, items a worker tool procedure fills in, sequential run. The parallel run is an optional path used only when you name or register a worker tool procedure, and worker models follow your settings. Registering a procedure is covered in the [Orca](orca-orchestration.md) and [Paseo](paseo-orchestration.md) setup docs |
 | [run-flow](skills/run-flow.md) | `SKILL.md` | Starting stage per argument, state file rules, links between stages |
 | | `assets/state-file.md` | State file format |
 | | `references/adr.md`, `references/brief-stage.md`, `references/pr-stage.md` | ADR criteria, procedures for stages 3 and 7 |
 | | `scripts/code_fingerprint.sh` | Fingerprint used to compare the reviewed code with the current code |
+| | `scripts/start_stage.py` | Rules for deciding the starting stage from docs files in stage 0 |
+| | `scripts/protected_paths.py` | Test file rules for the protected list, the pre-write decision, the check before acceptance. Keep `mods/gongbang-mods/hooks/protected_paths.py` identical |
 
 set-brief, set-ticket, and run-ticket exchange the same format. If you change the brief section names, the `- 작성일:` (Date written) line, or the ticket's `- 상태:` (Status) line, edit all three skills together.
 

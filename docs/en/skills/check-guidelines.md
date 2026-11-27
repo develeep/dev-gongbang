@@ -37,7 +37,7 @@ Creating or changing rules is set-guidelines' job. Do not use this skill for gen
    - `branch`: files changed since branching from the origin default branch
    - path: the given file or directory
 2. It collects rules. A rule file with `paths` applies only to files that match those patterns.
-3. It checks. If there are more than 100 target files, it warns you and shows zones by top-level directory. After you approve, it splits the check across subagents, one per zone.
+3. It checks. If there are more than 100 target files, it warns you and shows zones by top-level directory. After you approve, it checks the zones one after another itself and records each zone's results in the report right away.
 4. It reports, and you choose violations to fix by number.
 5. It fixes only the chosen violations and checks again with the same rules.
 
@@ -54,7 +54,7 @@ A rule check report. Sections with zero items are not created.
 | What to change | File to edit |
 |---|---|
 | Report format and writing style | `templates/report.md` |
-| Check scope options, threshold for splitting across subagents (100) | Steps 1 and 3 of SKILL.md |
+| Check scope options, threshold for splitting into zones (100) | Steps 1 and 3 of SKILL.md |
 
 The check criteria themselves come from the repo's rule files, CLAUDE.md/AGENTS.md, and linter and formatter configs, not from the skill. To change the criteria, edit those files. To copy and modify the skill, see the [customization guide](../customization.md).
 

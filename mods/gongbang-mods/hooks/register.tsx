@@ -2,6 +2,7 @@ import type { Register } from 'claude-code'
 
 import { chatSplit } from './chat-split'
 import { compactTools } from './compact-tools'
+import { protectedPaths } from './protected-paths'
 import { sessionContext } from './session/context'
 import { sessionRecap } from './session/recap'
 
@@ -10,4 +11,5 @@ export const register: Register = on => {
   chatSplit(on)
   sessionRecap(on)
   sessionContext(on)
+  protectedPaths(on)
 }

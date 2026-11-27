@@ -31,7 +31,11 @@ trap 'rm -f "$GIT_INDEX_FILE"' EXIT
 
 cd "$(git rev-parse --show-toplevel)"
 git read-tree HEAD
-git add -A
+git add -u
+# 새 파일은 일반 파일과 심볼릭 링크만 담는다. 장치 파일·소켓 같은 것은 git이 담지 못해 add 전체가 실패한다.
+git ls-files -z --others --exclude-standard | while IFS= read -r -d '' f; do
+  if [ -f "$f" ] || [ -L "$f" ]; then printf '%s\0' "$f"; fi
+done | xargs -0 -r git add --
 if [ "$#" -gt 0 ]; then
   git rm -r -q --cached --ignore-unmatch -- "$@"
 fi

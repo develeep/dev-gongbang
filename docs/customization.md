@@ -68,11 +68,14 @@ dev-gongbang의 스킬을 복사해 팀 규칙, 쓰는 모델, 문서 양식에 
 | [set-brief](skills/set-brief.md) | `SKILL.md` | brief 템플릿, 저장 경로 |
 | [set-ticket](skills/set-ticket.md) | `SKILL.md` | 티켓 템플릿, 분할 기준 |
 | [run-ticket](skills/run-ticket.md) | `SKILL.md` | 티켓 고르는 규칙, 리뷰 순서, 완료 기록 |
-| | `references/multi-ticket.md` | 여러 티켓 실행: 실행 방법 고르기, 병렬 실행, 워커 도구 절차가 채울 항목, 차례 실행 |
+| | `scripts/cross_review.py` | 교차 리뷰의 코드 지문, 완료 기록의 `- 교차 리뷰:` 줄 형식, 그 줄 없이 완료하지 않게 하는 게이트 |
+| | `references/multi-ticket.md` | 여러 티켓 실행: 실행 방법 고르기, 병렬 실행, 워커 도구 절차가 채울 항목, 차례 실행. 병렬 실행은 사용자가 워커 도구 절차를 지정하거나 등록할 때만 쓰는 선택 경로이고, 워커 모델은 사용자 설정을 따릅니다. 절차 등록은 [Orca](orca-orchestration.md)·[Paseo](paseo-orchestration.md) 설정 문서에 있습니다 |
 | [run-flow](skills/run-flow.md) | `SKILL.md` | 인자별 시작 단계, 상태 파일 규칙, 단계 사이의 연결 |
 | | `assets/state-file.md` | 상태 파일 형식 |
 | | `references/adr.md`, `references/brief-stage.md`, `references/pr-stage.md` | ADR 기준, 3단계와 7단계의 절차 |
 | | `scripts/code_fingerprint.sh` | 리뷰한 코드와 지금 코드를 비교하는 지문 계산 |
+| | `scripts/start_stage.py` | 0단계에서 docs 문서로 시작 단계를 판정하는 규칙 |
+| | `scripts/protected_paths.py` | 보호 목록에 넣을 테스트 파일 규칙, 쓰기 전 판정, 수락 전 검사. 고치면 `mods/gongbang-mods/hooks/protected_paths.py`도 똑같이 고칩니다 |
 
 set-brief, set-ticket, run-ticket은 같은 형식을 주고받습니다. brief의 섹션 이름, `- 작성일:` 줄, 티켓의 `- 상태:` 줄을 바꾸면 세 스킬을 함께 고치세요.
 

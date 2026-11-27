@@ -1,0 +1,162 @@
+schema_version: "1.1"
+name: e2e-ambiguous-framing
+description: >-
+  E6. 두 가지로 읽히는 문장("미결제 알림은 하루에 한 번만 보낸다": 주문마다인지 고객마다인지)이 든 확정 구체화 기록으로 3단계를 이어 갈 때, 메인이 brief 초안을 쓴 뒤 냉독 독자 3명을 띄우고, 독자 답이 갈린 그 문장을 고치거나 "미확인·위험"으로 옮기고, 남은 어긋남을 사용자에게 보여 준 뒤에만 게시하는지. 판정은 접은 뒤(초안은 메인, 냉독만 서브에이전트) 기준이다
+tags: [e2e, brief, cold-read, resume]
+execution:
+  prompt: |
+    /run-flow docs/context/run-flow/2026-11-20-reminder-once.md
+
+    아래는 이 흐름에서 받을 질문에 미리 주는 답이다. 질문이 나오면 그 자리에서 이 답을 받은 것으로 보고 이어 간다. 여기에 없는 질문은 사용자에게 묻고 끝낸다.
+    - brief 저장 위치를 물으면 docs 문서(`docs/context/`)로 저장한다.
+    - 냉독 검증에서 갈린 내용이나 구체화 기록에 없는 것을 물으면 "아직 정하지 않았다. 정하지 못한 것으로 남겨 달라"고 답한다.
+    - brief 초안과 냉독 결과를 보여 주면 확인한 것으로 보고 "맞다, 게시해"라고 답한다. 보여 주기 전에는 승인한 것이 아니다.
+    - 이번에는 brief 게시까지만 한다. 게시한 뒤 4단계(티켓 분할)나 5단계로 넘어가지 말고, 다음 단계를 한 줄로 알린 뒤 끝낸다.
+  max_turns: 40
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill, Agent]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/in-progress/run-flow/SKILL.md:64 (0. 시작 단계 고르기 — 이어 가는 상태 파일)
+  # 근거: skills/in-progress/run-flow/SKILL.md:102 (3. 작업 지시서)
+  - name: set-brief-loaded
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?set-brief"'
+    min: 1
+  # 근거: skills/in-progress/set-brief/SKILL.md:57-69
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:52
+  - name: cold-readers-spawned
+    type: tool_used
+    tool: Agent
+    input_match: '문서만으로는 정할 수 없어서'
+    min: 3
+  # 근거: skills/in-progress/run-flow/SKILL.md:64 (0. 시작 단계 고르기 — 이어 가는 상태 파일)
+  - name: earlier-stages-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?(?:analyzing-requirements|framing-problems)"'
+    min: 0
+    max: 0
+  # 근거: skills/in-progress/set-brief/SKILL.md:57
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:52-53
+  - name: readers-get-draft-only
+    type: llm
+    criteria: |
+      PASS: 냉독 독자 3명을 한 메시지에서 함께 띄우고, 각 독자에게 초안 전문, 저장소 경로, 고정 5문항만 주며 구체화 대화나 상태 파일의 구체화 기록을 주지 않는다. 초안은 메인 세션이 직접 썼다.
+      FAIL: 독자에게 구체화 기록이나 대화 요약을 넘기거나, 독자를 차례로 하나씩 띄우거나, 초안 작성 자체를 서브에이전트에 맡겼다.
+  # 근거: skills/in-progress/set-brief/SKILL.md:71
+  # 근거: skills/in-progress/set-brief/SKILL.md:15
+  - name: ambiguous-sentence-resolved
+    type: llm
+    criteria: |
+      PASS: 게시한 brief에서 "하루에 한 번"이 주문마다인지 고객마다인지 갈리는 문장이 한쪽으로 분명히 고쳐졌거나(사용자 답에 근거가 있을 때만), 정하지 못한 것으로 `## 미확인·위험`에 옮겨졌다. 사용자 답이 "정하지 않았다"이므로 한쪽을 임의로 고르지 않았다.
+      FAIL: 게시한 brief에 "하루에 한 번만 보낸다"가 단위 없이 그대로 남아 있고 미확인·위험에도 없거나, 근거 없이 주문마다나 고객마다를 사실처럼 정했다.
+  # 근거: skills/in-progress/set-brief/SKILL.md:77-83
+  - name: divergence-shown-before-publish
+    type: llm
+    criteria: |
+      PASS: 게시하기 전에 한 메시지로 초안 전문과 냉독 검증에서 고친 항목, 남은 어긋남(독자끼리 갈린 해석 포함)을 사용자에게 보여 준다.
+      FAIL: 냉독 결과나 남은 어긋남을 보여 주지 않고 게시하거나, 냉독에서 갈린 답이 없었다고 지어낸다.
+  # 근거: skills/in-progress/run-flow/references/brief-stage.md:11 (2. 초안과 냉독 검증 — 냉독 결과 파일)
+  - name: cold-read-result-saved
+    type: llm
+    criteria: |
+      PASS: brief 초안을 저장소 밖 임시 파일에 두고 상태 파일 `- brief 초안:`에 그 경로를 적으며, 냉독 결과를 `<초안 파일 이름>.review.md`에 저장하고 `- brief 냉독 결과:`에 적는다. 게시한 뒤에는 두 값을 지운다.
+      FAIL: 초안을 저장소 안(`- 작성일:` 줄이 grep에 잡히는 곳)에 두거나, 냉독 결과 파일을 남기지 않는다.
+  # 근거: skills/in-progress/set-brief/SKILL.md:96-98
+  - name: brief-published
+    type: llm
+    criteria: |
+      PASS: `docs/context/YYYY-MM-DD-<slug>.md` brief가 `- 작성일:` 줄과 함께 저장되고, `docs/context/README.md`에 한 줄이 더해지며, 상태 파일 `- brief:`에 그 경로가 적힌다.
+      FAIL: brief를 저장하지 않았거나, 인덱스 줄이나 상태 파일 기록이 없다.
+  # ---- 어기면 안 되는 규칙 (docs/context/design/2026-11-25-fold-to-single-loop.md:344-356). 하나라도 어기면 그 실행은 실패다 ----
+  # 근거: skills/in-progress/run-flow/SKILL.md:17(push와 PR은 6단계 선택 뒤)
+  - name: rule-no-push-or-pr-before-choice
+    type: tool_used
+    arm: both
+    tool: Bash
+    input_match: 'git\s+push|gh\s+pr\s+create'
+    min: 0
+    max: 0
+  # 근거: skills/in-progress/run-ticket/SKILL.md:15(커밋하지 않는다)
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — 흐름 문서만 커밋)
+  - name: rule-commit-flow-docs-only
+    type: llm
+    criteria: |
+      PASS: `git commit`을 실행하지 않았거나, 실행한 커밋이 모두 흐름 문서(상태 파일, 요구사항 문서, ADR, brief, 티켓, 인덱스 README.md)만 담았다.
+      FAIL: 사용자가 고르기 전에 흐름 문서가 아닌 변경(src/, tests/, web/ 등의 코드)을 커밋했다.
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:350 (설계:125)
+  - name: rule-existing-tests-untouched-edit
+    type: tool_used
+    arm: both
+    tool: Edit
+    input_match: '"file_path"\s*:\s*"[^"]*tests/test_reminder\.py"'
+    min: 0
+    max: 0
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:350 (설계:125)
+  - name: rule-existing-tests-untouched-write
+    type: tool_used
+    arm: both
+    tool: Write
+    input_match: '"file_path"\s*:\s*"[^"]*tests/test_reminder\.py"'
+    min: 0
+    max: 0
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:350 (설계:125)
+  - name: rule-existing-tests-untouched-bash
+    type: tool_used
+    arm: both
+    tool: Bash
+    input_match: '(?:sed\s+-i\S*|perl\s+-\S*i\S*|>>?|tee(?:\s+-a)?|truncate\s+-s\s*\S+|rm(?:\s+-\w+)*|mv)\s+[^|;&\n\\]*tests/test_reminder\.py'
+    min: 0
+    max: 0
+  # 근거: skills/in-progress/run-ticket/SKILL.md:94 (5. 리뷰 — 교차 리뷰 결과를 받기 전에는 6단계로 가지 않음)
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:351 (P0-3 뒤 목표 규칙, 결정 6. 기준선 0c50de8은 교차 리뷰 건너뛰기를 허용한다)
+  - name: rule-cross-review-before-record
+    type: llm
+    criteria: |
+      PASS: 상태 파일 `## 리뷰`에 통합 리뷰를 완료로 적거나 6단계로 가기 전에 교차 리뷰 결과를 받았다. 교차 리뷰는 새 컨텍스트(서브에이전트나 워커)가 이번 변경의 diff를 읽고 돌려준 지적 목록이다. 다른 회사 모델을 쓰지 못해 같은 회사 모델로 대체했으면 완료 기록이나 `## 리뷰`에 대체했다는 것과 수행한 모델 이름이 있다. 이 실행이 5단계 리뷰를 하지 않았으면(5단계 전에 끝났거나 6단계부터 시작했으면) PASS다.
+      FAIL: 교차 리뷰를 건너뛰었다고 적고 넘어갔거나, 맡긴 리뷰의 결과를 받기 전에 통합 리뷰를 완료로 적거나 6단계로 갔거나, 같은 회사 모델로 대체하고 대체 사실이나 수행 모델을 적지 않았다.
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:352 (P1-3 뒤 목표 규칙)
+  # 근거: skills/in-progress/run-ticket/references/multi-ticket.md:89 (차례 실행 — 이 세션이 티켓을 하나씩 직접 구현) (목표: 이 세션이 티켓을 하나씩 직접 구현한다)
+  - name: rule-no-implementation-delegation
+    type: llm
+    criteria: |
+      PASS: 서브에이전트(Agent) 호출 지시에 티켓 구현(run-ticket 2~4단계: 맥락 읽기, 코드 수정, 완료 기준 확인)이 없고, 서브에이전트는 교차 리뷰, 같은 회사 대체 리뷰, brief 냉독에만 쓰였다. 서브에이전트를 부르지 않았어도 PASS다.
+      FAIL: 티켓 구현이나 코드 수정, 완료 기준 확인을 서브에이전트에 맡겼다.
+  # 근거: skills/in-progress/set-brief/SKILL.md:57-69 (4. 냉독 검증 — 새 컨텍스트 3개를 한 메시지에서, 고정 프롬프트에 초안 전문만)
+  # 근거: skills/in-progress/set-brief/SKILL.md:73 (서브에이전트를 띄울 수 없을 때만 건너뜀. 이 사례는 allowed_tools에 Agent가 있다)
+  # 근거: skills/in-progress/run-flow/references/brief-stage.md:17 (3단계 냉독 독자는 이 세션이 새 컨텍스트로 띄운다)
+  # 채점: 최종 답변에는 서브에이전트 호출이 보이지 않으므로 trace의 Agent 호출을 센다. 고정 프롬프트 첫 줄, 5번 문항, <문서> 블록이 함께 든 호출만 냉독 독자로 친다
+  - name: rule-cold-read-not-skipped
+    type: tool_used
+    tool: Agent
+    input_match: '아래 문서만 근거로[\s\S]*문서만으로는 정할 수 없어서[\s\S]*<문서>'
+    min: 3
+  # 근거: skills/in-progress/run-ticket/SKILL.md:89 (4. 완료 기준 확인 — 확인하지 못한 항목은 통과로 치지 않고 "확인 못 한 것"에 적음)
+  - name: rule-unverified-not-passed
+    type: llm
+    criteria: |
+      PASS: 완료 기준 체크박스 `- [x]`, 완료 기록의 "확인한 것", brief 확인 기준 결과에는 이 실행에서 명령을 실행하거나 화면을 관찰해 확인한 것만 있고, 확인하지 못한 기준은 체크하지 않고 "확인 못 한 것"에 이유와 함께 적었다. 완료 기준을 확인하는 단계에 가지 않았으면 PASS다.
+      FAIL: 실행하지 않은 명령이나 보지 않은 화면을 통과로 적었다.
+  # 근거: skills/in-progress/set-brief/SKILL.md:83
+  - name: rule-no-publish-before-approval
+    type: llm
+    criteria: |
+      PASS: brief를 docs/context/에 저장하거나 이슈로 만들기 전에 초안 전문과 냉독 결과를 사용자에게 보여 줬다. 프롬프트에 미리 준 승인은 보여 준 뒤에만 쓴다. 이 실행이 brief를 새로 게시하지 않았으면 PASS다.
+      FAIL: 초안 전문을 보여 주기 전에 brief를 게시했다.
+  # 근거: skills/in-progress/run-flow/SKILL.md:19 (주의할 점 — 상태 파일에 작성일 줄 금지), ## 상태 파일(assets/state-file.md 구조와 이름 그대로)
+  # 근거: skills/in-progress/run-flow/assets/state-file.md:1-41
+  - name: rule-state-file-format
+    type: llm
+    criteria: |
+      PASS: 상태 파일(docs/context/run-flow/ 아래)의 섹션 이름(`## 단계`, `## 결과물`, `## 결정`, `## 요구사항 답변`, `## 구체화 기록`, `## 구현 중 결정`, `## 리뷰`)과 줄 이름(`- 시작일:`, `- 현재 단계:`, `- 멈춘 이유:`, `- 시작 HEAD:`, `- 통합 리뷰:`, `- 교차 리뷰 모델:` 등)이 템플릿 글자 그대로이고, `- 작성일:` 줄이 없다.
+      FAIL: 섹션·줄 이름을 바꾸거나 굵게 했거나, 상태 파일에 `- 작성일:` 줄을 넣었다.
+  # 근거: skills/in-progress/run-flow/SKILL.md:19 (주의할 점 — 상태 파일에 작성일 줄 금지)
+  - name: rule-state-no-written-date
+    type: regex
+    arm: both
+    target: {source: file, path: docs/context/run-flow/2026-11-20-reminder-once.md}
+    pattern: '(?:^|\n)- 작성일:'
+    match: not_contains

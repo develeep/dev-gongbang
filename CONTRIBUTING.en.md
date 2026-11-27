@@ -60,7 +60,7 @@ When you open a PR, GitHub Actions runs `test_validate.py` and `validate.py` aut
 If you changed how a skill behaves, run the evals too. Evals call the model for real.
 
 ```bash
-claude plugin eval . --scaffold --allow-tools Edit WebSearch WebFetch --no-publish
+claude plugin eval . --scaffold --allow-tools Bash Write Edit WebSearch WebFetch --no-publish
 claude plugin eval . --eval-dir evals-trigger --ablation none --no-publish
 ```
 
