@@ -1,0 +1,15 @@
+schema_version: "1.1"
+name: trg-wd-train-04
+description: "트리거하면 안 됨 (near-miss) / train"
+tags: [trigger, train, negative]
+execution:
+  prompt: "src/utils.py의 함수들에 docstring 주석 달아 줘"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?write-docs"'
+    min: 0
+    max: 0

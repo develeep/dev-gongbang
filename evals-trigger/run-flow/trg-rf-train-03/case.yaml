@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: trg-rf-train-03
+description: "트리거해야 함 / train"
+tags: [trigger, train, positive]
+execution:
+  prompt: "어제 하다 멈춘 개발 흐름 이어서 해 줘"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?run-flow"'

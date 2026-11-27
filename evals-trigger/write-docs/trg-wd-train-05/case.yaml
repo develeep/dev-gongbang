@@ -1,0 +1,15 @@
+schema_version: "1.1"
+name: trg-wd-train-05
+description: "트리거하면 안 됨 (near-miss) / train"
+tags: [trigger, train, negative]
+execution:
+  prompt: "방금 바꾼 내용으로 커밋 메시지 써 줘"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?write-docs"'
+    min: 0
+    max: 0
