@@ -24,7 +24,7 @@ NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 LINK_RE = re.compile(r"\]\(([^)\s]+)\)")
 PROMOTED = ("engineering", "productivity")
 TOC_LINES = 100  # 플랫폼 best practices 기준. skill-creator는 300을 쓴다.
-# 특정 에이전트의 도구 이름. 스킬은 Claude Code·OMP·Codex에서 함께 쓰므로 본문은 행동으로 쓴다(CLAUDE.md "도구 이름").
+# 특정 에이전트의 도구 이름. 스킬은 Claude Code·OMP·Codex에서 함께 쓰므로 본문은 행동으로 쓴다(AGENTS.md "도구 이름").
 TOOL_NAMES_RE = re.compile(r"AskUserQuestion|Agent 도구|Skill 도구|Task 도구|WebFetch|WebSearch|TodoWrite|request_user_input|spawn_agent")
 TOOL_NAMES_OK = "prompt-builder/reference/models/"  # 대상 모델 가이드는 프롬프트 내용으로 도구를 다룬다
 
@@ -180,7 +180,7 @@ def check_skill(skill_dir, repo):
 
 
 def repo_checks(repo, results, fms):
-    """CLAUDE.md 저장소 규칙. 결과는 해당 스킬 항목이나 repo_errors에 붙인다."""
+    """AGENTS.md 저장소 규칙. 결과는 해당 스킬 항목이나 repo_errors에 붙인다."""
     repo_errs = []
     by_name = {r["name"]: r for r in results}
     for stray in sorted((repo / "skills").glob("*/SKILL.md")):
@@ -265,7 +265,7 @@ def repo_checks(repo, results, fms):
             if TOOL_NAMES_OK not in md.as_posix():
                 for m in TOOL_NAMES_RE.finditer(t):
                     add("E15", mf, line_of(t, m.group(0)),
-                        f"도구 이름 `{m.group(0)}`. 행동으로 쓰고 폴백을 붙인다(CLAUDE.md \"도구 이름\")")
+                        f"도구 이름 `{m.group(0)}`. 행동으로 쓰고 폴백을 붙인다(AGENTS.md \"도구 이름\")")
         oa = s / "agents/openai.yaml"
         no_implicit = False
         if oa.exists():
