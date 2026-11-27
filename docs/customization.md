@@ -38,7 +38,7 @@ dev-gongbang의 스킬을 복사해 팀 규칙, 쓰는 모델, 문서 양식에 
    git clone https://github.com/develeep/dev-gongbang.git
    ```
 
-2. 고칠 스킬 폴더를 통째로 복사합니다. 번들 파일(`reference/`, `templates/`, `scripts/`)도 함께 옮겨야 합니다. 아래 명령은 write-docs를 사용자 스킬로 복사합니다.
+2. 고칠 스킬 폴더를 통째로 복사합니다. 스킬마다 `reference/`나 `references/`, `templates/`, `assets/`, `scripts/`, `agents/` 같은 번들 폴더가 있으니 함께 옮겨야 합니다. 아래 명령은 write-docs를 사용자 스킬로 복사합니다.
 
    ```bash
    cp -r dev-gongbang/skills/productivity/write-docs ~/.claude/skills/
@@ -50,7 +50,7 @@ dev-gongbang의 스킬을 복사해 팀 규칙, 쓰는 모델, 문서 양식에 
 
 ## 스킬별로 고칠 파일
 
-경로는 스킬 폴더 기준입니다. 자세한 설명은 각 스킬 문서의 "커스텀" 절에 있습니다.
+경로는 스킬 폴더 기준입니다. 스킬 순서는 [README](../README.md#스킬)와 같습니다. 자세한 설명은 각 스킬 문서의 "커스텀" 절에 있습니다.
 
 | 스킬 | 고칠 파일 | 바뀌는 것 |
 |---|---|---|
@@ -62,22 +62,24 @@ dev-gongbang의 스킬을 복사해 팀 규칙, 쓰는 모델, 문서 양식에 
 | | `reference/clear-writing.md` | 모든 분야에 적용하는 원칙 |
 | [set-guidelines](skills/set-guidelines.md) | `reference/guides-index.md` | 추천할 가이드와 도구 목록 |
 | | `templates/rule.md`, `templates/agent-instructions.md` | 규칙 파일과 CLAUDE.md/AGENTS.md 양식 |
-| [check-guidelines](skills/check-guidelines.md) | `templates/report.md` | 보고서 양식 |
 | [framing-problems](skills/framing-problems.md) | `SKILL.md` | 채울 항목(R1~R6)과 질문 형식 |
-| [analyzing-requirements](skills/analyzing-requirements.md) | `SKILL.md` | 문서 템플릿 |
+| [check-guidelines](skills/check-guidelines.md) | `templates/report.md` | 보고서 양식 |
+| [run-flow](skills/run-flow.md) | `SKILL.md` | 인자별 시작 단계, 상태 파일 규칙, 보호 목록 규칙, 단계 사이의 연결 |
+| | `assets/state-file.md` | 상태 파일 형식 |
+| | `references/adr.md` | ADR 후보로 올릴 조건, 저장 위치, ADR 양식 |
+| | `references/brief-stage.md`, `references/merge-stage.md`, `references/pr-stage.md` | 3단계(작업 지시서), 6단계(머지·PR 결정), 7단계(PR 만들기)의 절차 |
+| | `references/requirement-change.md` | 진행 중인 흐름에서 요구사항이 바뀌었을 때 1단계로 돌아가는 절차 |
+| | `scripts/code_fingerprint.sh` | 리뷰한 코드와 지금 코드를 비교하는 지문 계산 |
+| | `scripts/start_stage.py` | 0단계에서 docs 문서로 시작 단계를 판정하는 규칙 |
+| | `scripts/protected_paths.py` | 보호 목록에 넣을 테스트 파일 규칙, 쓰기 전 판정, 수락 전 검사. 저장소에서 고치면 gongbang-mods가 판정에 쓰는 사본 `mods/gongbang-mods/hooks/protected_paths.py`도 똑같이 고칩니다 |
 | [set-brief](skills/set-brief.md) | `SKILL.md` | brief 템플릿, 저장 경로 |
 | [set-ticket](skills/set-ticket.md) | `SKILL.md` | 티켓 템플릿, 분할 기준 |
 | [run-ticket](skills/run-ticket.md) | `SKILL.md` | 티켓 고르는 규칙, 리뷰 순서, 완료 기록 |
 | | `scripts/cross_review.py` | 교차 리뷰의 코드 지문, 완료 기록의 `- 교차 리뷰:` 줄 형식, 그 줄 없이 완료하지 않게 하는 게이트 |
 | | `references/multi-ticket.md` | 여러 티켓 실행: 실행 방법 고르기, 병렬 실행, 워커 도구 절차가 채울 항목, 차례 실행. 병렬 실행은 사용자가 워커 도구 절차를 지정하거나 등록할 때만 쓰는 선택 경로이고, 워커 모델은 사용자 설정을 따릅니다. 절차 등록은 [Orca](orca-orchestration.md)·[Paseo](paseo-orchestration.md) 설정 문서에 있습니다 |
-| [run-flow](skills/run-flow.md) | `SKILL.md` | 인자별 시작 단계, 상태 파일 규칙, 단계 사이의 연결 |
-| | `assets/state-file.md` | 상태 파일 형식 |
-| | `references/adr.md`, `references/brief-stage.md`, `references/pr-stage.md` | ADR 기준, 3단계와 7단계의 절차 |
-| | `scripts/code_fingerprint.sh` | 리뷰한 코드와 지금 코드를 비교하는 지문 계산 |
-| | `scripts/start_stage.py` | 0단계에서 docs 문서로 시작 단계를 판정하는 규칙 |
-| | `scripts/protected_paths.py` | 보호 목록에 넣을 테스트 파일 규칙, 쓰기 전 판정, 수락 전 검사. 고치면 `mods/gongbang-mods/hooks/protected_paths.py`도 똑같이 고칩니다 |
+| [analyzing-requirements](skills/analyzing-requirements.md) | `SKILL.md` | 문서 템플릿 |
 
-set-brief, set-ticket, run-ticket은 같은 형식을 주고받습니다. brief의 섹션 이름, `- 작성일:` 줄, 티켓의 `- 상태:` 줄을 바꾸면 세 스킬을 함께 고치세요.
+set-brief, set-ticket, run-ticket, run-flow는 같은 형식을 주고받습니다. brief의 섹션 이름, `- 작성일:` 줄, 티켓의 `- 상태:` 줄을 바꾸면 네 스킬을 함께 고치세요. run-flow에서는 `SKILL.md`, `references/`의 문서, 이 줄로 brief와 끝난 티켓을 찾는 `scripts/start_stage.py`를 고칩니다.
 
 ## 호출 방식 바꾸기
 
@@ -86,7 +88,9 @@ set-brief, set-ticket, run-ticket은 같은 형식을 주고받습니다. brief�
 - **User-invoked로 바꾸기**: `disable-model-invocation: true`를 넣으세요. 사용자가 이름을 입력할 때만 실행됩니다.
 - **Model-invoked로 바꾸기**: 그 줄을 지우세요. Claude가 `description`을 보고 스킬을 고르므로, `description`에 언제 쓰는지 구체적으로 적으세요.
 
-User-invoked 스킬은 다른 스킬이 불러올 수 없습니다. 그래서 run-flow가 이어 부르는 set-brief, set-ticket, run-ticket은 "사용자나 다른 스킬이 지시할 때만 쓴다"는 설명을 단 Model-invoked로 둡니다.
+Codex에서도 같은 호출 방식으로 쓰려면 스킬 폴더의 `agents/openai.yaml`도 맞추세요. User-invoked로 바꾸면 `policy.allow_implicit_invocation: false`를 넣어 Codex가 스스로 부르지 않게 하고, Model-invoked로 바꾸면 그 설정을 지웁니다. 이 저장소 안에서는 `scripts/check.py`가 두 설정이 어긋나면 오류를 냅니다.
+
+User-invoked 스킬은 다른 스킬이 불러올 수 없습니다. 그래서 run-flow가 단계마다 불러오는 analyzing-requirements, framing-problems, set-brief, set-ticket, run-ticket은 모두 Model-invoked입니다. 이 가운데 framing-problems, set-brief, set-ticket, run-ticket은 Claude가 일반 요청에 스스로 고르지 않도록 `description`에 사용자나 다른 스킬이 지시할 때만 쓴다고 적어 둡니다.
 
 ## 고친 스킬 검사하기
 
@@ -97,7 +101,7 @@ pip install pyyaml
 python3 dev-gongbang/scripts/validate.py ~/.claude/skills/write-docs
 ```
 
-결과는 JSON으로 나옵니다. `errors`가 비어 있으면 통과입니다. `warnings`는 고치거나 그대로 둘 이유를 확인하세요.
+결과는 JSON으로 나옵니다. 스킬 항목의 `errors`가 비어 있고 종료 코드가 0이면 통과입니다. `warnings`는 고치거나 그대로 둘 이유를 확인하세요.
 
 ## 고친 스킬 시험하기
 
@@ -121,7 +125,7 @@ dev-gongbang/scripts/link-in-progress.sh
 
 ## 저장소에 기여하기
 
-고친 내용을 모두가 쓰게 하려면 저장소를 포크해 PR을 보내세요. 스킬을 추가하거나 옮길 때 지킬 규칙은 [AGENTS.md](../AGENTS.md)에 있습니다. 변경한 뒤 `scripts/check.py`를 실행해 통과시키세요.
+고친 내용을 모두가 쓰게 하려면 저장소를 포크해 PR을 보내세요. 스킬을 추가하거나 옮길 때 지킬 규칙은 [AGENTS.md](../AGENTS.md)에 있습니다. 변경한 뒤 `scripts/check.py`를 실행해 통과시키세요. PyYAML과 Claude Code CLI가 필요합니다.
 
 ---
 
