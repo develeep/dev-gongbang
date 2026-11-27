@@ -11,7 +11,7 @@
 | 항목 | 값 |
 |---|---|
 | 버킷 | in-progress |
-| 호출 방식 | User-invoked |
+| 호출 방식 | Model-invoked (기획서를 받아 개발하거나 요구사항 정리부터 티켓 분할·구현·리뷰까지 거칠 큰 작업을 맡길 때) |
 | 호출 | `/gongbang:run-flow [기획서 경로·링크 \| 요청 \| brief 경로·이슈 번호 \| 상태 파일 \| status]`. 인자를 생략하면 진행 중인 흐름을 이어 갑니다 |
 | 원문 | [SKILL.md](../../skills/in-progress/run-flow/SKILL.md) |
 

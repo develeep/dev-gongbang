@@ -94,4 +94,4 @@ To copy and modify the skill, see the [customization guide](../customization.md)
 
 ---
 
-[All docs](../README.md) · Next: [building-skills](building-skills.md) →
+[All docs](../README.md) · Next: [set-guidelines](set-guidelines.md) →

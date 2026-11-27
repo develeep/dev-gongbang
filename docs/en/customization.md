@@ -56,12 +56,12 @@ Paths are relative to the skill folder. Skills are in the same order as in the [
 |---|---|---|
 | [prompt-builder](skills/prompt-builder.md) | `reference/models/<model>.md` | Per-model guide. If you add a new model, also add a row to the "모델 ID 패턴" (Model ID pattern) table in SKILL.md |
 | | `reference/interview.md` | Interview items and quick mode defaults |
+| [set-guidelines](skills/set-guidelines.md) | `reference/guides-index.md` | List of guides and tools to recommend |
+| | `templates/rule.md`, `templates/agent-instructions.md` | Rule file and CLAUDE.md/AGENTS.md templates |
 | [building-skills](skills/building-skills.md) | `references/authoring-rules.md` | Skill authoring rules and the human review checklist |
 | | `scripts/check_skill.py` | Rules checked by machine |
 | [write-docs](skills/write-docs.md) | `reference/tech-writing.md` | Technical document types, recommended structure, sentence principles. The default is the Toss technical writing guide |
 | | `reference/clear-writing.md` | Principles applied to every field |
-| [set-guidelines](skills/set-guidelines.md) | `reference/guides-index.md` | List of guides and tools to recommend |
-| | `templates/rule.md`, `templates/agent-instructions.md` | Rule file and CLAUDE.md/AGENTS.md templates |
 | [framing-problems](skills/framing-problems.md) | `SKILL.md` | Items to fill (R1–R6) and question format |
 | [check-guidelines](skills/check-guidelines.md) | `templates/report.md` | Report template |
 | [run-flow](skills/run-flow.md) | `SKILL.md` | Starting stage per argument, state file rules, protected list rules, links between stages |

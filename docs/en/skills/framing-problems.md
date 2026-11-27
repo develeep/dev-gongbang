@@ -118,4 +118,4 @@ It is Model-invoked, so the description sets when it runs. If you change the des
 
 ---
 
-← Previous: [set-guidelines](set-guidelines.md) · [All docs](../README.md) · Next: [check-guidelines](check-guidelines.md) →
+← Previous: [write-docs](write-docs.md) · [All docs](../README.md) · Next: [check-guidelines](check-guidelines.md) →

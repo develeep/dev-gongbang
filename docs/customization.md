@@ -56,12 +56,12 @@ dev-gongbang의 스킬을 복사해 팀 규칙, 쓰는 모델, 문서 양식에 
 |---|---|---|
 | [prompt-builder](skills/prompt-builder.md) | `reference/models/<모델>.md` | 모델별 가이드. 새 모델을 추가하면 SKILL.md의 "모델 ID 패턴" 표에도 줄을 추가 |
 | | `reference/interview.md` | 인터뷰 항목과 빠른 모드 기본값 |
+| [set-guidelines](skills/set-guidelines.md) | `reference/guides-index.md` | 추천할 가이드와 도구 목록 |
+| | `templates/rule.md`, `templates/agent-instructions.md` | 규칙 파일과 CLAUDE.md/AGENTS.md 양식 |
 | [building-skills](skills/building-skills.md) | `references/authoring-rules.md` | 스킬 작성 규칙과 사람 검토 체크리스트 |
 | | `scripts/check_skill.py` | 기계로 확인하는 규칙 |
 | [write-docs](skills/write-docs.md) | `reference/tech-writing.md` | 기술 문서 유형, 권장 구조, 문장 원칙. 기본은 토스 테크니컬 라이팅 가이드 |
 | | `reference/clear-writing.md` | 모든 분야에 적용하는 원칙 |
-| [set-guidelines](skills/set-guidelines.md) | `reference/guides-index.md` | 추천할 가이드와 도구 목록 |
-| | `templates/rule.md`, `templates/agent-instructions.md` | 규칙 파일과 CLAUDE.md/AGENTS.md 양식 |
 | [framing-problems](skills/framing-problems.md) | `SKILL.md` | 채울 항목(R1~R6)과 질문 형식 |
 | [check-guidelines](skills/check-guidelines.md) | `templates/report.md` | 보고서 양식 |
 | [run-flow](skills/run-flow.md) | `SKILL.md` | 인자별 시작 단계, 상태 파일 규칙, 보호 목록 규칙, 단계 사이의 연결 |

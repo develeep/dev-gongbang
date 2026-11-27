@@ -11,7 +11,7 @@ Give it a planning document, a request, or a brief, and it runs the development 
 | Field | Value |
 |---|---|
 | Bucket | in-progress |
-| Invocation | User-invoked |
+| Invocation | Model-invoked (when you hand over development from a planning document, or work large enough to go through requirements, tickets, implementation, and review) |
 | Command | `/gongbang:run-flow [planning doc path/link \| request \| brief path/issue number \| state file \| status]`. Without an argument it continues the flow in progress |
 | Source | [SKILL.md](../../../skills/in-progress/run-flow/SKILL.md) |
 

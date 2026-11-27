@@ -71,4 +71,4 @@ To add an in-house guide to the recommendation candidates, add its link to the s
 
 ---
 
-← Previous: [write-docs](write-docs.md) · [All docs](../README.md) · Next: [framing-problems](framing-problems.md) →
+← Previous: [prompt-builder](prompt-builder.md) · [All docs](../README.md) · Next: [building-skills](building-skills.md) →

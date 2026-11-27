@@ -118,4 +118,4 @@ Model-invoked라 description이 실행 조건을 정합니다. description을 �
 
 ---
 
-← 이전: [set-guidelines](set-guidelines.md) · [문서 목록](../README.md) · 다음: [check-guidelines](check-guidelines.md) →
+← 이전: [write-docs](write-docs.md) · [문서 목록](../README.md) · 다음: [check-guidelines](check-guidelines.md) →

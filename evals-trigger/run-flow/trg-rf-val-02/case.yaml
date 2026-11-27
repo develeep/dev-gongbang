@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: trg-rf-val-02
+description: "트리거해야 함 / val"
+tags: [trigger, val, positive]
+execution:
+  prompt: "진행 중인 개발 흐름들 지금 어느 단계인지 보여 줘"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?run-flow"'

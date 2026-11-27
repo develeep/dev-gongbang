@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: trg-bs-train-02
+description: "트리거해야 함 / train"
+tags: [trigger, train, positive]
+execution:
+  prompt: "skills/deploy/SKILL.md 초안을 검증하고 실제로 돌려 보면서 고쳐 줘"
+  max_turns: 3
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?building-skills"'

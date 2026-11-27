@@ -9,7 +9,7 @@ Pass a SKILL.md draft or your work material, and finish a skill that meets the A
 | Field | Value |
 |---|---|
 | Bucket | productivity |
-| Invocation | User-invoked |
+| Invocation | Model-invoked (when you ask to build a skill or to check or improve one) |
 | Command | `/gongbang:building-skills [skill folder path, SKILL.md draft, or description of the skill to build]` |
 | Source | [SKILL.md](../../../skills/productivity/building-skills/SKILL.md) |
 
@@ -89,4 +89,4 @@ To copy and modify the skill, see the [customization guide](../customization.md)
 
 ---
 
-← Previous: [prompt-builder](prompt-builder.md) · [All docs](../README.md) · Next: [write-docs](write-docs.md) →
+← Previous: [set-guidelines](set-guidelines.md) · [All docs](../README.md) · Next: [write-docs](write-docs.md) →

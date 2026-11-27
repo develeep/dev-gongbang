@@ -9,7 +9,7 @@ SKILL.md 초안이나 작업 자료를 넘기면, Agent Skills 명세에 맞고 
 | 항목 | 값 |
 |---|---|
 | 버킷 | productivity |
-| 호출 방식 | User-invoked |
+| 호출 방식 | Model-invoked (스킬을 만들거나 검증·개선해 달라고 할 때) |
 | 호출 | `/gongbang:building-skills [스킬 폴더 경로, SKILL.md 초안, 또는 만들 스킬 설명]` |
 | 원문 | [SKILL.md](../../skills/productivity/building-skills/SKILL.md) |
 
@@ -89,4 +89,4 @@ claude.ai·Cowork의 `propose_skills` 저장 카드는 `name`, `description`과 
 
 ---
 
-← 이전: [prompt-builder](prompt-builder.md) · [문서 목록](../README.md) · 다음: [write-docs](write-docs.md) →
+← 이전: [set-guidelines](set-guidelines.md) · [문서 목록](../README.md) · 다음: [write-docs](write-docs.md) →
