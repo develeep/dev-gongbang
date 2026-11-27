@@ -5,7 +5,8 @@ tags: [find]
 execution:
   prompt: /run-ticket
   max_turns: 30
-  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill, Agent]
 context:
   scaffold_script: fixture.sh
 graders:

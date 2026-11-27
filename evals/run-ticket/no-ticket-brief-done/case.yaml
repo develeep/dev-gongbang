@@ -4,8 +4,9 @@ description: 티켓 섹션이 없는 brief를 티켓 하나로 실행하고, 남
 tags: [status, brief]
 execution:
   prompt: /run-ticket docs/context/2026-10-23-slug-hyphen.md
-  max_turns: 30
-  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
+  max_turns: 40
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill, Agent]
 context:
   scaffold_script: fixture.sh
 graders:
@@ -19,11 +20,12 @@ graders:
   # 근거: skills/in-progress/run-ticket/SKILL.md:134
   # 근거: skills/in-progress/run-ticket/SKILL.md:136-140
   # 근거: skills/in-progress/run-ticket/SKILL.md:15
+  # 근거: 계획서 P0-3 (교차 리뷰나 같은 회사 대체 기록)
   - name: record-appended
     type: llm
     criteria: |
-      PASS: brief 파일 끝에 `## 완료 기록`을 붙이고, 완료일, 커밋하지 않았다는 사실, 바꾼 파일(`src/slug.py` 포함)을 적는다.
-      FAIL: 완료 기록이 없거나, brief가 아닌 다른 새 파일에만 적거나, 커밋 여부나 바꾼 파일이 빠졌다.
+      PASS: brief 파일 끝에 `## 완료 기록`을 붙이고, 완료일, 커밋하지 않았다는 사실, 바꾼 파일(`src/slug.py` 포함), 교차 리뷰를 했거나 같은 회사 새 컨텍스트 리뷰로 대체했다는 기록을 적는다.
+      FAIL: 완료 기록이 없거나, brief가 아닌 다른 새 파일에만 적거나, 커밋 여부나 바꾼 파일이 빠졌거나, 교차 리뷰를 건너뛰고 대체 기록도 없다.
   # 근거: skills/in-progress/run-ticket/SKILL.md:134
   # 근거: skills/in-progress/run-ticket/SKILL.md:154
   - name: brief-body-unchanged

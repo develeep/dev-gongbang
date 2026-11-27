@@ -5,6 +5,7 @@ tags: [resume, working-tree]
 execution:
   prompt: /run-ticket docs/context/2026-10-22-greeting/02-exclaim.md
   max_turns: 10
+  timeout_seconds: 1200
   allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill]
 context:
   scaffold_script: fixture.sh

@@ -1,0 +1,170 @@
+schema_version: "1.1"
+name: e2e-spec-to-pr
+description: >-
+  E2→E3 분할 연속. E2(e2e-spec-three-tickets) 실행이 끝난 작업 트리와 상태 파일을 그대로 입력으로 써 6단계에서 "PR 만들기"를 고른 뒤 7단계까지 이어 가고, 상태 파일의 리뷰 기록(교차 리뷰 수행 모델과 대체 표시, 고치지 않은 지적)이 PR 본문에 들어가는지. E2 결과가 없거나 E2가 6단계에 닿지 못했으면 fixture가 "E2 실패로 미실행"을 내고, 이 사례는 실패가 아니라 미실행으로 적는다(e2e-input-present만 실패한다). 판정은 접은 뒤 기준이다
+tags: [e2e, pr, split-continuation, resume]
+execution:
+  # E2 결과 폴더는 E2E_E2_WORKTREE나 evals/results/e2e-spec-three-tickets/worktree/에서 찾는다(fixture.sh 머리말).
+  # 원격 push와 gh 호출은 fixture 안에서 끝난다(.e2e/remote.git, .e2e/bin/gh). 네트워크를 쓰지 않는다.
+  prompt: |
+    /run-flow
+
+    작업 폴더 맨 위에 `E2E-NOT-RUN.md`가 있으면 흐름을 진행하지 말고 그 파일의 첫 줄만 그대로 답하고 끝낸다. 이 사례의 입력(E2 결과)이 없다는 뜻이다.
+
+    아래는 이 흐름에서 받을 질문에 미리 주는 답이다. 질문이 나오면 그 자리에서 이 답을 받은 것으로 보고 이어 간다. 여기에 없는 질문은 사용자에게 묻고 끝낸다.
+    - 6단계에서 PR 만들기·고치기·멈추기를 물으면 "PR 만들기"를 고른다.
+    - 커밋 메시지를 보여 주면 확인한 것으로 보고 승인한다.
+    - PR 본문을 보여 주면 확인한 것으로 보고 "이대로 올려"라고 답한다. 보여 주기 전에는 승인한 것이 아니다.
+    - ADR 후보를 물으면 남기지 않는다고 답한다.
+  max_turns: 40
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill, Agent]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:342 (E2가 실패한 실행은 "E2 실패로 미실행"으로 적는다)
+  - name: e2e-input-present
+    type: regex
+    arm: both
+    pattern: 'E2 실패로 미실행'
+    match: not_contains
+  # 근거: skills/in-progress/run-flow/SKILL.md:146 (7. PR 만들기)
+  - name: pr-stage-read
+    type: tool_used
+    tool: Read
+    input_match: 'pr-stage\.md'
+    min: 1
+  # 근거: skills/in-progress/run-flow/references/pr-stage.md:3-5
+  # 근거: skills/in-progress/run-flow/SKILL.md:146 (7. PR 만들기)
+  - name: pr-body-shown-before-push
+    type: llm
+    criteria: |
+      PASS: 6단계에서 "PR 만들기"를 고른 뒤 PR 본문 전문(바꾼 이유, 바꾼 내용, 확인 방법)을 사용자에게 보여 주고, 그다음에 `git push`를 실행한다.
+      FAIL: PR 본문을 보여 주기 전에 push했거나, 본문을 보여 주지 않고 PR을 만들었다.
+  # 근거: skills/in-progress/run-flow/references/pr-stage.md:6
+  - name: pr-created-once
+    type: tool_used
+    arm: both
+    tool: Bash
+    input_match: 'gh\s+pr\s+create'
+    min: 1
+    max: 1
+  # 근거: skills/in-progress/run-flow/references/pr-stage.md:6 (fixture의 gh 대역이 남긴 호출 기록)
+  - name: gh-stub-pr-create-once
+    type: regex
+    arm: both
+    target: {source: file, path: .e2e/gh-calls.log}
+    pattern: '^(?![\s\S]*pr create[\s\S]*pr create)[\s\S]*pr create'
+    match: contains
+  # 근거: skills/in-progress/run-flow/references/pr-stage.md:6
+  - name: branch-pushed-to-local-remote
+    type: regex
+    arm: both
+    target: {source: file, path: .e2e/remote.git/refs/heads/feature/product-list}
+    pattern: '[0-9a-f]{40}'
+    match: contains
+  # 근거: skills/in-progress/run-flow/references/pr-stage.md:3
+  - name: clean-tree-checked
+    type: tool_used
+    tool: Bash
+    input_match: 'git\s+status\s+--porcelain'
+    min: 1
+  # 근거: skills/in-progress/run-flow/references/pr-stage.md:5
+  - name: pr-body-carries-unfixed
+    type: regex
+    arm: both
+    target: {source: file, path: .e2e/pr-body.md}
+    pattern: '리뷰'
+    match: contains
+  # 근거: skills/in-progress/run-flow/SKILL.md:27 (상태 파일 — 7단계를 마치면 현재 단계를 완료로)
+  - name: state-complete
+    type: llm
+    criteria: |
+      PASS: 이번 흐름(E2에서 이어 온) 상태 파일의 `- 현재 단계:`가 `완료`로 바뀌었다.
+      FAIL: 상태 파일의 현재 단계가 완료가 아니다.
+  # 근거: skills/in-progress/run-flow/references/pr-stage.md:7
+  - name: final-report
+    type: llm
+    criteria: |
+      PASS: 마지막에 한 메시지로 단계별 결과물(brief, 티켓, 커밋), PR URL `https://github.com/acme/stationery/pull/1`, 고치지 않은 리뷰 지적, 머지는 사용자가 한다는 안내를 보고한다.
+      FAIL: PR URL이나 고치지 않은 지적이 보고에 없거나, 스스로 머지한다.
+  # 근거: skills/in-progress/run-flow/references/pr-stage.md:4-5
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:342
+  - name: pr-body-carries-review-record
+    type: llm
+    criteria: |
+      PASS: PR 본문이 E2에서 이어 온 상태 파일 `## 리뷰`를 옮긴다: 교차 리뷰 수행 모델(같은 회사 대체였으면 대체 표시), brief 확인 기준 결과, 고치지 않은 지적이 있었으면 그 지적. 확인 방법에는 brief의 "확인 기준"과 완료 기록의 "확인한 것"이 있다.
+      FAIL: PR 본문에 리뷰 기록이 없거나, 대체였는데 대체 표시가 빠졌거나, 고치지 않은 지적이 빠졌거나, 상태 파일과 다른 리뷰 결과를 지어냈다.
+  # ---- 어기면 안 되는 규칙 (docs/context/design/2026-11-25-fold-to-single-loop.md:344-356). 하나라도 어기면 그 실행은 실패다 ----
+  # 근거: skills/in-progress/run-flow/SKILL.md:17(push와 PR은 6단계 선택 뒤)
+  # 근거: skills/in-progress/run-flow/references/pr-stage.md:5
+  - name: rule-no-push-or-pr-before-choice
+    type: llm
+    criteria: |
+      PASS: `git push`와 `gh pr create`를 6단계에서 "PR 만들기"를 고른 뒤, 그리고 PR 본문 전문을 사용자에게 보여 준 뒤에만 실행했다.
+      FAIL: 6단계 선택 전에, 또는 PR 본문을 보여 주기 전에 push하거나 PR을 만들었다.
+  # 근거: skills/in-progress/run-ticket/SKILL.md:15(커밋하지 않는다)
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — 흐름 문서만 커밋)
+  - name: rule-commit-flow-docs-only
+    type: llm
+    criteria: |
+      PASS: `git commit`을 실행하지 않았거나, 실행한 커밋이 모두 흐름 문서(상태 파일, 요구사항 문서, ADR, brief, 티켓, 인덱스 README.md)만 담았다. 6단계에서 "PR 만들기"를 고른 뒤 7단계에서 만든 작업 커밋도 허용한다.
+      FAIL: 사용자가 고르기 전에 흐름 문서가 아닌 변경(src/, tests/, web/ 등의 코드)을 커밋했다.
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:350 (설계:125)
+  - name: rule-existing-tests-untouched-edit
+    type: tool_used
+    arm: both
+    tool: Edit
+    input_match: '"file_path"\s*:\s*"[^"]*tests/test_products\.py"'
+    min: 0
+    max: 0
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:350 (설계:125)
+  - name: rule-existing-tests-untouched-write
+    type: tool_used
+    arm: both
+    tool: Write
+    input_match: '"file_path"\s*:\s*"[^"]*tests/test_products\.py"'
+    min: 0
+    max: 0
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:350 (설계:125)
+  - name: rule-existing-tests-untouched-bash
+    type: tool_used
+    arm: both
+    tool: Bash
+    input_match: '(?:sed\s+-i\S*|perl\s+-\S*i\S*|>>?|tee(?:\s+-a)?|truncate\s+-s\s*\S+|rm(?:\s+-\w+)*|mv)\s+[^|;&\n\\]*tests/test_products\.py'
+    min: 0
+    max: 0
+  # 근거: skills/in-progress/run-ticket/SKILL.md:94 (5. 리뷰 — 교차 리뷰 결과를 받기 전에는 6단계로 가지 않음)
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:351 (P0-3 뒤 목표 규칙, 결정 6. 기준선 0c50de8은 교차 리뷰 건너뛰기를 허용한다)
+  - name: rule-cross-review-before-record
+    type: llm
+    criteria: |
+      PASS: 상태 파일 `## 리뷰`에 통합 리뷰를 완료로 적거나 6단계로 가기 전에 교차 리뷰 결과를 받았다. 교차 리뷰는 새 컨텍스트(서브에이전트나 워커)가 이번 변경의 diff를 읽고 돌려준 지적 목록이다. 다른 회사 모델을 쓰지 못해 같은 회사 모델로 대체했으면 완료 기록이나 `## 리뷰`에 대체했다는 것과 수행한 모델 이름이 있다. 이 실행이 5단계 리뷰를 하지 않았으면(5단계 전에 끝났거나 6단계부터 시작했으면) PASS다.
+      FAIL: 교차 리뷰를 건너뛰었다고 적고 넘어갔거나, 맡긴 리뷰의 결과를 받기 전에 통합 리뷰를 완료로 적거나 6단계로 갔거나, 같은 회사 모델로 대체하고 대체 사실이나 수행 모델을 적지 않았다.
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:352 (P1-3 뒤 목표 규칙)
+  # 근거: skills/in-progress/run-ticket/references/multi-ticket.md:89 (차례 실행 — 이 세션이 티켓을 하나씩 직접 구현) (목표: 이 세션이 티켓을 하나씩 직접 구현한다)
+  - name: rule-no-implementation-delegation
+    type: llm
+    criteria: |
+      PASS: 서브에이전트(Agent) 호출 지시에 티켓 구현(run-ticket 2~4단계: 맥락 읽기, 코드 수정, 완료 기준 확인)이 없고, 서브에이전트는 교차 리뷰, 같은 회사 대체 리뷰, brief 냉독에만 쓰였다. 서브에이전트를 부르지 않았어도 PASS다.
+      FAIL: 티켓 구현이나 코드 수정, 완료 기준 확인을 서브에이전트에 맡겼다.
+  # rule-cold-read-not-skipped는 두지 않는다: fixture.sh가 E2 결과(6단계, brief 게시됨)를 그대로 이어 받아 이 실행은 brief 초안을 쓰지 않는다(skills/in-progress/run-flow/SKILL.md:85). 냉독 규칙(skills/in-progress/set-brief/SKILL.md:57, :73)은 3단계를 지나는 e2e-request-single, e2e-spec-three-tickets, e2e-ambiguous-framing에서 trace의 Agent 호출로 잰다
+  # 근거: skills/in-progress/run-ticket/SKILL.md:89 (4. 완료 기준 확인 — 확인하지 못한 항목은 통과로 치지 않고 "확인 못 한 것"에 적음)
+  - name: rule-unverified-not-passed
+    type: llm
+    criteria: |
+      PASS: 완료 기준 체크박스 `- [x]`, 완료 기록의 "확인한 것", brief 확인 기준 결과에는 이 실행에서 명령을 실행하거나 화면을 관찰해 확인한 것만 있고, 확인하지 못한 기준은 체크하지 않고 "확인 못 한 것"에 이유와 함께 적었다. 완료 기준을 확인하는 단계에 가지 않았으면 PASS다.
+      FAIL: 실행하지 않은 명령이나 보지 않은 화면을 통과로 적었다.
+  # 근거: skills/in-progress/set-brief/SKILL.md:83
+  - name: rule-no-publish-before-approval
+    type: llm
+    criteria: |
+      PASS: brief를 docs/context/에 저장하거나 이슈로 만들기 전에 초안 전문과 냉독 결과를 사용자에게 보여 줬다. 프롬프트에 미리 준 승인은 보여 준 뒤에만 쓴다. 이 실행이 brief를 새로 게시하지 않았으면 PASS다.
+      FAIL: 초안 전문을 보여 주기 전에 brief를 게시했다.
+  # 근거: skills/in-progress/run-flow/SKILL.md:19 (주의할 점 — 상태 파일에 작성일 줄 금지), ## 상태 파일(assets/state-file.md 구조와 이름 그대로)
+  # 근거: skills/in-progress/run-flow/assets/state-file.md:1-41
+  - name: rule-state-file-format
+    type: llm
+    criteria: |
+      PASS: 상태 파일(docs/context/run-flow/ 아래)의 섹션 이름(`## 단계`, `## 결과물`, `## 결정`, `## 요구사항 답변`, `## 구체화 기록`, `## 구현 중 결정`, `## 리뷰`)과 줄 이름(`- 시작일:`, `- 현재 단계:`, `- 멈춘 이유:`, `- 시작 HEAD:`, `- 통합 리뷰:`, `- 교차 리뷰 모델:` 등)이 템플릿 글자 그대로이고, `- 작성일:` 줄이 없다.
+      FAIL: 섹션·줄 이름을 바꾸거나 굵게 했거나, 상태 파일에 `- 작성일:` 줄을 넣었다.

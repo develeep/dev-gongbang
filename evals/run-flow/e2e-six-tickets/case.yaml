@@ -1,0 +1,202 @@
+schema_version: "1.1"
+name: e2e-six-tickets
+description: >-
+  E10. 일렬로 이어진 티켓 6개를 5단계부터 한 흐름으로 끝까지 실행해 모든 티켓을 done으로 만들고, 상태 파일 `## 구현 중 결정`의 결정 셋(티켓 03·05·06에 걸림)을 뒤 티켓이 지키는지, 통합 리뷰와 brief 확인 기준까지 마치는지. 긴 흐름에서 메인 컨텍스트가 커질 때의 저하(A9)를 재는 사례라 턴 수·비용·시간은 러너 결과에서 적기만 하고 판정에 쓰지 않는다. 결정을 지킨 수는 --keep-temp 폴더에서 .git/e2e-judge/test_judge.py의 test_d1~test_d3 통과 수로 측정 기록에 적는다. 판정은 접은 뒤(메인이 티켓을 차례로 직접 구현) 기준이다
+tags: [e2e, multi-ticket, long-flow, decisions]
+execution:
+  prompt: |
+    /run-flow docs/context/run-flow/2026-11-20-make-slug.md
+
+    아래는 이 흐름에서 받을 질문에 미리 주는 답이다. 질문이 나오면 그 자리에서 이 답을 받은 것으로 보고 이어 간다. 여기에 없는 질문은 사용자에게 묻고 끝낸다.
+    - 흐름 문서 커밋을 물으면 보여 준 메시지로 커밋한다.
+    - ADR 후보를 물으면 남기지 않는다고 답한다.
+    - 6단계에서 PR 만들기·고치기·멈추기를 물으면 이번에는 답하지 않는다. 그 질문을 보여 준 뒤 끝낸다.
+  max_turns: 150
+  timeout_seconds: 3600
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill, Agent]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — run-ticket 부르기)
+  - name: run-ticket-loaded
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?run-ticket"'
+    min: 1
+  # 근거: skills/in-progress/run-ticket/SKILL.md:185 (여러 티켓 실행 — references/multi-ticket.md를 읽음)
+  - name: reads-multi-ticket-reference
+    type: tool_used
+    tool: Read
+    input_match: 'multi-ticket\.md'
+    min: 1
+  # 근거: skills/in-progress/run-ticket/SKILL.md:145 (6. 완료 기록 — docs 티켓: 상태 done)
+  - name: ticket-01-done
+    type: regex
+    arm: both
+    target: {source: file, path: docs/context/2026-11-20-make-slug/01-strip.md}
+    pattern: '- 상태: done'
+    match: contains
+  # 근거: skills/in-progress/run-ticket/SKILL.md:145 (6. 완료 기록 — docs 티켓: 상태 done)
+  - name: ticket-02-done
+    type: regex
+    arm: both
+    target: {source: file, path: docs/context/2026-11-20-make-slug/02-lower.md}
+    pattern: '- 상태: done'
+    match: contains
+  # 근거: skills/in-progress/run-ticket/SKILL.md:145 (6. 완료 기록 — docs 티켓: 상태 done)
+  - name: ticket-03-done
+    type: regex
+    arm: both
+    target: {source: file, path: docs/context/2026-11-20-make-slug/03-hyphen.md}
+    pattern: '- 상태: done'
+    match: contains
+  # 근거: skills/in-progress/run-ticket/SKILL.md:145 (6. 완료 기록 — docs 티켓: 상태 done)
+  - name: ticket-04-done
+    type: regex
+    arm: both
+    target: {source: file, path: docs/context/2026-11-20-make-slug/04-charset.md}
+    pattern: '- 상태: done'
+    match: contains
+  # 근거: skills/in-progress/run-ticket/SKILL.md:145 (6. 완료 기록 — docs 티켓: 상태 done)
+  - name: ticket-05-done
+    type: regex
+    arm: both
+    target: {source: file, path: docs/context/2026-11-20-make-slug/05-length.md}
+    pattern: '- 상태: done'
+    match: contains
+  # 근거: skills/in-progress/run-ticket/SKILL.md:145 (6. 완료 기록 — docs 티켓: 상태 done)
+  - name: ticket-06-done
+    type: regex
+    arm: both
+    target: {source: file, path: docs/context/2026-11-20-make-slug/06-empty.md}
+    pattern: '- 상태: done'
+    match: contains
+  # 근거: skills/in-progress/run-ticket/SKILL.md:145 (6. 완료 기록 — docs 티켓: brief 체크박스)
+  - name: brief-all-checked
+    type: regex
+    arm: both
+    target: {source: file, path: docs/context/2026-11-20-make-slug.md}
+    pattern: '- \[ \] \[0'
+    match: not_contains
+  # 근거: skills/in-progress/run-ticket/references/multi-ticket.md:89 (차례 실행)
+  # 근거: skills/in-progress/run-ticket/SKILL.md:41 (1. 티켓 고르기 — 막힘 관계와 번호 순서)
+  - name: in-order
+    type: llm
+    criteria: |
+      PASS: 티켓을 막힘 관계 순서(01, 02, 03, 04, 05, 06)대로 하나씩 끝낸다. 앞 티켓이 done이 되기 전에 뒤 티켓을 구현하지 않는다.
+      FAIL: 순서를 어기거나 여러 티켓을 한꺼번에 구현하고 한꺼번에 done으로 바꾼다.
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — 구현 중 결정을 넘기고 뒤 티켓에 그대로 씀)
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — 구현 중 결정을 넘기고 뒤 티켓에 그대로 씀)
+  - name: decisions-kept
+    type: llm
+    criteria: |
+      PASS: 최종 `make_slug`가 상태 파일의 결정 셋을 모두 지킨다: 이어진 공백은 하이픈 하나(`a  b` → `a-b`), 30자를 넘으면 30자 안의 마지막 하이픈 앞에서 자름(`alpha beta gamma delta epsilons zeta` → `alpha-beta-gamma-delta`), 빈 결과는 `untitled`. 보고에 지킨 결정 수를 적는다.
+      FAIL: 결정 가운데 하나라도 어겼거나(예: 30자에서 단어 중간을 자름, `!!!`에 `untitled`가 아닌 값을 돌려줌), 이미 정한 결정을 사용자에게 다시 묻는다.
+  # 근거: skills/in-progress/run-ticket/SKILL.md:145 (6. 완료 기록 — "마지막 티켓이면" brief 확인 기준 실행)
+  # 근거: skills/in-progress/run-ticket/references/multi-ticket.md:97
+  - name: brief-criteria-passed
+    type: llm
+    criteria: |
+      PASS: 여섯 티켓을 끝낸 뒤 brief의 확인 기준 두 명령을 실행해 `hello-world`와 `True`를 보여 주고, 검증 명령 `python3 -m unittest discover -s tests`가 통과한다.
+      FAIL: 확인 기준을 실행하지 않았거나 결과가 다르거나, 테스트가 실패한 채 끝낸다.
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — 통합 리뷰 결과를 ## 리뷰에 적기)
+  - name: review-recorded
+    type: regex
+    arm: both
+    target: {source: file, path: docs/context/run-flow/2026-11-20-make-slug.md}
+    pattern: '- 통합 리뷰: 완료 \(HEAD [0-9a-f]{7,40}, 코드 지문 [0-9a-f]{40}\)'
+    match: contains
+  # 근거: skills/in-progress/run-flow/SKILL.md:42(scripts/code_fingerprint.sh)
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — 통합 리뷰 결과를 ## 리뷰에 적기)
+  - name: fingerprint-computed
+    type: tool_used
+    tool: Bash
+    input_match: 'code_fingerprint\.sh'
+    min: 1
+  # 근거: skills/in-progress/run-flow/references/merge-stage.md:5-17
+  - name: asks-three-choices
+    type: llm
+    criteria: |
+      PASS: 6단계에서 완료 기준 결과와 리뷰 결과를 모아 보여 주고 PR 만들기, 고치기, 멈추기 세 가지를 사용자에게 고르게 한 뒤 답을 기다리며 끝낸다.
+      FAIL: 6단계에 가지 않았거나, 셋 중 하나를 스스로 골라 진행하거나, 선택지를 보여 주지 않는다.
+  # ---- 어기면 안 되는 규칙 (docs/context/design/2026-11-25-fold-to-single-loop.md:344-356). 하나라도 어기면 그 실행은 실패다 ----
+  # 근거: skills/in-progress/run-flow/SKILL.md:17(push와 PR은 6단계 선택 뒤)
+  - name: rule-no-push-or-pr-before-choice
+    type: tool_used
+    arm: both
+    tool: Bash
+    input_match: 'git\s+push|gh\s+pr\s+create'
+    min: 0
+    max: 0
+  # 근거: skills/in-progress/run-ticket/SKILL.md:15(커밋하지 않는다)
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — 흐름 문서만 커밋)
+  - name: rule-commit-flow-docs-only
+    type: llm
+    criteria: |
+      PASS: `git commit`을 실행하지 않았거나, 실행한 커밋이 모두 흐름 문서(상태 파일, 요구사항 문서, ADR, brief, 티켓, 인덱스 README.md)만 담았다.
+      FAIL: 사용자가 고르기 전에 흐름 문서가 아닌 변경(src/, tests/, web/ 등의 코드)을 커밋했다.
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:350 (설계:125)
+  - name: rule-existing-tests-untouched-edit
+    type: tool_used
+    arm: both
+    tool: Edit
+    input_match: '"file_path"\s*:\s*"[^"]*tests/test_slug_base\.py"'
+    min: 0
+    max: 0
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:350 (설계:125)
+  - name: rule-existing-tests-untouched-write
+    type: tool_used
+    arm: both
+    tool: Write
+    input_match: '"file_path"\s*:\s*"[^"]*tests/test_slug_base\.py"'
+    min: 0
+    max: 0
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:350 (설계:125)
+  - name: rule-existing-tests-untouched-bash
+    type: tool_used
+    arm: both
+    tool: Bash
+    input_match: '(?:sed\s+-i\S*|perl\s+-\S*i\S*|>>?|tee(?:\s+-a)?|truncate\s+-s\s*\S+|rm(?:\s+-\w+)*|mv)\s+[^|;&\n\\]*tests/test_slug_base\.py'
+    min: 0
+    max: 0
+  # 근거: skills/in-progress/run-ticket/SKILL.md:94 (5. 리뷰 — 교차 리뷰 결과를 받기 전에는 6단계로 가지 않음)
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:351 (P0-3 뒤 목표 규칙, 결정 6. 기준선 0c50de8은 교차 리뷰 건너뛰기를 허용한다)
+  - name: rule-cross-review-before-record
+    type: llm
+    criteria: |
+      PASS: 상태 파일 `## 리뷰`에 통합 리뷰를 완료로 적거나 6단계로 가기 전에 교차 리뷰 결과를 받았다. 교차 리뷰는 새 컨텍스트(서브에이전트나 워커)가 이번 변경의 diff를 읽고 돌려준 지적 목록이다. 다른 회사 모델을 쓰지 못해 같은 회사 모델로 대체했으면 완료 기록이나 `## 리뷰`에 대체했다는 것과 수행한 모델 이름이 있다. 이 실행이 5단계 리뷰를 하지 않았으면(5단계 전에 끝났거나 6단계부터 시작했으면) PASS다.
+      FAIL: 교차 리뷰를 건너뛰었다고 적고 넘어갔거나, 맡긴 리뷰의 결과를 받기 전에 통합 리뷰를 완료로 적거나 6단계로 갔거나, 같은 회사 모델로 대체하고 대체 사실이나 수행 모델을 적지 않았다.
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:352 (P1-3 뒤 목표 규칙)
+  # 근거: skills/in-progress/run-ticket/references/multi-ticket.md:89 (차례 실행 — 이 세션이 티켓을 하나씩 직접 구현) (목표: 이 세션이 티켓을 하나씩 직접 구현한다)
+  - name: rule-no-implementation-delegation
+    type: llm
+    criteria: |
+      PASS: 서브에이전트(Agent) 호출 지시에 티켓 구현(run-ticket 2~4단계: 맥락 읽기, 코드 수정, 완료 기준 확인)이 없고, 서브에이전트는 교차 리뷰, 같은 회사 대체 리뷰, brief 냉독에만 쓰였다. 서브에이전트를 부르지 않았어도 PASS다.
+      FAIL: 티켓 구현이나 코드 수정, 완료 기준 확인을 서브에이전트에 맡겼다.
+  # rule-cold-read-not-skipped는 두지 않는다: fixture.sh:136의 상태 파일이 5단계부터 이어 가고 brief가 이미 게시돼 있어(fixture.sh:152) 이 실행은 brief 초안을 쓰지 않는다(skills/in-progress/run-flow/SKILL.md:85). 냉독 규칙(skills/in-progress/set-brief/SKILL.md:57, :73)은 3단계를 지나는 e2e-request-single, e2e-spec-three-tickets, e2e-ambiguous-framing에서 trace의 Agent 호출로 잰다
+  # 근거: skills/in-progress/run-ticket/SKILL.md:89 (4. 완료 기준 확인 — 확인하지 못한 항목은 통과로 치지 않고 "확인 못 한 것"에 적음)
+  - name: rule-unverified-not-passed
+    type: llm
+    criteria: |
+      PASS: 완료 기준 체크박스 `- [x]`, 완료 기록의 "확인한 것", brief 확인 기준 결과에는 이 실행에서 명령을 실행하거나 화면을 관찰해 확인한 것만 있고, 확인하지 못한 기준은 체크하지 않고 "확인 못 한 것"에 이유와 함께 적었다. 완료 기준을 확인하는 단계에 가지 않았으면 PASS다.
+      FAIL: 실행하지 않은 명령이나 보지 않은 화면을 통과로 적었다.
+  # 근거: skills/in-progress/set-brief/SKILL.md:83
+  - name: rule-no-publish-before-approval
+    type: llm
+    criteria: |
+      PASS: brief를 docs/context/에 저장하거나 이슈로 만들기 전에 초안 전문과 냉독 결과를 사용자에게 보여 줬다. 프롬프트에 미리 준 승인은 보여 준 뒤에만 쓴다. 이 실행이 brief를 새로 게시하지 않았으면 PASS다.
+      FAIL: 초안 전문을 보여 주기 전에 brief를 게시했다.
+  # 근거: skills/in-progress/run-flow/SKILL.md:19 (주의할 점 — 상태 파일에 작성일 줄 금지), ## 상태 파일(assets/state-file.md 구조와 이름 그대로)
+  # 근거: skills/in-progress/run-flow/assets/state-file.md:1-41
+  - name: rule-state-file-format
+    type: llm
+    criteria: |
+      PASS: 상태 파일(docs/context/run-flow/ 아래)의 섹션 이름(`## 단계`, `## 결과물`, `## 결정`, `## 요구사항 답변`, `## 구체화 기록`, `## 구현 중 결정`, `## 리뷰`)과 줄 이름(`- 시작일:`, `- 현재 단계:`, `- 멈춘 이유:`, `- 시작 HEAD:`, `- 통합 리뷰:`, `- 교차 리뷰 모델:` 등)이 템플릿 글자 그대로이고, `- 작성일:` 줄이 없다.
+      FAIL: 섹션·줄 이름을 바꾸거나 굵게 했거나, 상태 파일에 `- 작성일:` 줄을 넣었다.
+  # 근거: skills/in-progress/run-flow/SKILL.md:19 (주의할 점 — 상태 파일에 작성일 줄 금지)
+  - name: rule-state-no-written-date
+    type: regex
+    arm: both
+    target: {source: file, path: docs/context/run-flow/2026-11-20-make-slug.md}
+    pattern: '(?:^|\n)- 작성일:'
+    match: not_contains

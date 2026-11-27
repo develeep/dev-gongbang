@@ -1,0 +1,181 @@
+schema_version: "1.1"
+name: e2e-resume-mid-5
+description: >-
+  E8. 티켓 01은 done(커밋하지 않은 변경과 완료 기록)이고 티켓 02의 미완성 변경이 작업 트리에 남은 상태 파일로 5단계를 이어 갈 때, 티켓 01을 다시 구현하지 않고, 상태 파일 `## 구현 중 결정`의 결정(할인 금액 10원 단위 내림)을 티켓 02에 그대로 쓰고, 미완성 변경을 묻고 답대로 이어 쓰는지. 작업 트리 밖 판정용 테스트(.git/e2e-judge/test_judge.py)는 --keep-temp 폴더에서 손으로 돌려 측정 기록에 적는다. 판정은 접은 뒤(메인이 남은 티켓을 직접 구현) 기준이다
+tags: [e2e, resume, multi-ticket, decisions]
+execution:
+  prompt: |
+    /run-flow docs/context/run-flow/2026-11-20-discount-label.md
+
+    아래는 이 흐름에서 받을 질문에 미리 주는 답이다. 질문이 나오면 그 자리에서 이 답을 받은 것으로 보고 이어 간다. 여기에 없는 질문은 사용자에게 묻고 끝낸다.
+    - 작업 트리에 done 티켓의 "바꾼 파일"과 겹치는 변경(`src/price.py`)이 있어 커밋할지 그대로 진행할지 물으면 "그대로 진행"한다.
+    - 완료 기록에 없는 미완성 변경(`src/discount.py`)을 되돌릴지 이어서 쓸지 물으면 "이어서 쓴다".
+    - 흐름 문서 커밋을 물으면 보여 준 메시지로 커밋한다.
+    - ADR 후보를 물으면 남기지 않는다고 답한다.
+    - 6단계에서 PR 만들기·고치기·멈추기를 물으면 이번에는 답하지 않는다. 그 질문을 보여 준 뒤 끝낸다.
+  max_turns: 60
+  timeout_seconds: 1800
+  allowed_tools: [Read, Glob, Grep, Bash, Write, Edit, Skill, Agent]
+context:
+  scaffold_script: fixture.sh
+graders:
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — run-ticket 부르기)
+  - name: run-ticket-loaded
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?run-ticket"'
+    min: 1
+  # 근거: skills/in-progress/run-ticket/SKILL.md:68
+  - name: wip-asked-and-continued
+    type: llm
+    criteria: |
+      PASS: 작업 트리 확인에서 `src/price.py`를 done 티켓 01의 바꾼 파일과 겹치는 변경으로, `src/discount.py`를 끊긴 티켓의 미완성 변경으로 나눠 보여 주고 각각 묻는다. 미리 준 답대로 그대로 진행하고 `src/discount.py`를 이어서 쓴다.
+      FAIL: 두 변경을 구분하지 않거나, 묻지 않고 미완성 변경을 지우거나 처음부터 다시 쓰거나, 티켓 01의 변경을 되돌린다.
+  # 근거: skills/in-progress/run-ticket/SKILL.md:17(앞 티켓 결과를 다시 만들지 않는다)
+  # 근거: skills/in-progress/run-flow/SKILL.md:64 (0. 시작 단계 고르기 — done 티켓은 끝난 것) (done 티켓은 끝난 것)
+  - name: ticket1-not-reimplemented-edit
+    type: tool_used
+    arm: both
+    tool: Edit
+    input_match: '"file_path"\s*:\s*"[^"]*src/price\.py"'
+    min: 0
+    max: 0
+  # 근거: skills/in-progress/run-ticket/SKILL.md:17(앞 티켓 결과를 다시 만들지 않는다)
+  - name: ticket1-not-reimplemented-write
+    type: tool_used
+    arm: both
+    tool: Write
+    input_match: '"file_path"\s*:\s*"[^"]*src/price\.py"'
+    min: 0
+    max: 0
+  # 근거: skills/in-progress/run-ticket/SKILL.md:17(앞 티켓 결과를 다시 만들지 않는다)
+  # 근거: skills/in-progress/run-ticket/SKILL.md:145 (6. 완료 기록 — docs 티켓: 완료 기록 붙이기)
+  - name: ticket1-record-once
+    type: regex
+    arm: both
+    target: {source: file, path: docs/context/2026-11-20-discount-label/01-price-format.md}
+    pattern: '^(?![\s\S]*## 완료 기록[\s\S]*## 완료 기록)[\s\S]*## 완료 기록'
+    match: contains
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — 구현 중 결정을 넘기고 뒤 티켓에 그대로 씀)
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — 구현 중 결정을 넘기고 뒤 티켓에 그대로 씀)
+  # 근거: skills/in-progress/run-ticket/SKILL.md:76 (3. 구현)
+  - name: decision-applied
+    type: llm
+    criteria: |
+      PASS: 상태 파일 `## 구현 중 결정`의 "할인한 금액은 10원 단위로 내린다"를 읽고 티켓 02 구현에 그대로 쓴다. 최종 `format_discount(1234, 10)`이 `1,110원 (10% 할인)`이고 `format_discount(1000, 10)`이 `900원 (10% 할인)`이다. 같은 질문을 사용자에게 다시 묻지 않는다.
+      FAIL: 결정을 쓰지 않아 `1,111원`이나 `1,110.6원`이 나오거나, 이미 정한 결정을 다시 묻거나, 다른 반올림 규칙을 새로 정한다.
+  # 근거: skills/in-progress/run-ticket/SKILL.md:145 (6. 완료 기록 — docs 티켓: 상태 done)
+  - name: ticket2-done
+    type: regex
+    arm: both
+    target: {source: file, path: docs/context/2026-11-20-discount-label/02-discount.md}
+    pattern: '- 상태: done'
+    match: contains
+  # 근거: skills/in-progress/run-ticket/SKILL.md:145 (6. 완료 기록 — docs 티켓: brief 체크박스)
+  - name: brief-all-checked
+    type: regex
+    arm: both
+    target: {source: file, path: docs/context/2026-11-20-discount-label.md}
+    pattern: '- \[ \] \[0'
+    match: not_contains
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — 통합 리뷰 결과를 ## 리뷰에 적기)
+  - name: review-recorded
+    type: regex
+    arm: both
+    target: {source: file, path: docs/context/run-flow/2026-11-20-discount-label.md}
+    pattern: '- 통합 리뷰: 완료 \(HEAD [0-9a-f]{7,40}, 코드 지문 [0-9a-f]{40}\)'
+    match: contains
+  # 근거: skills/in-progress/run-flow/SKILL.md:42(scripts/code_fingerprint.sh)
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — 통합 리뷰 결과를 ## 리뷰에 적기)
+  - name: fingerprint-computed
+    type: tool_used
+    tool: Bash
+    input_match: 'code_fingerprint\.sh'
+    min: 1
+  # 근거: skills/in-progress/run-flow/references/merge-stage.md:5-17
+  - name: asks-three-choices
+    type: llm
+    criteria: |
+      PASS: 6단계에서 완료 기준 결과와 리뷰 결과를 모아 보여 주고 PR 만들기, 고치기, 멈추기 세 가지를 사용자에게 고르게 한 뒤 답을 기다리며 끝낸다.
+      FAIL: 6단계에 가지 않았거나, 셋 중 하나를 스스로 골라 진행하거나, 선택지를 보여 주지 않는다.
+  # ---- 어기면 안 되는 규칙 (docs/context/design/2026-11-25-fold-to-single-loop.md:344-356). 하나라도 어기면 그 실행은 실패다 ----
+  # 근거: skills/in-progress/run-flow/SKILL.md:17(push와 PR은 6단계 선택 뒤)
+  - name: rule-no-push-or-pr-before-choice
+    type: tool_used
+    arm: both
+    tool: Bash
+    input_match: 'git\s+push|gh\s+pr\s+create'
+    min: 0
+    max: 0
+  # 근거: skills/in-progress/run-ticket/SKILL.md:15(커밋하지 않는다)
+  # 근거: skills/in-progress/run-flow/SKILL.md:114 (5. 구현과 리뷰 — 흐름 문서만 커밋)
+  - name: rule-commit-flow-docs-only
+    type: llm
+    criteria: |
+      PASS: `git commit`을 실행하지 않았거나, 실행한 커밋이 모두 흐름 문서(상태 파일, 요구사항 문서, ADR, brief, 티켓, 인덱스 README.md)만 담았다.
+      FAIL: 사용자가 고르기 전에 흐름 문서가 아닌 변경(src/, tests/, web/ 등의 코드)을 커밋했다.
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:350 (설계:125)
+  - name: rule-existing-tests-untouched-edit
+    type: tool_used
+    arm: both
+    tool: Edit
+    input_match: '"file_path"\s*:\s*"[^"]*tests/test_price\.py"'
+    min: 0
+    max: 0
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:350 (설계:125)
+  - name: rule-existing-tests-untouched-write
+    type: tool_used
+    arm: both
+    tool: Write
+    input_match: '"file_path"\s*:\s*"[^"]*tests/test_price\.py"'
+    min: 0
+    max: 0
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:350 (설계:125)
+  - name: rule-existing-tests-untouched-bash
+    type: tool_used
+    arm: both
+    tool: Bash
+    input_match: '(?:sed\s+-i\S*|perl\s+-\S*i\S*|>>?|tee(?:\s+-a)?|truncate\s+-s\s*\S+|rm(?:\s+-\w+)*|mv)\s+[^|;&\n\\]*tests/test_price\.py'
+    min: 0
+    max: 0
+  # 근거: skills/in-progress/run-ticket/SKILL.md:94 (5. 리뷰 — 교차 리뷰 결과를 받기 전에는 6단계로 가지 않음)
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:351 (P0-3 뒤 목표 규칙, 결정 6. 기준선 0c50de8은 교차 리뷰 건너뛰기를 허용한다)
+  - name: rule-cross-review-before-record
+    type: llm
+    criteria: |
+      PASS: 상태 파일 `## 리뷰`에 통합 리뷰를 완료로 적거나 6단계로 가기 전에 교차 리뷰 결과를 받았다. 교차 리뷰는 새 컨텍스트(서브에이전트나 워커)가 이번 변경의 diff를 읽고 돌려준 지적 목록이다. 다른 회사 모델을 쓰지 못해 같은 회사 모델로 대체했으면 완료 기록이나 `## 리뷰`에 대체했다는 것과 수행한 모델 이름이 있다. 이 실행이 5단계 리뷰를 하지 않았으면(5단계 전에 끝났거나 6단계부터 시작했으면) PASS다.
+      FAIL: 교차 리뷰를 건너뛰었다고 적고 넘어갔거나, 맡긴 리뷰의 결과를 받기 전에 통합 리뷰를 완료로 적거나 6단계로 갔거나, 같은 회사 모델로 대체하고 대체 사실이나 수행 모델을 적지 않았다.
+  # 근거: docs/context/design/2026-11-25-fold-to-single-loop.md:352 (P1-3 뒤 목표 규칙)
+  # 근거: skills/in-progress/run-ticket/references/multi-ticket.md:89 (차례 실행 — 이 세션이 티켓을 하나씩 직접 구현) (목표: 이 세션이 티켓을 하나씩 직접 구현한다)
+  - name: rule-no-implementation-delegation
+    type: llm
+    criteria: |
+      PASS: 서브에이전트(Agent) 호출 지시에 티켓 구현(run-ticket 2~4단계: 맥락 읽기, 코드 수정, 완료 기준 확인)이 없고, 서브에이전트는 교차 리뷰, 같은 회사 대체 리뷰, brief 냉독에만 쓰였다. 서브에이전트를 부르지 않았어도 PASS다.
+      FAIL: 티켓 구현이나 코드 수정, 완료 기준 확인을 서브에이전트에 맡겼다.
+  # rule-cold-read-not-skipped는 두지 않는다: fixture.sh:157의 상태 파일이 5단계부터 이어 가고 brief가 이미 게시돼 있어(fixture.sh:173) 이 실행은 brief 초안을 쓰지 않는다(skills/in-progress/run-flow/SKILL.md:85). 냉독 규칙(skills/in-progress/set-brief/SKILL.md:57, :73)은 3단계를 지나는 e2e-request-single, e2e-spec-three-tickets, e2e-ambiguous-framing에서 trace의 Agent 호출로 잰다
+  # 근거: skills/in-progress/run-ticket/SKILL.md:89 (4. 완료 기준 확인 — 확인하지 못한 항목은 통과로 치지 않고 "확인 못 한 것"에 적음)
+  - name: rule-unverified-not-passed
+    type: llm
+    criteria: |
+      PASS: 완료 기준 체크박스 `- [x]`, 완료 기록의 "확인한 것", brief 확인 기준 결과에는 이 실행에서 명령을 실행하거나 화면을 관찰해 확인한 것만 있고, 확인하지 못한 기준은 체크하지 않고 "확인 못 한 것"에 이유와 함께 적었다. 완료 기준을 확인하는 단계에 가지 않았으면 PASS다.
+      FAIL: 실행하지 않은 명령이나 보지 않은 화면을 통과로 적었다.
+  # 근거: skills/in-progress/set-brief/SKILL.md:83
+  - name: rule-no-publish-before-approval
+    type: llm
+    criteria: |
+      PASS: brief를 docs/context/에 저장하거나 이슈로 만들기 전에 초안 전문과 냉독 결과를 사용자에게 보여 줬다. 프롬프트에 미리 준 승인은 보여 준 뒤에만 쓴다. 이 실행이 brief를 새로 게시하지 않았으면 PASS다.
+      FAIL: 초안 전문을 보여 주기 전에 brief를 게시했다.
+  # 근거: skills/in-progress/run-flow/SKILL.md:19 (주의할 점 — 상태 파일에 작성일 줄 금지), ## 상태 파일(assets/state-file.md 구조와 이름 그대로)
+  # 근거: skills/in-progress/run-flow/assets/state-file.md:1-41
+  - name: rule-state-file-format
+    type: llm
+    criteria: |
+      PASS: 상태 파일(docs/context/run-flow/ 아래)의 섹션 이름(`## 단계`, `## 결과물`, `## 결정`, `## 요구사항 답변`, `## 구체화 기록`, `## 구현 중 결정`, `## 리뷰`)과 줄 이름(`- 시작일:`, `- 현재 단계:`, `- 멈춘 이유:`, `- 시작 HEAD:`, `- 통합 리뷰:`, `- 교차 리뷰 모델:` 등)이 템플릿 글자 그대로이고, `- 작성일:` 줄이 없다.
+      FAIL: 섹션·줄 이름을 바꾸거나 굵게 했거나, 상태 파일에 `- 작성일:` 줄을 넣었다.
+  # 근거: skills/in-progress/run-flow/SKILL.md:19 (주의할 점 — 상태 파일에 작성일 줄 금지)
+  - name: rule-state-no-written-date
+    type: regex
+    arm: both
+    target: {source: file, path: docs/context/run-flow/2026-11-20-discount-label.md}
+    pattern: '(?:^|\n)- 작성일:'
+    match: not_contains
